@@ -1,0 +1,15 @@
+%%
+headers
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+#include "totem-pl-parser.h"
+#include "totem-pl-parser-builtins.h"
+%%
+modulename playlist_parser
+%%
+import gobject.GObject as PyGObject_Type
+%%
+ignore-glob
+  *_get_type
+  *_error_quark
+%%
