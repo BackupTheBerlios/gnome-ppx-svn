@@ -1,5 +1,9 @@
 2004-12-26 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
-
+	
+	* preferences.py: (RecordingPreferences): Made speed radio button's position
+	remembered by gconf. Now speed spinbox is insensitive when the option is
+	not selected.
+	
 	* __init__.py: (Serpentine.burn): Now warns the user when the disc has more
 	then it can handle and in that case asks if the user wants to overburn.
 	Changed the default Ok button to 'Record Disk' for Hig compliance.

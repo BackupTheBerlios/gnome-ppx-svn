@@ -38,10 +38,18 @@ class RecordingPreferences (object):
 		# Speed selection
 		self.__speed = gaw.data_spin_button (g.get_widget ("speed"),
 		                                     '/apps/serpentine/write_speed')
+		self.__specify_speed = gaw.data_toggle_button (g.get_widget ("specify_speed"),
+		                                               "/apps/serpentine/specify_speed")
+		self.__specify_speed.widget.connect ("toggled", self.__on_specify_speed)
+		
+		# No default value set, set it to 99
+		if self.__speed.data == 0:
+			self.__speed.data = 99
 		self.__use_max_speed = gaw.data_toggle_button (g.get_widget ("use_max_speed"),
 		                                               '/apps/serpentine/use_max_speed')
 		self.__update_speed ()
 		self.__speed.sync_widget()
+		self.__speed.widget.set_sensitive (self.__specify_speed.widget.get_active ())
 	
 		# eject checkbox
 		self.__eject = gaw.data_toggle_button (g.get_widget ("eject"),
@@ -168,3 +176,6 @@ class RecordingPreferences (object):
 		else:
 			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#F88"))
 		self.__close.set_sensitive (is_ok)
+		
+	def __on_specify_speed (self, widget, *args):
+		self.__speed.widget.set_sensitive (widget.get_active ())

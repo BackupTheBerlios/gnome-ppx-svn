@@ -39,4 +39,4 @@ EXTRA_DIST =                \
 	$(bin_SCRIPTS)      \
 	$(desktop_DATA)     
 
-SUBDIRS = po
+#SUBDIRS = po
