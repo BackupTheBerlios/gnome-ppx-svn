@@ -26,7 +26,7 @@ import os
 import gtk, gtk.glade, gobject, sys
 
 from mastering import AudioMastering
-from converting import GvfsMusicPool, FetchMusicList
+from converting import FetchMusicList
 from recording import RecordMusicList
 import operations, nautilus_burn, gtk_util
 from preferences import RecordingPreferences
@@ -35,7 +35,6 @@ class RecordingMedia (operations.OperationsQueueListener):
 	def __init__ (self, music_list, preferences, parent = None):
 		self.__queue = operations.OperationsQueue()
 		self.__queue.listeners.append (self)
-		self.__pool = GvfsMusicPool()
 		self.__parent = parent
 		self.__prog = gtk_util.HigProgress (parent)
 		self.__prog.set_primary_text ("Recording Audio Disc")
@@ -53,8 +52,8 @@ class RecordingMedia (operations.OperationsQueueListener):
 		
 	def start (self):
 		self.__blocked = False
-		self.__pool.temporary_dir = self.preferences.temporary_dir
-		oper = FetchMusicList(self.__music_list, self.__pool)
+		self.preferences.pool.temporary_dir = self.preferences.temporary_dir
+		oper = FetchMusicList(self.__music_list, self.preferences.pool)
 		self.__fetching = oper
 		self.__queue.append (oper)
 		
@@ -141,6 +140,7 @@ class MainWindow (gtk.Window):
 		r.start()
 		
 	def quit (self, *args):
+		self.preferences.pool.clear()
 		gtk.main_quit()
 		sys.exit (0)
 		

@@ -121,7 +121,10 @@ class GstSourceToWavListener (operations.OperationListener):
 		self.__music = music
 	
 	def on_finished (self, event):
-		self.__cache[self.__music] = GstCacheEntry (self.__filename, True)
+		if event.id == operations.SUCCESSFUL:
+			self.__cache[self.__music] = GstCacheEntry (self.__filename, True)
+		else:
+			os.unlink (self.__filename)
 		
 class GstMusicPool (MusicPool):
 	def __init__ (self):
@@ -173,18 +176,39 @@ class GstMusicPool (MusicPool):
 
 import gnome.vfs
 import gnome_util
+
 class GvfsMusicPool (GstMusicPool):
+	def __unique_uri (self, uri):
+		"""
+		Provides a way of uniquely identifying URI's, in case of user sends:
+		file:///foo%20bar
+		file:///foo bar
+		/foo bar
+		"""
+		
+		if uri.path == '/':
+			return str(uri)
+		parent = self.__normalize_uri (uri.resolve_relative ('..'))
+		return parent + uri.short_name + (uri.self.path[-1] == '/' and '/')
+		
 	def is_available (self, music):
-		on_cache = GstMusicPool.is_available (self, music)
+		music_id = self.__unique_uri (gnome.vfs.URI (music))
+		on_cache = GstMusicPool.is_available (self, music_id)
 		uri = gnome.vfs.URI (music)
 		if not on_cache and \
 					uri.is_local and \
 					gnome.vfs.get_mime_type (music) == 'audio/x-wav':
 			# convert to native filename
-			self.cache[music] = GstCacheEntry (gnome_util.unescape_uri (uri), False)
+			self.cache[music_id] = GstCacheEntry (gnome_util.unescape_uri (uri), False)
 			on_cache = True
 		del uri
 		return on_cache
+	
+	def get_filename (self, music):
+		return GstMusicPool.get_filename (self, self.__unique_uri (music))
+	
+	def fetch_music (self, music):
+		return GstMusicPool.fetch_music (self, self.__unique_uri (music))
 	
 	def get_source (self, music):
 		src = gst.element_factory_make ("gnomevfssrc", "source")
@@ -207,6 +231,9 @@ class FetchMusicListPriv (operations.OperationListener):
 			e = operations.FinishedEvent (self.parent, evt.id)
 			for l in self.parent.listeners:
 				l.on_finished (e)
+			return
+		assert isinstance (evt.source, GetMusic)
+		if evt.id != operations.SUCCESSFUL:
 			return
 			
 		uri = evt.source.music

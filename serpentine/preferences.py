@@ -1,4 +1,5 @@
 import gtk.glade, nautilus_burn, gtk, gobject
+from converting import GvfsMusicPool
 
 class RecordingPreferences (object):
 	def __init__ (self, simulate = False):
@@ -29,6 +30,9 @@ class RecordingPreferences (object):
 		
 		# temp
 		self.__tmp = g.get_widget ("location_ent")
+		
+		# Pool
+		self.__pool = GvfsMusicPool ()
 	
 	def __update_speed (self):
 		speed = self.drive.get_max_speed_write ()
@@ -71,4 +75,4 @@ class RecordingPreferences (object):
 	
 	temporary_dir = property (lambda self: self.__tmp.get_text())
 			
-	
+	pool = property (lambda self: self.__pool)

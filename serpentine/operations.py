@@ -96,7 +96,6 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 		self.__total = 0
 	
 	def __is_running (self):
-		assert not self.__curr_oper or self.__curr_oper.running
 		return self.__curr_oper != None
 		
 	running = property (__is_running)

@@ -1,0 +1,23 @@
+2004-12-20 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* preferences.py:
+	Centralized pool inside RecordingPreferences
+	
+	* gnome_util.py:
+	Made unsescape_uri a bit more correct, but with the same pratical results.
+	
+	* serpentine_shell.py:
+	Updated the pool to use it from RecordingPreferences.
+	Explicitly clears cache on exit.
+	
+	* converting.py:
+	(GstSourceToWavListener.on_finished):
+	Corrected a bug where it would put an element on cache even when it wasn't
+	a successfull covertion. Also removes temporary files upon failure.
+	(GvfsMusicPool.__unique_uri):
+	Generates a unique string from an URI.
+	(GvfsMusicPool.is_available), (GvfsMusicPool.get_filename),
+	(GvfsMusicPool.fetch_music):
+	Musics are passed through __unique_uri.
+	(FetchMusicListPriv.on_finished):
+	GetMusic operations when are finished in an unsuccessful state are ignored.

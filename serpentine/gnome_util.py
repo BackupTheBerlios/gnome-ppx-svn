@@ -20,9 +20,9 @@
 from gnome.vfs import URI
 def unescape_uri (uri):
 	assert isinstance (uri, URI)
-	if uri.short_name == '/':
-		return uri.short_name
-	parent = unescape_uri (URI(uri.dirname))
+	if uri.path == '/':
+		return uri.path
+	parent = unescape_uri (u.resolve_relative ('..'))
 	if parent == '/':
 		parent = ''
 		
