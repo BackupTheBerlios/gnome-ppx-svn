@@ -143,7 +143,24 @@ class Serpentine (gtk.Window):
 			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
 			self.__on_preferences ()
 			return
-		if gtk_util.dialog_ok_cancel ("Do you want to continue?", "You are about to record a media disk. Canceling a writing operation will make your disk unusable.", self) != gtk.RESPONSE_OK:
+		
+		if self.masterer.source.total_duration > self.masterer.disk_size:
+			title = "Do you want to overburn your disk?"
+			msg = "You are about to record a media disk in overburn mode." + " " + \
+			      "This may not work on all drives and shouldn't give you more then a couple of minutes."
+			btn = "Overburn Disk"
+			self.preferences.overburn = True
+		else:
+			title = "Do you want to record your musics?"
+			msg = "You are about to record a media disk." + " " + \
+			      "Canceling a writing operation will make your disk unusable."
+			btn = "Record Disk"
+			self.preferences.overburn = False
+		
+		if gtk_util.dialog_ok_cancel (title,
+		                              msg,
+		                              self,
+		                              btn) != gtk.RESPONSE_OK:
 			return
 		r = RecordingMedia (self.masterer.source, self.preferences, self)
 		r.start()

@@ -13,7 +13,8 @@ gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NO
 
 class RecordingPreferences (object):
 	def __init__ (self, data_dir):
-		self.__write_flags = 0
+		# By default use burnproof
+		self.__write_flags = nautilus_burn.RECORDER_WRITE_BURNPROOF
 		self.data_dir = data_dir
 		# Sets up data dir and version
 		if release:
@@ -93,6 +94,19 @@ class RecordingPreferences (object):
 		return (self.__write_flags & nautilus_burn.RECORDER_WRITE_DUMMY_WRITE) == nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
 	
 	simulate = property (__get_simulate, __set_simulate)
+
+	def __set_overburn (self, overburn):
+		assert isinstance (overburn, bool)
+		if overburn:
+			self.__write_flags |= nautilus_burn.RECORDER_WRITE_OVERBURN
+		else:
+			self.__write_flags &= ~nautilus_burn.RECORDER_WRITE_OVERBURN
+	
+	def __get_overburn (self):
+		return (self.__write_flags & nautilus_burn.RECORDER_WRITE_OVERBURN) == nautilus_burn.RECORDER_WRITE_OVERBURN
+	
+	overburn = property (__get_overburn, __set_overburn)
+
 	dialog = property (lambda self: self.__dialog)
 	
 	def __set_version (self, version):

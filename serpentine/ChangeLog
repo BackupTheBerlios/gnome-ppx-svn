@@ -1,3 +1,12 @@
+2004-12-26 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* __init__.py: (Serpentine.burn): Now warns the user when the disc has more
+	then it can handle and in that case asks if the user wants to overburn.
+	Changed the default Ok button to 'Record Disk' for Hig compliance.
+	
+	* gtk_util.py: (dialog_ok_cancel): Now has the possibility of setting the
+	ok button's text.
+	
 === 0.4 ===
 
 2004-12-25 Tiago Cogumbreiro <cogumbreiro@users.sf.net>

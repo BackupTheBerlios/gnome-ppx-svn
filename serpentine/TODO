@@ -9,3 +9,4 @@
 - gtk_util.HigProgress should be visible in taskbar, not have a parent and be
   minizable
 - handle adding operations in a queue when it's already running
+- emit to context when dnd has moved successfully
