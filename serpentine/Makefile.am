@@ -16,9 +16,9 @@ serpentine_PYTHON = \
 
 # Launcher
 desktopdir = $(datadir)/applications
-desktop_in_files = data/serpentine.desktop.in
-desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
-@INTLTOOL_DESKTOP_RULE@
+desktop_DATA = data/serpentine.desktop
+#desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+#INTLTOOL_DESKTOP_RULE
 
 # Glade files
 uidir= $(datadir)/serpentine
@@ -27,20 +27,16 @@ ui_DATA = data/serpentine.glade
 # Executable
 bin_SCRIPTS = scripts/serpentine
 
-DISTCLEANFILES =            \
-	intltool-extract    \
-	intltool-merge      \
-	intltool-update     \
-	$(desktop_DATA)
+#DISTCLEANFILES =            \
+#	intltool-extract    \
+#	intltool-merge      \
+#	intltool-update     \
+#	$(desktop_DATA)
 
 # Files to be packaged
 EXTRA_DIST =                \
-	intltool-extract.in \
-	intltool-merge.in   \
-	intltool-update.in  \
 	$(ui_DATA)          \
 	$(bin_SCRIPTS)      \
-	$(desktop_in_files) \
 	$(desktop_DATA)     
 
 SUBDIRS = po

@@ -6,7 +6,7 @@ AM_MAINTAINER_MODE
 
 AC_PATH_PROG(GCONFTOOL, gconftool-2)
 AM_GCONF_SOURCE_2
-AC_PROG_INTLTOOL([0.21])
+# AC_PROG_INTLTOOL([0.23])
 
 dnl check for python
 AM_PATH_PYTHON(2.3)
@@ -15,17 +15,15 @@ AM_PATH_PYTHON(2.3)
 #AC_SUBST(PYGTK_CFLAGS)
 #AC_SUBST(PYGTK_LIBS)
 
-dnl ALL_LINGUAS="az ca de en_CA en_GB es et fr hr ja ms nl no pl pt sq sr sr@Latn sv it pt_BR uk"
-ALL_LINGUAS=""
+# ALL_LINGUAS=""
 
-GETTEXT_PACKAGE=serpentine
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The gettext package])
-# For generating the Makefile.in
-AM_GLIB_GNU_GETTEXT
+# GETTEXT_PACKAGE=serpentine
+# AC_SUBST(GETTEXT_PACKAGE)
+# AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The gettext package])
+# For generating the Makefile.in :(
+# AM_GLIB_GNU_GETTEXT
 
 AC_OUTPUT([
-po/Makefile.in
 Makefile
 serpentine/release.py
 ])
