@@ -21,19 +21,21 @@
 #include <pygobject.h>
 #include <Python.h>
 #include "nb_drive.h"
-#include <cd-recorder.h>
+#include <nautilus-burn-recorder.h>
 void nautilus_burn_register_classes (PyObject *d);
-
+void nautilus_burn_add_constants(PyObject *module, const gchar *strip_prefix);
 extern PyMethodDef nautilus_burn_functions[];
 
 DL_EXPORT(void)
-initnautilus_burn(void)
+initnautilusburn(void)
 {
 	PyObject *m, *d;
 	
 	init_pygobject ();
 	
-	m = Py_InitModule ("nautilus_burn", nautilus_burn_functions);
+	m = Py_InitModule ("nautilusburn", nautilus_burn_functions);
+	nautilus_burn_add_constants (m, "NAUTILUS_BURN_");
+#if 0
 	/* CDRecorderWriteFlags */
 	PyModule_AddIntConstant (m, "RECORDER_WRITE_EJECT", CDRECORDER_EJECT);
 	PyModule_AddIntConstant (m, "RECORDER_WRITE_BLANK", CDRECORDER_BLANK);
@@ -55,7 +57,7 @@ initnautilus_burn(void)
 	PyModule_AddIntConstant (m, "RECORDER_ACTION_WRITING", WRITING);
 	PyModule_AddIntConstant (m, "RECORDER_ACTION_FIXATING", FIXATING);
 	PyModule_AddIntConstant (m, "RECORDER_ACTION_BLANKING", BLANKING);
-	
+#endif
 	
 	d = PyModule_GetDict (m);
 

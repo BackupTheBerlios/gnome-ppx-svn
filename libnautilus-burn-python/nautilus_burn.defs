@@ -5,7 +5,7 @@
 (define-flags RecorderWriteFlags
   (in-module "Burn")
   (c-name "NautilusBurnRecorderWriteFlags")
-  (gtype-id "CD_TYPE_RECORDER_WRITE_FLAGS")
+  (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_WRITE_FLAGS")
   (values
     '("eject"        "NAUTILUS_BURN_RECORDER_WRITE_EJECT")
     '("blank"        "NAUTILUS_BURN_RECORDER_WRITE_BLANK")
@@ -42,10 +42,22 @@
 (define-enum NautilusBurnRecorderBlankType
   (in-module "Burn")
   (c-name "NautilusBurnRecorderBlankType")
-  (gtype-id "NAUTILUS_BURN_TYPE_BLANK_TYPE")
+  (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_BLANK_TYPE")
   (values
     '("fast"  "NAUTILUS_BURN_RECORDER_BLANK_FAST")
     '("full" "NAUTILUS_BURN_RECORDER_BLANK_FULL")
+  )
+)
+
+(define-enum NautilusBurnRecorderResult
+  (in-module "Burn")
+  (c-name "NautilusBurnRecorderResult")
+  (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_RESULT")
+  (values
+    '("error"     "NAUTILUS_BURN_RECORDER_RESULT_ERROR")
+    '("cancel"    "NAUTILUS_BURN_RECORDER_RESULT_CANCEL")
+    '("finished"  "NAUTILUS_BURN_RECORDER_RESULT_FINISHED")
+    '("retry"     "NAUTILUS_BURN_RECORDER_RESULT_RETRY")
   )
 )
 

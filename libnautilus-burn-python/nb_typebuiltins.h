@@ -29,25 +29,31 @@ G_BEGIN_DECLS
 
 /* enumerations from "/usr/include/libnautilus-burn/cd-drive.h" */
 
-GType cd_media_type_get_type (void) G_GNUC_CONST;
-#define CD_TYPE_MEDIA_TYPE (cd_media_type_get_type())
+GType nautilus_burn_media_type_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_MEDIA_TYPE (nautilus_burn_media_type_get_type())
 
-GType cd_drive_type_get_type (void) G_GNUC_CONST;
-#define CD_TYPE_DRIVE_TYPE (cd_drive_type_get_type())
+GType nautilus_burn_drive_type_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_DRIVE_TYPE (nautilus_burn_drive_type_get_type())
 
 /* enumerations from "/usr/include/libnautilus-burn/cd-recorder.h" */
 
-GType track_type_get_type (void) G_GNUC_CONST;
-#define TRACK_TYPE_TYPE (track_type_get_type())
+GType nautilus_burn_recorder_track_type_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TRACK_TYPE_TYPE (nautilus_burn_recorder_track_type_get_type())
 
-GType cd_recorder_write_flags_get_type (void) G_GNUC_CONST;
-#define CD_TYPE_RECORDER_WRITE_FLAGS (cd_recorder_write_flags_get_type())
+GType nautilus_burn_recorder_write_flags_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_RECORDER_WRITE_FLAGS (nautilus_burn_recorder_write_flags_get_type())
 
-GType cd_recorder_actions_get_type (void) G_GNUC_CONST;
-#define CD_TYPE_RECORDER_ACTIONS (cd_recorder_actions_get_type())
+GType nautilus_burn_recorder_blank_type_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_RECORDER_BLANK_TYPE (nautilus_burn_recorder_blank_type_get_type())
 
-GType cd_recorder_media_get_type (void) G_GNUC_CONST;
-#define CD_TYPE_RECORDER_MEDIA (cd_recorder_media_get_type())
+GType nautilus_burn_recorder_result_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_RECORDER_RESULT (nautilus_burn_recorder_result_get_type())
+
+GType nautilus_burn_recorder_actions_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_RECORDER_ACTIONS (nautilus_burn_recorder_actions_get_type())
+
+GType nautilus_burn_recorder_media_get_type (void) G_GNUC_CONST;
+#define NAUTILUS_BURN_TYPE_RECORDER_MEDIA (nautilus_burn_recorder_media_get_type())
 
 G_END_DECLS
 

@@ -220,6 +220,7 @@ initdrive(void)
         return;
 
     m = Py_InitModule("nautilus_burn", nb_methods);
+    /*
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_BUSY", NAUTILUS_BURN_MEDIA_TYPE_BUSY);
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", NAUTILUS_BURN_MEDIA_TYPE_ERROR);
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", NAUTILUS_BURN_MEDIA_TYPE_ERROR);
@@ -233,7 +234,7 @@ initdrive(void)
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_RAM", NAUTILUS_BURN_MEDIA_TYPE_DVD_RAM);
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_R", NAUTILUS_BURN_MEDIA_TYPE_DVD_PLUS_R);
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_RW", NAUTILUS_BURN_MEDIA_TYPE_DVD_PLUS_RW);
-	
+*/
     Py_INCREF(&nb_Drive_Type);
     PyModule_AddObject(m, "Drive", (PyObject *)&nb_Drive_Type);
 }

@@ -18,7 +18,7 @@ nautilus_burn.c: nautilus_burn.defs nautilus_burn.override
 	-o nautilus_burn.override \
 	nautilus_burn.defs > $@
 
-nautilus_burn.pyd: nautilus_burn.o nb_module.o nb_typebuiltins.o nb_drive.o
+nautilusburn.pyd: nautilus_burn.o nb_module.o nb_typebuiltins.o nb_drive.o
 	$(CC) $(LDFLAGS) -shared $^ -o $@
 
 clean:

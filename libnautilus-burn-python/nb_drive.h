@@ -19,7 +19,7 @@
  */
 
 #include <Python.h>
-#include <cd-drive.h>
+#include <nautilus-burn-drive.h>
 void initdrive(void);
 
 typedef struct {

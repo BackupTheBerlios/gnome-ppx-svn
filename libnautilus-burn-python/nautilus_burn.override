@@ -75,17 +75,17 @@ nb_Object_CheckFromString (PyObject *obj, char *module_name, char *class_name)
 	return ret;
 }
 
-static Track *
+static NautilusBurnRecorderTrack *
 nb_track_new_from_object (PyObject *obj)
 {
-	Track *t = g_new (Track, 1);
+	NautilusBurnRecorderTrack *t = g_new (NautilusBurnRecorderTrack, 1);
 	PyObject *data;
 	
 	if (!t)
 		return NULL;
 
 	if (nb_Object_CheckFromString (obj, "nautilusburn", "AudioTrack")) {
-		t->type = TRACK_TYPE_AUDIO;
+		t->type = NAUTILUS_BURN_RECORDER_TRACK_TYPE_AUDIO;
 		data = PyObject_GetAttrString (obj, "filename");
 		if (!data || !PyString_Check (data))
 			return NULL;
@@ -100,7 +100,7 @@ nb_track_new_from_object (PyObject *obj)
 		return t;
 		
 	} else if (nb_Object_CheckFromString (obj, "nautilusburn", "DataTrack")) {
-		t->type = TRACK_TYPE_DATA;
+		t->type = NAUTILUS_BURN_RECORDER_TRACK_TYPE_DATA;
 		data = PyObject_GetAttrString (obj, "filename");
 		if (!data || !PyString_Check (data))
 			return NULL;
@@ -117,7 +117,7 @@ _wrap_nautilus_burn_recorder_write_tracks (PyGObject *self, PyObject *args, PyOb
 {
 	nb_Drive *drive;
 	PyObject *tracks;
-	Track *t;
+	NautilusBurnRecorderTrack *t;
 	GList *g_tracks = NULL;
 	PyGILState_STATE gstate;
 	
