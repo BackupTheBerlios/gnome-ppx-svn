@@ -118,10 +118,7 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 			row['artist'] = metadata['artist']
 			
 		if self.insert_at != None:
-			if self.insert_before:
-				self.masterer.source.insert_before (self.insert_at, row)
-			else:
-				self.masterer.source.insert_after (self.insert_at, row)
+			self.masterer.source.insert (self.insert_at, row)
 		else:
 			self.masterer.source.append (row)
 		
@@ -131,7 +128,7 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 		for l in self.listeners:
 			l.on_finished (e)
 			
-
+ 
 class SetGraphicalUpdate (operations.Operation):
 	def __init__ (self, masterer, update):
 		operations.Operation.__init__ (self)
@@ -236,14 +233,10 @@ class GtkMusicList (MusicList):
 			for l in self.listeners:
 				l.on_musics_added (e, rows)
 	
-	def insert_before (self, index, row):
+	def insert (self, index, row):
 		self.model.insert_before (self.model.get_iter (index), row)
 		self.__total_duration += int (row['duration'])
-	
-	def insert_after (self, index, row):
-		self.model.insert_after (self.model.get_iter (index), row)
-		self.__total_duration += int (row['duration'])
-	
+		
 	def __len__ (self):
 		return len(self.model)
 	
@@ -333,7 +326,6 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		gtk.VBox.__init__ (self)
 		operations.Listenable.__init__ (self)
 		self.__disk_size = 74 * 60
-		self.queue.abort_on_failure = False
 		self.update = True
 		self.source = GtkMusicList ()
 		self.source.listeners.append (AudioMasteringMusicListener(self))
@@ -421,8 +413,15 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		if drop_info:
 			insert_at, insert_before = drop_info
-			insert_before = (insert_before == gtk.TREE_VIEW_DROP_BEFORE or
-			                 insert_before == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+			assert isinstance(insert_at, tuple), len(insert_at) == 1
+			insert_at, = insert_at
+			if (insert_before != gtk.TREE_VIEW_DROP_BEFORE and
+			    insert_before != gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+				insert_at += 1
+				if insert_at == len (self.source):
+					insert_at = None
+				del insert_before
+				
 		del drop_info
 		
 		if selection.type == 'application/x-rhythmbox-source':
@@ -440,10 +439,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			del self.source[path]
 			# Append this row
 			if insert_at != None:
-				if insert_before:
-					self.source.insert_before (insert_at, row)
-				else:
-					self.source.insert_after (insert_at, row)
+				self.source.insert (insert_at, row)
 			else:
 				self.source.append (row)
 			return
@@ -465,7 +461,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			except gnome.vfs.NotFoundError, e:
 				print "file not found"
 				return
-		self.add_files (uris, insert_at, insert_before)
+		self.add_files (uris, insert_at)
 	
 	def __on_dnd_send (self, widget, context, selection, target_type, timestamp):
 		store, path_list = self.__selection.get_selected_rows ()

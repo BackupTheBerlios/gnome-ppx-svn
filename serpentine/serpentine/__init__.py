@@ -124,6 +124,11 @@ class Serpentine (gtk.Window):
 			return strings[1]
 		
 	def burn (self, *args):
+		if not self.preferences.temporary_dir_is_ok():
+			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
+			self.__on_preferences ()
+			return
+			
 		# Check if we have space available in our cache dir
 		secs = 0
 		for music in self.masterer.source:
@@ -131,7 +136,13 @@ class Serpentine (gtk.Window):
 				secs += music['duration']
 		# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
 		size_needed = secs * 176400L
-		s = os.statvfs (self.preferences.temporary_dir)
+		try:
+			s = os.statvfs (self.preferences.temporary_dir)
+		except OSError:
+			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
+			self.__on_preferences ()
+			return
+			
 		size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
 		if (size_avail - size_needed) < 0:
 			
@@ -139,11 +150,6 @@ class Serpentine (gtk.Window):
 				"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % (self.__hig_bytes(size_needed - size_avail)), self)
 			return
 	
-		if not self.preferences.temporary_dir_is_ok():
-			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
-			self.__on_preferences ()
-			return
-		
 		if self.masterer.source.total_duration > self.masterer.disk_size:
 			title = "Do you want to overburn your disk?"
 			msg = "You are about to record a media disk in overburn mode." + " " + \

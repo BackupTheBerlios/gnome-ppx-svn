@@ -4,3 +4,4 @@
 - handle adding operations in a queue when it's already running
 - emit to context when dnd has moved successfully
 - add export to playlist and export to CUE/WAVs
+- When a list of files is added order the files which have the same album name and track number

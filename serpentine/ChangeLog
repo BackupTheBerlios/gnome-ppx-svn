@@ -1,3 +1,22 @@
+2004-12-28 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* mastering.py: (AddFile.on_metadata): (GtkMusicList):
+	(AudioMastering.__on_dnd_drop):
+	Removed redundant insert_before/insert_after to only an insert method
+	(which works as insert_before, as expected).
+	
+	* mastering.py:
+	(AudioMastering.__on_dnd_drop):
+	Corrected a bug where it tries
+	to insert at the position after the last one (in this case it should append).
+	(AudioMastering.__init__):
+	Forgot to add a last reference to global operations queue.
+	
+	* __init__.py:
+	(Serpentine.burn): verification of cache location should be made before
+	verifying if it has the available space.
+
+	
 2004-12-27 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
 	* mastering.py: (AudioMastering.add_file): (AudioMastering.add_files):
