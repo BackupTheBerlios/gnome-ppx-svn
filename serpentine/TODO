@@ -1,0 +1,7 @@
+- Make list items moveable (they do not hcange positions)
+- Make recording cancelable (currently lib-n-b ignores it)
+- check for temp size and verify perms
+- GvfsPool needs love
+- when u don't have a cd in the drive the cd and u cancel the operation
+  the files created in the cache are ignored
+- when u have a rw cd it doesn't ask if u want to clean it first
