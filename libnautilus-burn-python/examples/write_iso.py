@@ -10,7 +10,7 @@ if len(sys.argv) != 2:
 	sys.exit (1)
 
 def on_progress_changed (recorder, fract):
-	print fract
+	print "%d%%" % (fract * 100)
 	
 r = nautilusburn.Recorder()
 drives = nautilusburn.get_drives_list(True)
@@ -18,5 +18,5 @@ d = drives[0]
 t = nautilusburn.DataTrack()
 t.filename = sys.argv[1]
 r.connect ('progress-changed', on_progress_changed)
-r.write_tracks (d, [t], d.get_max_speed_write(), nautilusburn.RECORDER_WRITE_DUMMY_WRITE)
+print r.write_tracks (d, [t], d.get_max_speed_write(), nautilusburn.RECORDER_WRITE_DUMMY_WRITE | nautilusburn.RECORDER_WRITE_EJECT)
 print "done"

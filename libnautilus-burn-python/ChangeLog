@@ -1,0 +1,13 @@
+=== 0.1.2 ===
+
+2004-12-22 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	nautilus_burn.override:
+	(_wrap_bacon_cd_selection_get_cdrom):
+	Method didn't used keywords so it was corrected to use varargs only.
+	
+2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	nautilus_burn.override:
+	(_wrap_bacon_cd_selection_get_cdrom):
+	Handle non existing drives.
