@@ -89,9 +89,15 @@ _wrap_bacon_cd_selection_get_default_device(PyGObject *self)
 static PyObject *
 _wrap_bacon_cd_selection_get_cdrom (PyGObject *self)
 {
-	return nb_drive_new_from_native (bacon_cd_selection_get_cdrom ((BaconCdSelection*)self->obj));
+	const CDDrive *drive;
+	drive = bacon_cd_selection_get_cdrom ((BaconCdSelection*)self->obj);
+	if (drive == NULL) {
+		Py_INCREF (Py_None);
+		return Py_None;
+	}
+	return nb_drive_new_from_native (drive);
 }
-#line 95 "nautilus_burn.c"
+#line 101 "nautilus_burn.c"
 
 
 static PyMethodDef _PyBaconCdSelection_methods[] = {
@@ -151,7 +157,7 @@ PyTypeObject PyBaconCdSelection_Type = {
 
 /* ----------- CDRecorder ----------- */
 
-#line 147 "nautilus_burn.override"
+#line 152 "nautilus_burn.override"
 static int
 _wrap_cd_recorder_new (PyGObject *self)
 {
@@ -165,10 +171,10 @@ _wrap_cd_recorder_new (PyGObject *self)
     return 0;
 }
 
-#line 169 "nautilus_burn.c"
+#line 175 "nautilus_burn.c"
 
 
-#line 57 "nautilus_burn.override"
+#line 62 "nautilus_burn.override"
 
 static int
 nb_Object_CheckFromString (PyObject *obj, char *module_name, char *class_name)
@@ -257,22 +263,21 @@ _wrap_cd_recorder_write_tracks (PyGObject *self, PyObject *args, PyObject *kwarg
 	return Py_BuildValue ("i", ret);
 }
 
-#line 261 "nautilus_burn.c"
+#line 267 "nautilus_burn.c"
 
 
-#line 44 "nautilus_burn.override"
+#line 50 "nautilus_burn.override"
 static PyObject *
-_wrap_cd_recorder_cancel (PyGObject *self, PyObject *args, PyObject *kwargs)
+_wrap_cd_recorder_cancel (PyGObject *self, PyObject *args)
 {
-	static char *kwlist[] = {"skip_if_dangerous"};
 	int skip_if_dangerous = TRUE;
 	
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|i:Recorder.cancel", kwlist, &skip_if_dangerous))
+	if (!PyArg_ParseTuple(args, "|i:Recorder.cancel", &skip_if_dangerous))
 		return NULL;
 	
 	return Py_BuildValue ("i", cd_recorder_cancel ((CDRecorder *)self->obj, skip_if_dangerous));
 }
-#line 276 "nautilus_burn.c"
+#line 281 "nautilus_burn.c"
 
 
 static PyObject *
@@ -410,7 +415,7 @@ nautilus_burn_register_classes(PyObject *d)
     }
 
 
-#line 414 "nautilus_burn.c"
+#line 419 "nautilus_burn.c"
     pygobject_register_class(d, "BaconCdSelection", BACON_TYPE_CD_SELECTION, &PyBaconCdSelection_Type, Py_BuildValue("(O)", &PyGtkComboBox_Type));
     pygobject_register_class(d, "CDRecorder", CD_TYPE_RECORDER, &PyCDRecorder_Type, Py_BuildValue("(O)", &PyGObject_Type));
 }

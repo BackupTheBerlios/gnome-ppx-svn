@@ -48,12 +48,11 @@ _wrap_bacon_cd_selection_get_cdrom (PyGObject *self)
 %%
 override cd_recorder_cancel
 static PyObject *
-_wrap_cd_recorder_cancel (PyGObject *self, PyObject *args, PyObject *kwargs)
+_wrap_cd_recorder_cancel (PyGObject *self, PyObject *args)
 {
-	static char *kwlist[] = {"skip_if_dangerous"};
 	int skip_if_dangerous = TRUE;
 	
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|i:Recorder.cancel", kwlist, &skip_if_dangerous))
+	if (!PyArg_ParseTuple(args, "|i:Recorder.cancel", &skip_if_dangerous))
 		return NULL;
 	
 	return Py_BuildValue ("i", cd_recorder_cancel ((CDRecorder *)self->obj, skip_if_dangerous));
