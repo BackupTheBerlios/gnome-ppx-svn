@@ -1,0 +1,2 @@
+To install type make install or:
+python setup.py install

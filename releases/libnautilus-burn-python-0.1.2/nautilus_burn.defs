@@ -1,0 +1,102 @@
+;; -*- scheme -*-
+; object definitions ...
+; Enumerations and flags ...
+
+(define-flags RecorderWriteFlags
+  (in-module "Burn")
+  (c-name "CDRecorderWriteFlags")
+  (gtype-id "CD_TYPE_RECORDER_WRITE_FLAGS")
+  (values
+    '("eject" "CDRECORDER_EJECT")
+    '("blank" "CDRECORDER_BLANK")
+    '("dummy-write" "CDRECORDER_DUMMY_WRITE")
+    '("disc-at-once" "CDRECORDER_DISC_AT_ONCE")
+    '("debug" "CDRECORDER_DEBUG")
+    '("overburn" "CDRECORDER_OVERBURN")
+    '("burnproof" "CDRECORDER_BURNPROOF")
+  )
+)
+
+(define-enum CdRecorderActions
+  (in-module "Burn")
+  (c-name "CDRecorderActions")
+  (gtype-id "CD_TYPE_RECORDER_ACTIONS")
+  (values
+    '("preparing-write" "PREPARING_WRITE")
+    '("writing" "WRITING")
+    '("fixating" "FIXATING")
+    '("blanking" "BLANKING")
+  )
+)
+
+(define-enum CdRecorderMedia
+  (in-module "Burn")
+  (c-name "CDRecorderMedia")
+  (gtype-id "CD_TYPE_RECORDER_MEDIA")
+  (values
+    '("cd" "MEDIA_CD")
+    '("dvd" "MEDIA_DVD")
+  )
+)
+
+
+;; From /usr/include/libnautilus-burn/bacon-cd-selection.h
+(include "nb_drive_selection.defs")
+
+;; From /usr/include/libnautilus-burn/cd-drive.h
+;(include "nb_cd_drive.defs")
+
+;; From /usr/include/libnautilus-burn/cd-recorder.h
+
+(define-object Recorder
+  (in-module "Burn")
+  (parent "GObject")
+  (c-name "CDRecorder")
+  (gtype-id "CD_TYPE_RECORDER")
+)
+
+(define-function cd_recorder_get_type
+  (c-name "cd_recorder_get_type")
+  (return-type "GType")
+)
+
+(define-function cd_recorder_new
+  (c-name "cd_recorder_new")
+  (is-constructor-of "CDRecorder")
+  (return-type "CDRecorder*")
+)
+
+(define-method write_tracks
+  (of-object "CDRecorder")
+  (c-name "cd_recorder_write_tracks")
+  (return-type "int")
+  (parameters
+    '("CDDrive*" "drive")
+    '("GList*" "tracks")
+    '("gint" "speed")
+    '("CDRecorderWriteFlags" "flags")
+  )
+)
+
+(define-method cancel
+  (of-object "CDRecorder")
+  (c-name "cd_recorder_cancel")
+  (return-type "gboolean")
+  (parameters
+    '("gboolean" "skip_if_dangerous")
+  )
+)
+
+(define-method get_error_message
+  (of-object "CDRecorder")
+  (c-name "cd_recorder_get_error_message")
+  (return-type "const-char*")
+)
+
+(define-method get_error_message_details
+  (of-object "CDRecorder")
+  (c-name "cd_recorder_get_error_message_details")
+  (return-type "const-char*")
+)
+
+
