@@ -1,0 +1,34 @@
+AC_PREREQ(2.52)
+
+AC_INIT(totem/totem-pl-parser.h)
+
+AM_INIT_AUTOMAKE(totem-pl-parser-python, 0.1)
+AM_MAINTAINER_MODE
+
+AM_DISABLE_STATIC
+AM_PROG_LIBTOOL
+
+AC_PROG_CC
+
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal, no)
+AC_PATH_PROG(GLIB_MKENUMS, glib-mkenums, no)
+PKG_CHECK_MODULES(TOTEM_PL_PARSER, gtk+-2.0 libxml-2.0 gnome-vfs-2.0 glib-2.0 gnome-vfs-module-2.0)
+PKG_CHECK_MODULES(PL_PARSER, gtk+-2.0 pygtk-2.0 libxml-2.0 gnome-vfs-2.0 glib-2.0 gnome-vfs-module-2.0)
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
+
+DEFSDIR=`pkg-config --variable=defsdir pygtk-2.0`
+AC_SUBST(DEFSDIR)
+
+AC_SUBST(PL_PARSER_CFLAGS)
+AC_SUBST(PL_PARSER_LIBS)
+AC_SUBST(TOTEM_PL_PARSER_CFLAGS)
+AC_SUBST(TOTEM_PL_PARSER_LIBS)
+AC_SUBST(GLIB_GENMARSHAL)
+AC_SUBST(GLIB_MKENUMS)
+
+AC_OUTPUT([
+Makefile
+playlist_parser/Makefile
+totem/Makefile
+])
