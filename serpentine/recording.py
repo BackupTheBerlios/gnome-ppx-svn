@@ -19,6 +19,84 @@ import nautilus_burn
 from nautilus_burn import AudioTrack
 import gtk, gobject
 import operations, gtk_util
+from converting import FetchMusicList
+
+class RecordingMedia (operations.OperationsQueueListener):
+	def __init__ (self, music_list, preferences, parent = None):
+		self.__queue = operations.OperationsQueue ()
+		self.__queue.listeners.append (self)
+		self.__parent = parent
+		self.__prog = gtk_util.HigProgress (parent)
+		self.__prog.set_primary_text ("Recording Audio Disc")
+		self.__prog.set_secondary_text ("The audio tracks are going to be written to a disc. This operation may take a long time, depending on data size and write speed.")
+		self.__prog.connect ('destroy-event', self.__on_prog_destroyed)
+		self.__prog.connect ('response', self.__on_response)
+		self.__music_list = music_list
+		self.__preferences = preferences
+	
+	preferences = property (lambda self: self.__preferences)
+	
+	def __on_prog_destroyed (self, *args):
+		self.__prog.hide ()
+		return False
+		
+	def start (self):
+		print self.preferences.drive.get_media_type ()
+		if self.preferences.drive.get_media_type () == nautilus_burn.MEDIA_TYPE_CDRW:
+			gtk_util.dialog_warn ("CD-RW disk will be erased",
+			                      "Please remove your disk if you want to preserve it's contents.",
+			                      self.__parent)
+		self.__blocked = False
+		self.preferences.pool.temporary_dir = self.preferences.temporary_dir
+		oper = FetchMusicList(self.__music_list, self.preferences.pool)
+		self.__fetching = oper
+		self.__queue.append (oper)
+		
+		oper = RecordMusicList (self.__music_list, self.preferences)
+		                        
+		oper.recorder.connect ('progress-changed', self.__tick)
+		oper.recorder.connect ('action-changed', self.__on_action_changed)
+		self.__queue.append (oper)
+		self.__recording = oper
+
+		self.__queue.start ()
+		self.__source = gobject.timeout_add (200, self.__tick)
+		if self.__prog.run () == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
+			# Disable the cancel button to make sure user 
+			# doesn't click it twice
+			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
+			self.__queue.stop ()
+	
+	def __tick (self, *args):
+		if self.__queue.running:
+			self.__prog.set_progress_fraction (self.__queue.progress)
+			
+		return True
+	
+	def __on_response (self, dialog, response):
+		if self.__blocked and response == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
+			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
+			self.__queue.stop ()
+	
+	def __on_action_changed (self, recorder, action, media):
+		if action == nautilus_burn.RECORDER_ACTION_PREPARING_WRITE:
+			self.__prog.set_sub_progress_text ("Preparing recorder")
+		elif action == nautilus_burn.RECORDER_ACTION_WRITING:
+			self.__prog.set_sub_progress_text ("Writing media files to disc")
+		elif action == nautilus_burn.RECORDER_ACTION_FIXATING:
+			self.__prog.set_sub_progress_text ("Fixating disc")
+	
+	def before_operation_starts (self, evt, oper):
+		if oper == self.__fetching:
+			self.__prog.set_sub_progress_text ("Preparing media files")
+		else:
+			self.__blocked = True
+	
+	def on_finished (self, evt):
+		self.__prog.hide ()
+		gobject.source_remove (self.__source)
+
+################################################################################
 
 class RecordMusicList (operations.MeasurableOperation):
 	def __init__ (self, music_list, preferences, parent = None):
@@ -45,8 +123,8 @@ class RecordMusicList (operations.MeasurableOperation):
 		gobject.idle_add (self.__thread, tracks)
 	
 	def stop (self):
-		print "trying to abort it"
-		self.recorder.cancel ()
+		# To cancel you have to send False, sending True just checks
+		self.recorder.cancel (False)
 		
 	def __on_progress (self, source, progress):
 		self.__progress = progress
@@ -81,6 +159,9 @@ class RecordMusicList (operations.MeasurableOperation):
 		elif not reload_media and can_rewrite:
 			msg = "Please put a rewritable or blank disc into the drive."
 			title = "Insert rewritable or blank disc"
+		elif not reload_media and not can_rewrite:
+			msg = "Please put a blank disc into the drive."
+			title = "Insert blank disc"
 		elif can_rewrite:
 			msg = "Please replace the disc in the drive with a rewritable or blank disc."
 			title = "Reload rewritable or blank disc"

@@ -19,11 +19,22 @@
 	New function to show error dialogs: dialog_error
 	(hig_alert):
 	Removed title and corrected image alignment for HIG compliance.
+	(dialog_warn): Changed the button from OK to Close, for HIG compliance.
 	
 	* operations.py:
 	(OperationsQueue):
 	Adds support for queues that do not abort on an operation error.
-
+	
+	* recording.py:
+	* serpentine_shell.py:
+	Moved RecordingMedia class to recording.py
+	
+	* recording.py:
+	(RecordMusicList.stop):
+	Canceling a recording operation now works.
+	(RecordMusicList.__insert_cd):
+	Added a missing case for the dialog.
+	
 2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	* serpentine_shell.py:
 	(MainWindow.__init__):

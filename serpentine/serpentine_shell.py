@@ -26,81 +26,10 @@ import os
 import gtk, gtk.glade, gobject, sys
 
 from mastering import AudioMastering
-from converting import FetchMusicList
-from recording import RecordMusicList
+from recording import RecordMusicList, RecordingMedia
 import operations, nautilus_burn, gtk_util
 from preferences import RecordingPreferences
 from operations import MapProxy
-
-class RecordingMedia (operations.OperationsQueueListener):
-	def __init__ (self, music_list, preferences, parent = None):
-		self.__queue = operations.OperationsQueue ()
-		self.__queue.listeners.append (self)
-		self.__parent = parent
-		self.__prog = gtk_util.HigProgress (parent)
-		self.__prog.set_primary_text ("Recording Audio Disc")
-		self.__prog.set_secondary_text ("The audio tracks are going to be written to a disc. This operation may take a long time, depending on data size and write speed.")
-		self.__prog.connect ('destroy-event', self.__on_prog_destroyed)
-		self.__prog.connect ('response', self.__on_response)
-		self.__music_list = music_list
-		self.__preferences = preferences
-	
-	preferences = property (lambda self: self.__preferences)
-	
-	def __on_prog_destroyed (self, *args):
-		self.__prog.hide ()
-		return False
-		
-	def start (self):
-		self.__blocked = False
-		self.preferences.pool.temporary_dir = self.preferences.temporary_dir
-		oper = FetchMusicList(self.__music_list, self.preferences.pool)
-		self.__fetching = oper
-		self.__queue.append (oper)
-		
-		oper = RecordMusicList (self.__music_list, self.preferences)
-		                        
-		oper.recorder.connect ('progress-changed', self.__tick)
-		oper.recorder.connect ('action-changed', self.__on_action_changed)
-		self.__queue.append (oper)
-		self.__recording = oper
-
-		self.__queue.start ()
-		self.__source = gobject.timeout_add (200, self.__tick)
-		if self.__prog.run () == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
-			# Disable the cancel button to make sure user 
-			# doesn't click it twice
-			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
-			self.__queue.stop ()
-	
-	def __tick (self, *args):
-		if self.__queue.running:
-			self.__prog.set_progress_fraction (self.__queue.progress)
-			
-		return True
-	
-	def __on_response (self, dialog, response):
-		if self.__blocked and response == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
-			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
-			self.__queue.stop ()
-	
-	def __on_action_changed (self, recorder, action, media):
-		if action == nautilus_burn.RECORDER_ACTION_PREPARING_WRITE:
-			self.__prog.set_sub_progress_text ("Preparing recorder")
-		elif action == nautilus_burn.RECORDER_ACTION_WRITING:
-			self.__prog.set_sub_progress_text ("Writing media files to disc")
-		elif action == nautilus_burn.RECORDER_ACTION_FIXATING:
-			self.__prog.set_sub_progress_text ("Fixating disc")
-	
-	def before_operation_starts (self, evt, oper):
-		if oper == self.__fetching:
-			self.__prog.set_sub_progress_text ("Preparing media files")
-		else:
-			self.__blocked = True
-	
-	def on_finished (self, evt):
-		self.__prog.hide ()
-		gobject.source_remove (self.__source)
 	
 # TODO make this actually beautiful
 class MainWindow (gtk.Window):
@@ -188,7 +117,6 @@ class MainWindow (gtk.Window):
 		self.masterer.source.clear()
 		
 	def add_file (self, *args):
-		# XXX: NEW METHOD
 		if self.__add_file.run () == gtk.RESPONSE_OK:
 			files = self.__add_file.get_uris()
 			self.masterer.add_files (files)

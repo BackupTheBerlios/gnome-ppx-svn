@@ -125,13 +125,16 @@ dialog_error = \
 
 dialog_warn = \
 	lambda primary_text, secondary_text, parent = None:\
-		hig_alert (primary_text, secondary_text, parent, stock = gtk.STOCK_DIALOG_WARNING)
+		hig_alert (primary_text, secondary_text, parent,
+		           stock = gtk.STOCK_DIALOG_WARNING,
+		           buttons = gtk.STOCK_CLOSE, gtk.RESPONSE_OK)
 
 dialog_ok_cancel = \
 	lambda primary_text, secondary_text, parent = None:\
-		hig_alert (primary_text, secondary_text, parent, \
-			stock = gtk.STOCK_DIALOG_WARNING, \
-			buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK))
+		hig_alert (primary_text, secondary_text, parent,
+		           stock = gtk.STOCK_DIALOG_WARNING,
+		           buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+		                      gtk.STOCK_OK, gtk.RESPONSE_OK))
 
 def hig_label (text = None):
 	lbl = gtk.Label ()

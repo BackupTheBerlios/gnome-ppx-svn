@@ -1,13 +1,12 @@
 - Make list items moveable (they do not hcange positions): TreeView DND is apparently bugged (at least 2.4.0)
-- Make recording cancelable (currently lib-n-b ignores it)
 - check for temp size and verify perms
-- when u have a rw cd it doesn't ask if u want to clean it first
+- when u have a rw cd it doesn't ask if u want to clean it first (done but should be moved to ncb instead)
 - serpentine_shell.py needs looove!
 - we need to handle the recording process better:
   * lock the drive before converting
   * check if user has a cdrw inserted
   * check if user has a blank cd or a cdrw
-- gtk_util.HigProgress should be visible in taskbar and not have a parent and 
+- gtk_util.HigProgress should be visible in taskbar, not have a parent and be
   minizable
 - add gconf entries
 - handle adding operations in a queue when it's already running
