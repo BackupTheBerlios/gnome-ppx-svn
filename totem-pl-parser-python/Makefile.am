@@ -1,1 +1,1 @@
-SUBDIRS = playlist_parser
+SUBDIRS = totem playlist_parser
