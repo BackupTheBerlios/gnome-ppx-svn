@@ -15,7 +15,7 @@ serpentine_PYTHON = \
 
 
 uidir= $(datadir)/serpentine
-ui_DATA = ui/serpentine.glade
+ui_DATA = data/serpentine.glade
 
 bin_SCRIPTS = scripts/serpentine
 
