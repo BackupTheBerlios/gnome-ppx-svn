@@ -66,7 +66,7 @@ class ErrorTrapper (operations.Operation, operations.OperationListener):
 		
 		for f in filenames[1:]:
 			msg += ", " + f
-		gtk_util.dialog_error (title, msg)
+		gtk_util.dialog_error (title, msg, self.parent)
 		
 		e = operations.FinishedEvent (self, operations.SUCCESSFUL)
 		for l in self.listeners:
@@ -458,7 +458,9 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			doc = "Represents the disc size, in seconds.")
 	
 	def add_file (self, uri):
-		trapper = ErrorTrapper ()
+		w = gtk_util.get_root_parent (self)
+		assert isinstance(w, gtk.Window)
+		trapper = ErrorTrapper (w)
 		a = AddFile (self, uri)
 		self.queue.append (a)
 		self.queue.append (trapper)

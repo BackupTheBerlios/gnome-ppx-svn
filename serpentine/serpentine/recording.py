@@ -51,7 +51,7 @@ class RecordingMedia (operations.OperationsQueueListener):
 		self.__fetching = oper
 		self.__queue.append (oper)
 		
-		oper = RecordMusicList (self.__music_list, self.preferences)
+		oper = RecordMusicList (self.__music_list, self.preferences, self.__parent)
 		                        
 		oper.recorder.connect ('progress-changed', self.__tick)
 		oper.recorder.connect ('action-changed', self.__on_action_changed)
@@ -167,7 +167,7 @@ class RecordMusicList (operations.MeasurableOperation):
 		else:
 			msg = "Please replace the disc in the drive a blank disc."
 			title = "Reload blank disc"
-		return gtk_util.dialog_ok_cancel (title, msg) == gtk.RESPONSE_OK
+		return gtk_util.dialog_ok_cancel (title, msg, self.parent) == gtk.RESPONSE_OK
 
 if __name__ == '__main__':
 	import sys, gobject

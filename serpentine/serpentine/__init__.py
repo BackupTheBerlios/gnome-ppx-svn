@@ -35,6 +35,7 @@ class Serpentine (gtk.Window):
 	def __init__ (self, data_dir):
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
 		self.preferences = RecordingPreferences (data_dir)
+		self.preferences.dialog.set_transient_for (self)
 		self.masterer = AudioMastering (self.preferences)
 		self.masterer.listeners.append (self)
 		g = gtk.glade.XML (os.path.join (self.preferences.data_dir, "serpentine.glade"),
@@ -177,9 +178,11 @@ class Serpentine (gtk.Window):
 		self.preferences.dialog.run ()
 		self.preferences.dialog.hide ()
 	
-	def __on_about (self, *args):
-		a = gnome.ui.About ("Serpentine", self.preferences.version, "Copyright 2004 Tiago Cogumbreiro", "Audio CD Recording", ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"], [], "")
+	def __on_about (self, widget, *args):
+		a = gnome.ui.About ("Serpentine", self.preferences.version, "Copyright 2004 Tiago Cogumbreiro", "Audio CD Recording", ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"])
+		a.set_transient_for (self)
 		a.run ()
+		a.destroy ()
 
 if __name__ == '__main__':
 	s = Serpentine ()

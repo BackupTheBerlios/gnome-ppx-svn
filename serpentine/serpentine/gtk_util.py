@@ -248,3 +248,9 @@ class HigProgress (gtk.Dialog):
 		self.sub_progress_label.set_markup ('<i>'+text+'</i>')
 	
 gobject.type_register (HigProgress)
+
+def get_root_parent (widget):
+	p = widget.get_parent ()
+	if p:
+		return get_root_parent (p)
+	return p
