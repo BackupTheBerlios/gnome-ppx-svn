@@ -28,13 +28,14 @@ from recording import RecordMusicList, RecordingMedia
 import operations, nautilus_burn, gtk_util
 from preferences import RecordingPreferences
 from operations import MapProxy
+import gnome.ui
 # TODO make this actually beautiful
+
 class Serpentine (gtk.Window):
-	def __init__ (self, masterer = None):
+	def __init__ (self, data_dir):
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
-		self.preferences = RecordingPreferences ()
-		masterer = AudioMastering (self.preferences)
-		self.masterer = masterer
+		self.preferences = RecordingPreferences (data_dir)
+		self.masterer = AudioMastering (self.preferences)
 		self.masterer.listeners.append (self)
 		g = gtk.glade.XML (os.path.join (self.preferences.data_dir, "serpentine.glade"),
 		                   "main_window_container")
@@ -50,8 +51,8 @@ class Serpentine (gtk.Window):
 		
 		# masterer widget
 		box = self.get_child()
-		masterer.show()
-		box.add (masterer)
+		self.masterer.show()
+		box.add (self.masterer)
 		
 		# preferences
 		g.get_widget ("preferences_mni").connect ('activate', self.__on_preferences)
@@ -78,6 +79,9 @@ class Serpentine (gtk.Window):
 		# setup quit menu item
 		g.get_widget ("quit_mni").connect ('activate', self.quit)
 		self.connect("destroy", self.quit)
+		
+		# About dialog
+		g.get_widget ("about_mni").connect ('activate', self.__on_about)
 		
 		self.__last_path = None
 		self.__add_file = gtk.FileChooserDialog (buttons = (gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -128,6 +132,10 @@ class Serpentine (gtk.Window):
 	def __on_preferences (self, *args):
 		self.preferences.dialog.run ()
 		self.preferences.dialog.hide ()
+	
+	def __on_about (self, *args):
+		a = gnome.ui.About ("Serpentine", self.preferences.version, "Copyright 2004 Tiago Cogumbreiro", "Audio CD Recording", ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"], [], "")
+		a.run ()
 
 if __name__ == '__main__':
 	s = Serpentine ()

@@ -1,3 +1,16 @@
+2004-12-24 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* serpentine:
+	A new relocable script for running Serpentine.
+	
+	* __init__.py: serpentine_shell.py was renamed to __init__.py.
+	There is no mastering object sent through argument, one is constructed
+	inside. data_dir is sent through argument and fed to RecordingPreferences.
+	About dialog was implemented.
+	
+	* preferences.py:
+	the releases file will have the version.
+	
 2004-12-23 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
 	* preferences.py:

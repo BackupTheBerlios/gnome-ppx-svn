@@ -12,19 +12,18 @@ except Exception:
 gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NONE)
 
 class RecordingPreferences (object):
-	def __init__ (self):
+	def __init__ (self, data_dir):
 		self.__write_flags = 0
-		
+		self.data_dir = data_dir
 		# Sets up data dir and version
 		if release:
-			self.__version = release.version
-			self.__data_dir = release.data_dir
+			self.version = release.version
 		else:
-			self.__version = "testing"
-			self.__data_dir = "ui"
+			self.version = "testing"
 		
 		# setup ui
-		g = gtk.glade.XML (os.path.join(self.data_dir, "serpentine.glade"), "preferences_dialog")
+		g = gtk.glade.XML (os.path.join(self.data_dir, 'serpentine.glade'),
+		                   'preferences_dialog')
 		self.__dialog = g.get_widget ("preferences_dialog")
 		self.dialog.connect ('destroy-event', self.__on_destroy)
 		
@@ -36,16 +35,20 @@ class RecordingPreferences (object):
 		drv.pack_start (cmb_drv, False, False)
 		
 		# Speed selection
-		self.__speed = gaw.data_spin_button (g.get_widget ("speed"), '/apps/serpentine/write_speed')
-		self.__use_max_speed = gaw.data_toggle_button (g.get_widget ("use_max_speed"), '/apps/serpentine/use_max_speed')
+		self.__speed = gaw.data_spin_button (g.get_widget ("speed"),
+		                                     '/apps/serpentine/write_speed')
+		self.__use_max_speed = gaw.data_toggle_button (g.get_widget ("use_max_speed"),
+		                                               '/apps/serpentine/use_max_speed')
 		self.__update_speed ()
 		self.__speed.sync_widget()
 	
 		# eject checkbox
-		self.__eject = gaw.data_toggle_button (g.get_widget ("eject"), '/apps/serpentine/eject')
+		self.__eject = gaw.data_toggle_button (g.get_widget ("eject"),
+		                                       '/apps/serpentine/eject')
 		
 		# temp
-		self.__tmp = gaw.data_entry (g.get_widget ('location_ent'), "/apps/serpentine/temporary_dir")
+		self.__tmp = gaw.data_entry (g.get_widget ('location_ent'),
+		                                           '/apps/serpentine/temporary_dir')
 		if self.__tmp.data == '':
 			self.__tmp.data = '/tmp'
 			
@@ -53,8 +56,8 @@ class RecordingPreferences (object):
 		self.__tmp.sync_widget()
 		self.dialog.connect ('show', self.__on_tmp_changed)
 		g.get_widget ('location_btn').connect ('clicked', self.__on_tmp_choose)
-		self.__tmp_dlg = gtk.FileChooserDialog (action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-		                                        parent = self.dialog,
+		self.__tmp_dlg = gtk.FileChooserDialog (action  = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+		                                        parent  = self.dialog,
 		                                        buttons = (gtk.STOCK_CANCEL,
 		                                                   gtk.RESPONSE_CANCEL,
 		                                                   gtk.STOCK_OPEN,
@@ -91,8 +94,19 @@ class RecordingPreferences (object):
 	
 	simulate = property (__get_simulate, __set_simulate)
 	dialog = property (lambda self: self.__dialog)
-	version = property (lambda self: self.__version)
-	data_dir = property (lambda self: self.__data_dir)
+	
+	def __set_version (self, version):
+		assert isinstance (version, str)
+		self.__version = version
+		
+	version = property (lambda self: self.__version, __set_version)
+	
+	def __set_data_dir (self, data_dir):
+		assert isinstance (data_dir, str)
+		self.__data_dir = data_dir
+		
+	data_dir = property (lambda self: self.__data_dir, __set_data_dir)
+	
 	drive = property (lambda self: self.__drive_selection.get_drive())
 	temporary_dir = property (lambda self: self.__tmp.data)
 	pool = property (lambda self: self.__pool)
