@@ -43,7 +43,6 @@ class GetMusic (operations.MeasurableOperation, operations.OperationListener):
 	pool = property (lambda self: self.__pool)
 	
 	def start (self):
-(self.__music)
 		if self.__pool.is_available (self.__music):
 			self.__done ()
 			self.__oper = None

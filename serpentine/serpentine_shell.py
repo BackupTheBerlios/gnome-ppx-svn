@@ -97,7 +97,6 @@ class RecordingMedia (operations.OperationsQueueListener):
 			self.__prog.set_sub_progress_text ("Preparing media files")
 		else:
 			self.__blocked = True
-			#self.__prog.set_sub_progress_text ("Recording media files")
 	
 	def on_finished (self, evt):
 		self.__prog.hide ()
@@ -135,8 +134,9 @@ class MainWindow (gtk.Window):
 		self.preferences = RecordingPreferences (simulate)
 		
 	def burn (self, *args):
-		gtk_util.dialog_ok_cancel ("Do you want to continue?", 
-		                         "You are about to record a media disk, cancelling a writing operation will make you copy unusable.", self)
+		if gtk_util.dialog_ok_cancel ("Do you want to continue?", 
+		                         "You are about to record a media disk. Canceling a writing operation will make your disk unusable.", self) != gtk.RESPONSE_OK:
+			return
 		r = RecordingMedia (self.masterer.source, self.preferences, self)
 		r.start()
 		
