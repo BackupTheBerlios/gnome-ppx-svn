@@ -251,10 +251,12 @@ class HigProgress (gtk.Window):
 		self.__sub_progress_label = lbl
 		vbox.pack_start (lbl, False, False)
 		
-		# Cancel Button
+		# Buttons box
 		bbox = gtk.HButtonBox ()
 		bbox.set_layout (gtk.BUTTONBOX_END)
 		bbox.show ()
+		
+		# Cancel Button
 		cancel = gtk.Button (gtk.STOCK_CANCEL)
 		cancel.set_use_stock (True)
 		cancel.show ()
@@ -262,11 +264,19 @@ class HigProgress (gtk.Window):
 		bbox.add (cancel)
 		main.add (bbox)
 		
+		# Close button, which is hidden by default
+		close = gtk.Button (gtk.STOCK_CLOSE)
+		close.set_use_stock (True)
+		close.hide ()
+		bbox.add (close)
+		self.__close = close
+		
 	primary_label = property (lambda self: self.__primary_label)
 	secondary_label = property (lambda self: self.__secondary_label)
 	progress_bar = property (lambda self: self.__progress_bar)
 	sub_progress_label = property (lambda self: self.__sub_progress_label)
 	cancel_button = property (lambda self: self.__cancel)
+	close_button = property (lambda self: self.__close)
 	
 	def primary_text (self, text):
 		self.primary_label.set_markup ('<span weight="bold" size="larger">'+text+'</span>')
@@ -293,7 +303,7 @@ class HigProgress (gtk.Window):
 	sub_progress_text = property (fset = sub_progress_text)
 	
 	def __on_close (self, *args):
-		if not self.cancel_button.is_sensitive ():
+		if not self.cancel_button.get_property ("sensitive"):
 			return True
 		# click on the cancel button
 		self.cancel_button.do_clicked ()

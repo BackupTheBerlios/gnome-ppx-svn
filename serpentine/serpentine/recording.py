@@ -15,6 +15,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
 import nautilusburn
 from nautilusburn import AudioTrack
 import gtk, gobject
@@ -22,6 +23,7 @@ import operations, gtkutil
 from operations import OperationsQueueListener, MeasurableOperation
 from converting import FetchMusicList
 
+################################################################################
 class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 	"""
 	RecordingMedia class is yet another operation. When this operation is
@@ -37,9 +39,11 @@ class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 		self.__prog.primary_text = "Recording Audio Disc"
 		self.__prog.secondary_text = "The audio tracks are going to be written to a disc. This operation may take a long time, depending on data size and write speed."
 		self.__prog.connect ('destroy-event', self.__on_prog_destroyed)
-		self.__prog.cancel_button.connect ('clicked', self.__on_cancel)
+		self.__prog.cancel_button.connect ("clicked", self.__on_cancel)
+		self.__prog.close_button.connect ("clicked", self.__on_close)
 		self.__music_list = music_list
 		self.__preferences = preferences
+		self.__drive = preferences.drive
 		self.__can_start = True
 	
 	preferences = property (lambda self: self.__preferences)
@@ -49,6 +53,7 @@ class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 	can_start = property (lambda self: self.__can_start)
 	running = property (lambda self: self.__queue.running)
 	progress = property (lambda self: self.__queue.progress)
+	drive = property (lambda self: self.__drive)
 	
 	def __on_prog_destroyed (self, *args):
 		if self.cancel_button.is_sensitive ():
@@ -95,6 +100,9 @@ class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 			# Makes it impossible for our user to stop
 			self.__prog.cancel_button.set_sensitive (False)
 			self.__queue.stop ()
+		
+	def __on_close (self, *args):
+		self.__prog.destroy ()
 	
 	def __on_action_changed (self, recorder, action, media):
 		if action == nautilusburn.RECORDER_ACTION_PREPARING_WRITE:
@@ -119,7 +127,8 @@ class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 			self.__blocked = True
 	
 	def on_finished (self, evt):
-		self.__prog.hide ()
+		self.__prog.cancel_button.hide ()
+		self.__prog.close_button.show ()
 		gobject.source_remove (self.__source)
 		# Warn our listenrs
 		e = operations.FinishedEvent (self, evt.id)
@@ -204,6 +213,7 @@ class RecordMusicList (MeasurableOperation):
 			msg = "Please replace the disc in the drive a blank disc."
 			title = "Reload blank disc"
 		return gtkutil.dialog_ok_cancel (title, msg, self.parent) == gtk.RESPONSE_OK
+
 
 if __name__ == '__main__':
 	import sys, gobject

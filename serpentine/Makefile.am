@@ -9,10 +9,12 @@ serpentine_PYTHON = \
 	serpentine/mastering.py    \
 	serpentine/recording.py    \
 	serpentine/export.py       \
-	serpentine/gtkutil.py     \
+	serpentine/gtkutil.py      \
 	serpentine/operations.py   \
 	serpentine/xspf.py         \
-	serpentine/release.py
+	serpentine/services.py     \
+	serpentine/constants.py    \
+	serpentine/release.py     
 
 # Launcher
 desktopdir = $(datadir)/applications
@@ -27,7 +29,7 @@ ui_DATA = data/serpentine.glade
 # Executable
 bin_SCRIPTS = scripts/serpentine
 
-#DISTCLEANFILES =            \
+#DISTCLEANFILES =           \
 #	intltool-extract    \
 #	intltool-merge      \
 #	intltool-update     \

@@ -28,10 +28,10 @@ import gnomevfs
 from operations import OperationsQueue
 import xspf
 try:
-	import playlist_parser
+	from totem import plparser
 except ImportError:
 	print "No playlist parsers found!"
-	playlist_parser = None
+	plparser = None
 
 ################################################################################
 # Operations used on AudioMastering
@@ -363,6 +363,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		self.add (g.get_widget ("audio_container"))
 		self.__setup_track_list (g)
 		self.__setup_container_misc (g)
+
 	
 	def __setup_container_misc (self, g):
 		self.__size_list = g.get_widget ("size_list")
@@ -574,14 +575,14 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			return None
 		if mime == "audio/x-mpegurl" or mime == "audio/x-scpls":
 			hints_list = []
-			p = playlist_parser.Parser()
+			p = plparser.Parser()
 			p.connect("entry", self.__on_pl_entry, hints_list)
 			p.parse(uri, False)
 			return hints_list
 		return None
 		
 	# Add a no op when we don't have a paylist parser
-	if playlist_parser == None:
+	if plparser is None:
 		__add_totemplaylist = lambda self, uri: None
 		
 	def __add_playlist (self, uri):

@@ -30,32 +30,39 @@ from mastering import AudioMastering
 from recording import RecordMusicList, RecordingMedia
 from preferences import RecordingPreferences
 from operations import MapProxy, OperationListener
+import constants
 
-# Discover the data dir
-DATA_DIR = os.path.join(__file__,     # site-packages/serpentine/__init__.py
-			'..',         # site-packages/serpentine
-			'..',         # python2.*/site-packages
-			'..',         # lib/python2.*
-			'..',         # lib/
-			'..',         # 
-			'share',      # share
-			'serpentine') # share/serpentine
-DATA_DIR = os.path.abspath (DATA_DIR)
+try:
+	import services, dbus
+except ImportError:
+	services = None
 
+class SerpentineError (StandardError): pass
 
 class Serpentine (gtk.Window, OperationListener):
 	def __init__ (self, data_dir = None):
+		if services:
+			bus = dbus.SessionBus ()
+			dbus_srv = bus.get_service ("org.freedesktop.DBus")
+			dbus_obj = dbus_srv.get_object ("/org/freedesktop/DBus", "org.freedesktop.DBus")
+			if services.SERVICE_NAME in dbus_obj.ListServices ():
+				raise SerpentineError("Serpentine is already running.")
+			
+			# Start the service since it isn't available
+			self.__service = dbus.Service (services.SERVICE_NAME, bus=bus)
+			self.__application = services.Application (self.__service, self)
+				
+		self.__recording = []
 		self.__initialized = False
-		self.__recording = False
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
-		#self.set_sensitive (False)
+
 		if data_dir is None:
-			data_dir = DATA_DIR
+			data_dir = constants.data_dir
 		self.preferences = RecordingPreferences (data_dir)
 		self.preferences.dialog.set_transient_for (self)
 		self.masterer = AudioMastering (self.preferences)
 		self.masterer.listeners.append (self)
-		#self.connect ("show", self.__on_show)
+
 		glade_file = os.path.join (data_dir, "serpentine.glade")
 		g = gtk.glade.XML (glade_file, "main_window_container")
 		self.add (g.get_widget ("main_window_container"))
@@ -180,10 +187,13 @@ class Serpentine (gtk.Window, OperationListener):
 		if gtkutil.dialog_ok_cancel (title, msg, self, btn) != gtk.RESPONSE_OK:
 			return
 		r = RecordingMedia (self.masterer.source, self.preferences, self)
+		
 		r.start()
 		r.listeners.append (self)
 		self.burn.set_sensitive (False)
-		self.__recording = True
+		dev = r.drive.get_device ()
+		assert dev not in self.__recording
+		self.__recording.append (dev)
 		
 	def quit (self, *args):
 		if self.recording:
@@ -239,7 +249,9 @@ class Serpentine (gtk.Window, OperationListener):
 	
 	# This method is associated with the listener to the recording operation
 	def on_finished (self, event):
-		self.__recording = False
+		dev = event.source.drive.get_device ()
+		assert dev in self.__recording, (dev, self.__recording)
+		self.__recording.remove (dev)
 		self.on_contents_changed ()
 
 class CacheError (StandardError):

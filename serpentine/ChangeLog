@@ -1,3 +1,31 @@
+2005-02-12 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* scripts/serpentine: Serpentine can optionally throw an exception, catch it
+	and print the error message.
+	
+	* converting.py:
+	* audio.py: Changed license to LGPL, since it isn't linked to any GPL'ed
+	module.
+	
+	* gaw.py: Included copyright noticed (LGPL)
+	
+	* __init__.py: Removed DATA_DIR contant, it was moved to a new module:
+	constants.py. Added support for new optional DBus module: services.py.
+	Added initial support for multiple recorders.
+	
+	* gtkutil.py: A close button was added and defaults to hidden state.
+	Corrected a bug where the insensitive property was being get in the wrong
+	way.
+	
+	* mastering.py: Corrected the import module from playlist_parser to
+	totem.plparser, which is it's new name.
+	
+	* recording.py: RecordingMedia operation has now a "drive" property which is
+	the associated nautiulsburn.Drive. When the operation is finished the 
+	progress window is no longer closed but the cancel button changes to a
+	close button (should this happen? HIG is a bit confusing).
+	
+	
 2005-02-07 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	
 	* mastering.py: Changed the Disk capacity progress label to the time missing

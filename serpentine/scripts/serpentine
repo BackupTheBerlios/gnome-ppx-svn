@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import gtk, sys, gnome
+import gtk, sys, gobject, gnome, os
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -24,12 +24,16 @@ lib_dir = os.path.join (prefix_dir, 'lib',
 if os.path.isdir (lib_dir) and lib_dir not in sys.path:
 	sys.path.append (lib_dir)
 
-from serpentine import Serpentine
+from serpentine import Serpentine, SerpentineError
 
-s = Serpentine ()
+try:
+	s = Serpentine ()
+except SerpentineError, e:
+	print e
+	sys.exit (1)
+	
 app = gnome.init ('serpentine', s.preferences.version)
 s.simulate = options.simulate
 s.show()
+
 gtk.main()
-del s
-del app
