@@ -22,8 +22,8 @@ from types import IntType, TupleType
 from urlparse import urlparse, urlunparse
 
 import operations, audio
-from gtk_util import DictStore
-import gtk_util
+from gtkutil import DictStore
+import gtkutil
 import gnomevfs
 from operations import OperationsQueue
 import xspf
@@ -77,7 +77,7 @@ class ErrorTrapper (operations.Operation, operations.OperationListener):
 		
 		for f in filenames[1:]:
 			msg += ", " + f
-		gtk_util.dialog_error (title, msg, self.parent)
+		gtkutil.dialog_error (title, msg, self.parent)
 		
 		e = operations.FinishedEvent (self, operations.SUCCESSFUL)
 		for l in self.listeners:
@@ -509,8 +509,6 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		if seconds:
 			hig_secs = ("%s %s") %(seconds, seconds == 1 and "second" or "seconds")
 			hig_duration += (len (hig_duration) and " and ") + hig_secs
-		if not len(hig_duration):
-			hig_duration = "Empty"
 		return hig_duration
 	
 	def update_disc_usage (self):
@@ -525,7 +523,14 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		# Flush events so progressbar redrawing gets done
 		while gtk.events_pending():
 			gtk.main_iteration(True)
-		self.__usage_bar.set_text (self.__hig_duration(self.source.total_duration))
+		
+		if self.source.total_duration > 0:
+			dur = "%s remaining"  % self.__hig_duration (self.__disk_size - self.source.total_duration)
+		else:
+			dur = "Empty"
+		
+		self.__usage_bar.set_text (dur)
+			
 		e = operations.Event(self)
 		for l in self.listeners:
 			l.on_contents_changed (e)
@@ -547,7 +552,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			doc = "Represents the disc size, in seconds.")
 	
 	def add_file (self, hints):
-		w = gtk_util.get_root_parent (self)
+		w = gtkutil.get_root_parent (self)
 		assert isinstance(w, gtk.Window)
 		pls = self.__add_playlist (hints['location'])
 		if pls is not None:
@@ -613,7 +618,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		assert insert is None or isinstance (insert, IntType)
 		# Lock graphical updating on each request and
 		# only refresh the UI later
-		w = gtk_util.get_root_parent (self)
+		w = gtkutil.get_root_parent (self)
 		assert isinstance(w, gtk.Window), type(w)
 		
 		trapper = ErrorTrapper (w)

@@ -1,5 +1,14 @@
 2005-02-07 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	
+	* mastering.py: Changed the Disk capacity progress label to the time missing
+	instead of the filled, since it's more useful.
+	
+	* gtkutil.py:
+	* recording.py: Progress is now HIG compliant.
+	
+	* converting.py: Corrected a bug where WAV files sent with URL's would not
+	be converted correctly.
+	
 	* converting.py:
 	* audio.py:
 	* mastering.py: Renamed from gnome.vfs to gnomevfs, deprecation

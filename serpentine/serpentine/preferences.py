@@ -16,8 +16,9 @@
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
-import gtk.glade, nautilusburn, gtk, gobject, os, os.path, gconf, gtk.gdk
+import gtk.glade, nautilusburn, gtk, gobject, os, os.path, gconf, gtk.gdk, urllib
 from xml.dom import minidom
+from urlparse import urlparse
 
 from converting import GvfsMusicPool
 import gaw, xspf
@@ -137,7 +138,21 @@ class RecordingPreferences (object):
 	data_dir = property (lambda self: self.__data_dir, __set_data_dir)
 	
 	drive = property (lambda self: self.__drive_selection.get_drive())
-	temporary_dir = property (lambda self: self.__tmp.data)
+	
+	def temporary_dir (self):
+		tmp = self.__tmp.data
+		# tmp can be a url or a filename
+		s = urlparse (tmp)
+		scheme = s[0]
+		# in case it is a url
+		if scheme == 'file':
+			tmp = urllib.unquote (s[2])
+		# in case it is a url but not file://
+		elif scheme != '':
+			return None
+		return tmp
+		
+	temporary_dir = property (temporary_dir)
 	pool = property (lambda self: self.__pool)
 	
 	def __get_speed_write (self):
@@ -158,12 +173,13 @@ class RecordingPreferences (object):
 	write_flags = property (__get_write_flags)
 	
 	def temporary_dir_is_ok (self):
-		tmp = self.__tmp.data
-		is_ok = False
+		tmp = self.temporary_dir
+		# Try to open the local file
 		try:
 			is_ok = os.path.isdir (tmp) and os.access (tmp, os.W_OK)
 		except OSError, err:
-			pass
+			print err
+			is_ok = False
 		return is_ok
 	
 	def __on_tmp_choose (self, *args):

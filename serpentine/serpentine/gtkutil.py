@@ -71,7 +71,7 @@ class DictStore (gtk.ListStore):
 	def __iter__ (self):
 		return DictModelIterator(self)
 		
-#gobject.type_register (DictStore)
+gobject.type_register (DictStore)
 
 class DictModelRow (object):
 	def __init__ (self, parent, row):
@@ -197,18 +197,25 @@ def hig_alert (primary_text, secondary_text, parent = None, flags = 0, buttons =
 	dlg.destroy()
 	return reply
 	
-class HigProgress (gtk.Dialog):
-	def __init__ (self, parent = None):
-		gtk.Dialog.__init__(self, parent = parent, buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+class HigProgress (gtk.Window):
+	"""
+	HigProgress returns a window that contains a number of properties to
+	access what a common Progress window should have.
+	"""
+	def __init__ (self):
+		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 		self.set_border_width (6)
-		self.set_has_separator (False)
 		self.set_resizable (False)
-		self.set_property ("skip-taskbar-hint", False)
+		# defaults to center location
+		self.set_position (gtk.WIN_POS_CENTER)
+		self.connect ("delete-event", self.__on_close)
 		
-		main = self.get_child ()
+		# main container
+		main = gtk.VBox (spacing = 12)
 		main.set_spacing (12)
 		main.set_border_width (6)
 		main.show()
+		self.add (main)
 		
 		# primary text
 		alg = gtk.Alignment ()
@@ -244,27 +251,55 @@ class HigProgress (gtk.Dialog):
 		self.__sub_progress_label = lbl
 		vbox.pack_start (lbl, False, False)
 		
+		# Cancel Button
+		bbox = gtk.HButtonBox ()
+		bbox.set_layout (gtk.BUTTONBOX_END)
+		bbox.show ()
+		cancel = gtk.Button (gtk.STOCK_CANCEL)
+		cancel.set_use_stock (True)
+		cancel.show ()
+		self.__cancel = cancel
+		bbox.add (cancel)
+		main.add (bbox)
+		
 	primary_label = property (lambda self: self.__primary_label)
 	secondary_label = property (lambda self: self.__secondary_label)
 	progress_bar = property (lambda self: self.__progress_bar)
 	sub_progress_label = property (lambda self: self.__sub_progress_label)
+	cancel_button = property (lambda self: self.__cancel)
 	
-	def set_primary_text (self, text):
+	def primary_text (self, text):
 		self.primary_label.set_markup ('<span weight="bold" size="larger">'+text+'</span>')
 		self.set_title (text)
+	
+	primary_text = property (fset = primary_text)
 		
-	def set_secondary_text (self, text):
+	def secondary_text (self, text):
 		self.secondary_label.set_markup (text)
 	
-	def set_progress_fraction (self, fraction):
+	secondary_text = property (fset = secondary_text)
+	
+	def progress_fraction (self, fraction):
 		self.progress_bar.set_fraction (fraction)
 	
-	def set_progress_text (self, text):
+	progress_fraction = property (fset = progress_fraction)
+	
+	def progress_text (self, text):
 		self.progress_bar.set_text (text)
+	progress_text = property (fset = progress_text)
 	
-	def set_sub_progress_text (self, text):
+	def sub_progress_text (self, text):
 		self.sub_progress_label.set_markup ('<i>'+text+'</i>')
+	sub_progress_text = property (fset = sub_progress_text)
 	
+	def __on_close (self, *args):
+		if not self.cancel_button.is_sensitive ():
+			return True
+		# click on the cancel button
+		self.cancel_button.do_clicked ()
+		# let the clicked event close the window if it likes too
+		return True
+		
 gobject.type_register (HigProgress)
 
 def get_root_parent (widget):

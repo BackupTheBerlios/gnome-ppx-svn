@@ -18,40 +18,60 @@
 import nautilusburn
 from nautilusburn import AudioTrack
 import gtk, gobject
-import operations, gtk_util
+import operations, gtkutil
+from operations import OperationsQueueListener, MeasurableOperation
 from converting import FetchMusicList
 
-class RecordingMedia (operations.OperationsQueueListener):
+class RecordingMedia (MeasurableOperation, OperationsQueueListener):
+	"""
+	RecordingMedia class is yet another operation. When this operation is
+	started it will show the user the dialog for the recording operation.
+	It is supposed to be a one time operation.
+	"""
 	def __init__ (self, music_list, preferences, parent = None):
+		MeasurableOperation.__init__ (self)
 		self.__queue = operations.OperationsQueue ()
 		self.__queue.listeners.append (self)
 		self.__parent = parent
-		self.__prog = gtk_util.HigProgress (parent)
-		self.__prog.set_primary_text ("Recording Audio Disc")
-		self.__prog.set_secondary_text ("The audio tracks are going to be written to a disc. This operation may take a long time, depending on data size and write speed.")
+		self.__prog = gtkutil.HigProgress ()
+		self.__prog.primary_text = "Recording Audio Disc"
+		self.__prog.secondary_text = "The audio tracks are going to be written to a disc. This operation may take a long time, depending on data size and write speed."
 		self.__prog.connect ('destroy-event', self.__on_prog_destroyed)
-		self.__prog.connect ('response', self.__on_response)
+		self.__prog.cancel_button.connect ('clicked', self.__on_cancel)
 		self.__music_list = music_list
 		self.__preferences = preferences
+		self.__can_start = True
 	
 	preferences = property (lambda self: self.__preferences)
 	
+	# MeasurableOperation's properties
+	can_stop = property (lambda self: self.__queue.can_stop)
+	can_start = property (lambda self: self.__can_start)
+	running = property (lambda self: self.__queue.running)
+	progress = property (lambda self: self.__queue.progress)
+	
 	def __on_prog_destroyed (self, *args):
-		self.__prog.hide ()
+		if self.cancel_button.is_sensitive ():
+			self.__prog.hide ()
+			self.__on_cancel ()
 		return False
 		
 	def start (self):
+		self.__can_start = False
+		self.__prog.show ()
 		if self.preferences.drive.get_media_type () == nautilusburn.MEDIA_TYPE_CDRW:
-			gtk_util.dialog_warn ("CD-RW disk will be erased",
+			gtkutil.dialog_warn ("CD-RW disk will be erased",
 			                      "Please remove your disk if you want to preserve it's contents.",
-			                      self.__parent)
+			                      self.__prog)
 		self.__blocked = False
 		self.preferences.pool.temporary_dir = self.preferences.temporary_dir
 		oper = FetchMusicList(self.__music_list, self.preferences.pool)
 		self.__fetching = oper
 		self.__queue.append (oper)
 		
-		oper = RecordMusicList (self.__music_list, self.preferences, self.__parent)
+		oper = RecordMusicList (self.__music_list,
+		                        self.preferences,
+		                        self.__prog)
 		                        
 		oper.recorder.connect ('progress-changed', self.__tick)
 		oper.recorder.connect ('action-changed', self.__on_action_changed)
@@ -60,46 +80,57 @@ class RecordingMedia (operations.OperationsQueueListener):
 
 		self.__queue.start ()
 		self.__source = gobject.timeout_add (200, self.__tick)
-		if self.__prog.run () == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
-			# Disable the cancel button to make sure user 
-			# doesn't click it twice
-			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
-			self.__queue.stop ()
+	
+	def stop (self):
+		self.__on_cancel ()
 	
 	def __tick (self, *args):
 		if self.__queue.running:
-			self.__prog.set_progress_fraction (self.__queue.progress)
+			self.__prog.progress_fraction = self.__queue.progress
 			
 		return True
 	
-	def __on_response (self, dialog, response):
-		if self.__blocked and response == gtk.RESPONSE_CANCEL and self.__queue.can_stop:
-			self.__prog.set_response_sensitive (gtk.RESPONSE_CANCEL, False)
+	def __on_cancel (self, *args):
+		if self.can_stop:
+			# Makes it impossible for our user to stop
+			self.__prog.cancel_button.set_sensitive (False)
 			self.__queue.stop ()
 	
 	def __on_action_changed (self, recorder, action, media):
 		if action == nautilusburn.RECORDER_ACTION_PREPARING_WRITE:
-			self.__prog.set_sub_progress_text ("Preparing recorder")
+			self.__prog.sub_progress_text = "Preparing recorder"
 		elif action == nautilusburn.RECORDER_ACTION_WRITING:
-			self.__prog.set_sub_progress_text ("Writing media files to disc")
+			self.__prog.sub_progress_text = "Writing media files to disc"
 		elif action == nautilusburn.RECORDER_ACTION_FIXATING:
-			self.__prog.set_sub_progress_text ("Fixating disc")
+			self.__prog.sub_progress_text = "Fixating disc"
 	
 	def before_operation_starts (self, evt, oper):
+		# There can be only to operations starting
+		# The first is to convert to WAV the second is to record files
+		
+		# We are converting
 		if oper == self.__fetching:
-			self.__prog.set_sub_progress_text ("Preparing media files")
+			self.__prog.sub_progress_text = "Preparing media files"
+		
+		# We are recording
 		else:
+			# When we are recording the main source remains blocked
+			# Therefore there are no idle events
 			self.__blocked = True
 	
 	def on_finished (self, evt):
 		self.__prog.hide ()
 		gobject.source_remove (self.__source)
+		# Warn our listenrs
+		e = operations.FinishedEvent (self, evt.id)
+		for l in self.listeners:
+			l.on_finished (e)
 
 ################################################################################
 
-class RecordMusicList (operations.MeasurableOperation):
+class RecordMusicList (MeasurableOperation):
 	def __init__ (self, music_list, preferences, parent = None):
-		operations.MeasurableOperation.__init__(self)
+		MeasurableOperation.__init__(self)
 		self.music_list = music_list
 		self.__progress = 0.0
 		self.__running = False
@@ -118,8 +149,13 @@ class RecordMusicList (operations.MeasurableOperation):
 		for m in self.music_list:
 			tracks.append (AudioTrack (filename = m["cache_location"]))
 		self.recorder.connect ('progress-changed', self.__on_progress)
-		self.recorder.connect ('insert-cd-request', self.__insert_cd)
+		self.recorder.connect ('insert-media-request', self.__insert_cd)
+		self.recorder.connect ('warn-data-loss', self.__on_data_loss)
 		gobject.idle_add (self.__thread, tracks)
+	
+	def __on_data_loss (self, *args):
+		print "data loss", args
+		return True
 	
 	def stop (self):
 		# To cancel you have to send False, sending True just checks
@@ -146,9 +182,9 @@ class RecordMusicList (operations.MeasurableOperation):
 			
 		e = operations.FinishedEvent(self, result)
 		
+		self.__running = False
 		for l in self.listeners:
 			l.on_finished (e)
-		self.__running = False
 	
 	def __insert_cd (self, rec, reload_media, can_rewrite, busy_cd):
 		# messages from nautilus-burner-cd.c
@@ -167,7 +203,7 @@ class RecordMusicList (operations.MeasurableOperation):
 		else:
 			msg = "Please replace the disc in the drive a blank disc."
 			title = "Reload blank disc"
-		return gtk_util.dialog_ok_cancel (title, msg, self.parent) == gtk.RESPONSE_OK
+		return gtkutil.dialog_ok_cancel (title, msg, self.parent) == gtk.RESPONSE_OK
 
 if __name__ == '__main__':
 	import sys, gobject

@@ -21,16 +21,15 @@ This is the window widget which will contain the audio mastering widget
 defined in audio_widgets.AudioMastering. 
 """
 
-import os, os.path, gtk, gtk.glade, gobject, sys, statvfs
+import os, os.path, gtk, gtk.glade, gobject, sys, statvfs, gnome.ui
+from xml.parsers.expat import ExpatError
 
+# Private modules
+import operations, nautilusburn, gtkutil
 from mastering import AudioMastering
 from recording import RecordMusicList, RecordingMedia
-import operations, nautilusburn, gtkutil
 from preferences import RecordingPreferences
-from operations import MapProxy
-import gnome.ui
-from xml.parsers.expat import ExpatError
-# TODO make this actually beautiful
+from operations import MapProxy, OperationListener
 
 # Discover the data dir
 DATA_DIR = os.path.join(__file__,     # site-packages/serpentine/__init__.py
@@ -43,9 +42,11 @@ DATA_DIR = os.path.join(__file__,     # site-packages/serpentine/__init__.py
 			'serpentine') # share/serpentine
 DATA_DIR = os.path.abspath (DATA_DIR)
 
-class Serpentine (gtk.Window):
+
+class Serpentine (gtk.Window, OperationListener):
 	def __init__ (self, data_dir = None):
 		self.__initialized = False
+		self.__recording = False
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
 		#self.set_sensitive (False)
 		if data_dir is None:
@@ -80,8 +81,8 @@ class Serpentine (gtk.Window):
 		self.remove = MapProxy ({'menu': g.get_widget ("remove_mni"),
 		                         'button': g.get_widget ("remove")})
 
-		self.remove['menu'].connect ("activate", self.remove_file)
-		self.remove['button'].connect ("clicked", self.remove_file)
+		self.remove["menu"].connect ("activate", self.remove_file)
+		self.remove["button"].connect ("clicked", self.remove_file)
 		self.remove.set_sensitive (False)
 		
 		# setup record button
@@ -97,7 +98,7 @@ class Serpentine (gtk.Window):
 		
 		# setup quit menu item
 		g.get_widget ("quit_mni").connect ('activate', self.quit)
-		self.connect("destroy", self.quit)
+		self.connect("delete-event", self.quit)
 		
 		# About dialog
 		g.get_widget ("about_mni").connect ('activate', self.__on_about)
@@ -115,6 +116,8 @@ class Serpentine (gtk.Window):
 			g.get_widget ("preferences_mni").set_sensitive (False)
 			self.burn.set_sensitive (False)
 		self.__load_playlist()
+	
+	recording = property (lambda self: self.__recording)
 	
 	def __on_show (self, *args):
 		if self.__initialized:
@@ -134,7 +137,9 @@ class Serpentine (gtk.Window):
 			
 	def burn (self, *args):
 		if not self.preferences.temporary_dir_is_ok():
-			gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
+			gtkutil.dialog_warn ("Cache directory location unavailable",
+			                     "Please check if the cache location exists and has writable permissions.",
+			                     self)
 			self.__on_preferences ()
 			return
 			
@@ -172,15 +177,18 @@ class Serpentine (gtk.Window):
 			btn = "Record Disk"
 			self.preferences.overburn = False
 		
-		if gtkutil.dialog_ok_cancel (title,
-		                              msg,
-		                              self,
-		                              btn) != gtk.RESPONSE_OK:
+		if gtkutil.dialog_ok_cancel (title, msg, self, btn) != gtk.RESPONSE_OK:
 			return
 		r = RecordingMedia (self.masterer.source, self.preferences, self)
 		r.start()
+		r.listeners.append (self)
+		self.burn.set_sensitive (False)
+		self.__recording = True
 		
 	def quit (self, *args):
+		if self.recording:
+			gtkutil.dialog_warn ("Stop recording first", "Serpentine can only exit if you cancel the recording operation first.", self)
+			return True
 		self.preferences.save_playlist (self.masterer.source)
 		self.preferences.pool.clear()
 		gtk.main_quit()
@@ -192,8 +200,8 @@ class Serpentine (gtk.Window):
 	def on_contents_changed (self, *args):
 		is_sensitive = len(self.masterer.source) > 0
 		self.clear.set_sensitive (is_sensitive)
-		# Only set it sentitive if the drive is available
-		if self.preferences.drive is not None:
+		# Only set it sentitive if the drive is available and is not recording
+		if self.preferences.drive is not None and not self.recording:
 			self.burn.set_sensitive (is_sensitive)
 
 	def remove_file (self, *args):
@@ -217,17 +225,6 @@ class Serpentine (gtk.Window):
 		self.preferences.dialog.hide ()
 	
 	def __on_about (self, widget, *args):
-#		a = gnome.ui.About ("Serpentine",
-#		                    self.preferences.version,
-#		                    "Copyright 2004 Tiago Cogumbreiro",
-#		                    "Audio CD Recording",
-#		                    ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"],
-#		                    [],
-#		                    "")
-#		a.set_transient_for (self)
-#		a.show ()
-#		a.connect ('destroy', self.__on_about_closed, widget)
-#		widget.set_sensitive (False)
 		a = gtk.AboutDialog ()
 		a.set_name ("Serpentine")
 		a.set_version (self.preferences.version)
@@ -239,6 +236,11 @@ class Serpentine (gtk.Window):
 	
 	def __on_about_closed (self, about, widget):
 		widget.set_sensitive (True)
+	
+	# This method is associated with the listener to the recording operation
+	def on_finished (self, event):
+		self.__recording = False
+		self.on_contents_changed ()
 
 class CacheError (StandardError):
 	CACHE_INVALID = 1

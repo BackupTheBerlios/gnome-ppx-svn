@@ -9,7 +9,7 @@ serpentine_PYTHON = \
 	serpentine/mastering.py    \
 	serpentine/recording.py    \
 	serpentine/export.py       \
-	serpentine/gtk_util.py     \
+	serpentine/gtkutil.py     \
 	serpentine/operations.py   \
 	serpentine/xspf.py         \
 	serpentine/release.py

@@ -199,14 +199,19 @@ class GvfsMusicPool (GstMusicPool):
 		file:///foo%20bar
 		file:///foo bar
 		/foo bar
+		Returns always a URL, even if the string was a file path.
 		"""
 		s = urlparse (uri)
 		scheme = s[1]
 		path = s[2]
-		urllib.unquote(path)
-		if scheme == 'file':
-			return path
-		s = list(s)	
+		# Just unparse in case we are handling a URL
+		if scheme != '':
+			# Remove %20
+			path = urllib.unquote(path)
+		s = list(s)
+		# If it was a file path convert it to a file scheme
+		if scheme == '':
+			s[1] = 'file'
 		s[2] = path
 		return urlunparse (s)
 		
@@ -217,8 +222,10 @@ class GvfsMusicPool (GstMusicPool):
 					uri.is_local and \
 					gnomevfs.get_mime_type (music) == 'audio/x-wav':
 			# convert to native filename
-			filename = self.unique_music_id (music)
-			self.cache[filename] = GstCacheEntry (filename, False)
+			unique_id = self.unique_music_id (music)
+			s = urlparse (unique_id)
+			filename = s[2]
+			self.cache[unique_id] = GstCacheEntry (filename, False)
 			on_cache = True
 		del uri
 		return on_cache
@@ -304,7 +311,7 @@ class FetchMusicList (operations.MeasurableOperation):
 		self.__queue.stop ()
 
 if __name__ == '__main__':
-	import os.path, sys, gtk, gobject, gtk_util
+	import os.path, sys, gtk, gobject, gtkutil
 	def quit ():
 		#gtk.main_quit()
 		return False
@@ -325,7 +332,7 @@ if __name__ == '__main__':
 			
 		def before_music_fetched (self, evt, music):
 			print music
-			prog_txt = "Converting " 
+			prog_txt = "Converting "
 			prog_txt += gnomevfs.URI (music['uri']).short_path_name
 			
 			self.prog.set_sub_progress_text (prog_txt)
@@ -349,7 +356,7 @@ if __name__ == '__main__':
 			return True
 	
 #	win = gtk.Window (gtk.WINDOW_TOPLEVEL)
-	prog = gtk_util.HigProgress ()
+	prog = gtkutil.HigProgress ()
 	prog.set_primary_text ("Recording Audio Disc")
 	prog.set_secondary_text ("Selected files are to be written to a CD or DVD disc. This operation may take a long time, depending on data size and write speed.")
 	prog.show()
