@@ -71,7 +71,7 @@ class DictStore (gtk.ListStore):
 	def __iter__ (self):
 		return DictModelIterator(self)
 		
-gobject.type_register (DictStore)
+#gobject.type_register (DictStore)
 
 class DictModelRow (object):
 	def __init__ (self, parent, row):

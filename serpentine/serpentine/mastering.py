@@ -24,7 +24,7 @@ from urlparse import urlparse, urlunparse
 import operations, audio
 from gtk_util import DictStore
 import gtk_util
-import gnome.vfs
+import gnomevfs
 from operations import OperationsQueue
 import xspf
 try:
@@ -65,7 +65,7 @@ class ErrorTrapper (operations.Operation, operations.OperationListener):
 			
 		filenames = []
 		for e in self.errors:
-			filenames.append (gnome.vfs.URI(e.hints['location']).short_name)
+			filenames.append (gnomevfs.URI(e.hints['location']).short_name)
 		del self.__errors
 		
 		if len (filenames) == 1:
@@ -104,7 +104,7 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 		row = {
 			"location": self.hints['location'],
 			"cache_location": "",
-			"title": gnome.vfs.URI(self.hints['location'][:-4]).short_name or "Unknown",
+			"title": gnomevfs.URI(self.hints['location'][:-4]).short_name or "Unknown",
 			"artist": "Unknow Artist",
 			"duration": int(metadata['duration']),
 		}
@@ -479,8 +479,8 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			if len (line) < 1:
 				continue
 			try:
-				nfo = gnome.vfs.get_file_info (line)
-				if nfo.type == gnome.vfs.FILE_TYPE_DIRECTORY:
+				nfo = gnomevfs.get_file_info (line)
+				if nfo.type == gnomevfs.FILE_TYPE_DIRECTORY:
 					pass
 					# Handle directory importing
 				else:
@@ -489,7 +489,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 					
 				del nfo
 				
-			except gnome.vfs.NotFoundError, e:
+			except gnomevfs.NotFoundError, e:
 				print "file not found"
 				return
 		self.add_files (hints_list, insert)
@@ -564,7 +564,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	
 	def __add_totemplaylist (self, uri):
 		try:
-			mime = gnome.vfs.get_mime_type (uri)
+			mime = gnomevfs.get_mime_type (uri)
 		except RuntimeError:
 			return None
 		if mime == "audio/x-mpegurl" or mime == "audio/x-scpls":
@@ -581,7 +581,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		
 	def __add_playlist (self, uri):
 		try:
-			mime = gnome.vfs.get_mime_type (uri)
+			mime = gnomevfs.get_mime_type (uri)
 		except RuntimeError:
 			return None
 		if mime == "text/xml":

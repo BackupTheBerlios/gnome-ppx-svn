@@ -17,7 +17,6 @@ import os.path
 
 bins_dir = os.path.dirname (os.path.abspath (sys.argv[0]))
 prefix_dir = os.path.dirname (bins_dir)
-data_dir = os.path.join (prefix_dir, 'share', 'serpentine')
 lib_dir = os.path.join (prefix_dir, 'lib',
                         "python%d.%d" % sys.version_info[0:2],
                         'site-packages')
@@ -27,7 +26,7 @@ if os.path.isdir (lib_dir) and lib_dir not in sys.path:
 
 from serpentine import Serpentine
 
-s = Serpentine (data_dir)
+s = Serpentine ()
 app = gnome.init ('serpentine', s.preferences.version)
 s.simulate = options.simulate
 s.show()

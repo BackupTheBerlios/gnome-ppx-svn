@@ -15,8 +15,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
-import nautilus_burn
-from nautilus_burn import AudioTrack
+import nautilusburn
+from nautilusburn import AudioTrack
 import gtk, gobject
 import operations, gtk_util
 from converting import FetchMusicList
@@ -41,7 +41,7 @@ class RecordingMedia (operations.OperationsQueueListener):
 		return False
 		
 	def start (self):
-		if self.preferences.drive.get_media_type () == nautilus_burn.MEDIA_TYPE_CDRW:
+		if self.preferences.drive.get_media_type () == nautilusburn.MEDIA_TYPE_CDRW:
 			gtk_util.dialog_warn ("CD-RW disk will be erased",
 			                      "Please remove your disk if you want to preserve it's contents.",
 			                      self.__parent)
@@ -78,11 +78,11 @@ class RecordingMedia (operations.OperationsQueueListener):
 			self.__queue.stop ()
 	
 	def __on_action_changed (self, recorder, action, media):
-		if action == nautilus_burn.RECORDER_ACTION_PREPARING_WRITE:
+		if action == nautilusburn.RECORDER_ACTION_PREPARING_WRITE:
 			self.__prog.set_sub_progress_text ("Preparing recorder")
-		elif action == nautilus_burn.RECORDER_ACTION_WRITING:
+		elif action == nautilusburn.RECORDER_ACTION_WRITING:
 			self.__prog.set_sub_progress_text ("Writing media files to disc")
-		elif action == nautilus_burn.RECORDER_ACTION_FIXATING:
+		elif action == nautilusburn.RECORDER_ACTION_FIXATING:
 			self.__prog.set_sub_progress_text ("Fixating disc")
 	
 	def before_operation_starts (self, evt, oper):
@@ -104,7 +104,7 @@ class RecordMusicList (operations.MeasurableOperation):
 		self.__progress = 0.0
 		self.__running = False
 		self.parent = parent
-		self.__recorder = nautilus_burn.Recorder()
+		self.__recorder = nautilusburn.Recorder()
 		self.__preferences = preferences
 	
 	progress = property (lambda self: self.__progress)
@@ -116,7 +116,7 @@ class RecordMusicList (operations.MeasurableOperation):
 		self.__running = True
 		tracks = []
 		for m in self.music_list:
-			tracks.append (AudioTrack (filename = m['filename']))
+			tracks.append (AudioTrack (filename = m["cache_location"]))
 		self.recorder.connect ('progress-changed', self.__on_progress)
 		self.recorder.connect ('insert-cd-request', self.__insert_cd)
 		gobject.idle_add (self.__thread, tracks)
@@ -134,13 +134,13 @@ class RecordMusicList (operations.MeasurableOperation):
 		                                     self.preferences.speed_write,
 		                                     self.preferences.write_flags)
 
-		if result == nautilus_burn.RECORDER_RESULT_FINISHED:
+		if result == nautilusburn.RECORDER_RESULT_FINISHED:
 			result = operations.SUCCESSFUL
-		elif result == nautilus_burn.RECORDER_RESULT_ERROR:
+		elif result == nautilusburn.RECORDER_RESULT_ERROR:
 			result = operations.ERROR
-		elif result == nautilus_burn.RECORDER_RESULT_CANCEL:
+		elif result == nautilusburn.RECORDER_RESULT_CANCEL:
 			result == operations.ABORTED
-		elif result == nautilus_burn.RECORDER_RESULT_RETRY:
+		elif result == nautilusburn.RECORDER_RESULT_RETRY:
 			#TODO: hanlde this
 			result == operations.ERROR
 			
@@ -176,14 +176,13 @@ if __name__ == '__main__':
 			gtk.main_quit()
 	
 	def print_progress (oper):
-#		print oper.progress
 		return True
 	w = gtk.Window(gtk.WINDOW_TOPLEVEL)
 	w.add (gtk.Label("---"))
 	w.show_all()
-	d = nautilus_burn.get_drives_list (False)[0]
+	d = nautilusburn.get_drives_list (False)[0]
 	music_lst = [{'filename': sys.argv[1]}]
-	r = RecordMusicList (music_lst, d, d.get_max_speed_write(), 0) #nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
+	r = RecordMusicList (music_lst, d, d.get_max_speed_write(), 0) #nautilusburn.RECORDER_WRITE_DUMMY_WRITE
 	r.listeners.append (MyListener())
 	gobject.timeout_add (250, print_progress, r)
 	r.start()

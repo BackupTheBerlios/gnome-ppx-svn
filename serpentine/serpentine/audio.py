@@ -235,7 +235,7 @@ def file_audio_metadata (filename):
 
 
 try:
-	import gnome.vfs
+	import gnomevfs
 	def gvfs_audio_metadata (uri):
 		"""
 		Returns the audio metadata from an URI.
@@ -284,14 +284,14 @@ def file_to_wav (src_filename, sink_filename):
 	sink.set_property ("location", sink_filename)
 	return source_to_wav (src, sink)
 
-# We don't export the gvfs function if there is no gnome.vfs avail
+# We don't export the gvfs function if there is no gnomevfs avail
 try:
-	import gnome.vfs
+	import gnomevfs
 	def gvfs_to_wav (src_uri, sink_uri):
 		"Converts a given source URI to a wav located in sink URI."
 		src = gst.element_factory_make ("gnomevfssrc")
 		src.set_property ("location", src_uri)
-		handle = gnome.vfs.Handle (sink_uri)
+		handle = gnomevfs.Handle (sink_uri)
 		sink = gst.element_factory_make ("gnomevfssink")
 		sink.set_property ("handle", handle)
 		return source_to_wav (src, sink)

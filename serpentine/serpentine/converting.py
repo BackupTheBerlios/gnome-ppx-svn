@@ -190,7 +190,7 @@ class GstMusicPool (MusicPool):
 	
 import urllib
 from urlparse import urlparse, urlunparse
-import gnome.vfs
+import gnomevfs
 
 class GvfsMusicPool (GstMusicPool):
 	def unique_music_id (self, uri):
@@ -206,16 +206,16 @@ class GvfsMusicPool (GstMusicPool):
 		urllib.unquote(path)
 		if scheme == 'file':
 			return path
-			
+		s = list(s)	
 		s[2] = path
 		return urlunparse (s)
 		
 	def is_available (self, music):
 		on_cache = GstMusicPool.is_available (self, music)
-		uri = gnome.vfs.URI (music)
+		uri = gnomevfs.URI (music)
 		if not on_cache and \
 					uri.is_local and \
-					gnome.vfs.get_mime_type (music) == 'audio/x-wav':
+					gnomevfs.get_mime_type (music) == 'audio/x-wav':
 			# convert to native filename
 			filename = self.unique_music_id (music)
 			self.cache[filename] = GstCacheEntry (filename, False)
@@ -235,7 +235,7 @@ class FetchMusicListPriv (operations.OperationListener):
 	
 	def get_music_from_uri (self, uri):
 		for m in self.music_list:
-			if m['uri'] == uri:
+			if m["location"] == uri:
 				return m
 		return None
 	
@@ -254,7 +254,7 @@ class FetchMusicListPriv (operations.OperationListener):
 		filename = pool.get_filename (uri)
 		m = self.get_music_from_uri (uri)
 		if m:
-			m['filename'] = filename
+			m["cache_location"] = filename
 		else:
 			assert False, "uri '%s' was not found in music list." % (uri)
 	
@@ -293,7 +293,7 @@ class FetchMusicList (operations.MeasurableOperation):
 	
 	def start (self):
 		for m in self.__music_list:
-			get = GetMusic (self.__pool, m['uri'])
+			get = GetMusic (self.__pool, m["location"])
 			get.listeners.append (self.__listener)
 			self.__queue.append (get)
 		self.__queue.start ()
@@ -326,7 +326,7 @@ if __name__ == '__main__':
 		def before_music_fetched (self, evt, music):
 			print music
 			prog_txt = "Converting " 
-			prog_txt += gnome.vfs.URI (music['uri']).short_path_name
+			prog_txt += gnomevfs.URI (music['uri']).short_path_name
 			
 			self.prog.set_sub_progress_text (prog_txt)
 			self.prog.set_progress_fraction (self.oper.progress)

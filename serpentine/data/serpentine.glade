@@ -46,7 +46,7 @@
 		      <signal name="activate" handler="on_export_activate" last_modification_time="Fri, 12 Nov 2004 14:23:28 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image13">
+			<widget class="GtkImage" id="image14">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-convert</property>
 			  <property name="icon_size">1</property>
@@ -62,48 +62,6 @@
 		  <child>
 		    <widget class="GtkSeparatorMenuItem" id="separator1">
 		      <property name="visible">True</property>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkImageMenuItem" id="recent_documents1">
-		      <property name="visible">True</property>
-		      <property name="sensitive">False</property>
-		      <property name="label" translatable="yes">Recent Documents...</property>
-		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="on_recent_documents1_activate" last_modification_time="Tue, 14 Dec 2004 19:56:08 GMT"/>
-
-		      <child internal-child="image">
-			<widget class="GtkImage" id="image14">
-			  <property name="visible">True</property>
-			  <property name="stock">gtk-open</property>
-			  <property name="icon_size">1</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkMenu" id="recent_documents1_menu">
-
-			  <child>
-			    <widget class="GtkSeparatorMenuItem" id="separador1">
-			      <property name="visible">True</property>
-			    </widget>
-			  </child>
-
-			  <child>
-			    <widget class="GtkImageMenuItem" id="clear">
-			      <property name="visible">True</property>
-			      <property name="label">gtk-clear</property>
-			      <property name="use_stock">True</property>
-			      <signal name="activate" handler="on_clear_activate" last_modification_time="Sat, 18 Dec 2004 10:59:53 GMT"/>
-			    </widget>
-			  </child>
-			</widget>
-		      </child>
 		    </widget>
 		  </child>
 
@@ -467,7 +425,7 @@
 		  <property name="visible">True</property>
 		  <property name="orientation">GTK_PROGRESS_LEFT_TO_RIGHT</property>
 		  <property name="fraction">0</property>
-		  <property name="pulse_step">0.1</property>
+		  <property name="pulse_step">0.10000000149</property>
 		  <property name="text" translatable="yes">00:00</property>
 		</widget>
 		<packing>
@@ -733,44 +691,13 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkHBox" id="hbox5">
+	    <widget class="GtkHBox" id="location_box">
 	      <property name="visible">True</property>
 	      <property name="homogeneous">False</property>
 	      <property name="spacing">6</property>
 
 	      <child>
-		<widget class="GtkEntry" id="location_ent">
-		  <property name="visible">True</property>
-		  <property name="can_focus">True</property>
-		  <property name="editable">True</property>
-		  <property name="visibility">True</property>
-		  <property name="max_length">0</property>
-		  <property name="text" translatable="yes">/tmp</property>
-		  <property name="has_frame">True</property>
-		  <property name="invisible_char" translatable="yes">*</property>
-		  <property name="activates_default">False</property>
-		</widget>
-		<packing>
-		  <property name="padding">0</property>
-		  <property name="expand">False</property>
-		  <property name="fill">False</property>
-		</packing>
-	      </child>
-
-	      <child>
-		<widget class="GtkButton" id="location_btn">
-		  <property name="visible">True</property>
-		  <property name="can_focus">True</property>
-		  <property name="label">gtk-open</property>
-		  <property name="use_stock">True</property>
-		  <property name="relief">GTK_RELIEF_NORMAL</property>
-		  <property name="focus_on_click">True</property>
-		</widget>
-		<packing>
-		  <property name="padding">0</property>
-		  <property name="expand">False</property>
-		  <property name="fill">False</property>
-		</packing>
+		<placeholder/>
 	      </child>
 	    </widget>
 	    <packing>

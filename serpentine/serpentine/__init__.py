@@ -25,28 +25,38 @@ import os, os.path, gtk, gtk.glade, gobject, sys, statvfs
 
 from mastering import AudioMastering
 from recording import RecordMusicList, RecordingMedia
-import operations, nautilus_burn, gtk_util
+import operations, nautilusburn, gtkutil
 from preferences import RecordingPreferences
 from operations import MapProxy
 import gnome.ui
 from xml.parsers.expat import ExpatError
 # TODO make this actually beautiful
 
+# Discover the data dir
+DATA_DIR = os.path.join(__file__,     # site-packages/serpentine/__init__.py
+			'..',         # site-packages/serpentine
+			'..',         # python2.*/site-packages
+			'..',         # lib/python2.*
+			'..',         # lib/
+			'..',         # 
+			'share',      # share
+			'serpentine') # share/serpentine
+DATA_DIR = os.path.abspath (DATA_DIR)
+
 class Serpentine (gtk.Window):
-	def __init__ (self, data_dir):
+	def __init__ (self, data_dir = None):
+		self.__initialized = False
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
+		#self.set_sensitive (False)
+		if data_dir is None:
+			data_dir = DATA_DIR
 		self.preferences = RecordingPreferences (data_dir)
 		self.preferences.dialog.set_transient_for (self)
 		self.masterer = AudioMastering (self.preferences)
-		try:
-			self.preferences.load_playlist (self.masterer.source)
-		except ExpatError:
-			pass
-		except IOError:
-			pass
 		self.masterer.listeners.append (self)
-		g = gtk.glade.XML (os.path.join (self.preferences.data_dir, "serpentine.glade"),
-		                   "main_window_container")
+		#self.connect ("show", self.__on_show)
+		glade_file = os.path.join (data_dir, "serpentine.glade")
+		g = gtk.glade.XML (glade_file, "main_window_container")
 		self.add (g.get_widget ("main_window_container"))
 		self.set_title ("Serpentine")
 		self.set_default_size (450, 350)
@@ -100,63 +110,52 @@ class Serpentine (gtk.Window):
 		# update buttons
 		self.on_contents_changed()
 		
-		if not self.preferences.drive:
-			gtk_util.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.", self)
+		if self.preferences.drive is None:
+			gtkutil.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.", self)
 			g.get_widget ("preferences_mni").set_sensitive (False)
 			self.burn.set_sensitive (False)
+		self.__load_playlist()
 	
-	def __hig_bytes (self, bytes):
-		hig_desc = [("GByte", "GBytes"),
-		            ("MByte", "MBytes"),
-		            ("KByte", "KByte" ),
-		            ("byte" , "bytes" )]
-		value, strings = self.__decompose_bytes (bytes, 30, hig_desc)
-		return "%.1f %s" % (value, self.__plural (value, strings))
+	def __on_show (self, *args):
+		if self.__initialized:
+			return
+		self.set_sensitive(True)
+		gobject.idle_add (self.__load_playlist)
+		self.__initialized = True
 	
-	def __decompose_bytes (self, bytes, offset, hig_desc):
-		if bytes == 0:
-			return (0.0, hig_desc[-1:])
-		if offset == 0:
-			return (float (bytes), hig_desc[-1:])
+	def __load_playlist (self):
+		try:
+			self.preferences.load_playlist (self.masterer.source)
+		except ExpatError:
+			pass
+		except IOError:
+			pass
 			
-		part = bytes >> offset
-		if part > 0:
-			sub_part = part ^ ((part >> offset) << offset)
-			return ((part * 1024 + sub_part) / 1024.0, hig_desc[0])
-		else:
-			del hig_desc[0]
-			return self.__decompose_bytes (bytes, offset - 10, hig_desc)
-
-	def __plural (self, value, strings):
-		if value == 1:
-			return strings[0]
-		else:
-			return strings[1]
-		
+			
 	def burn (self, *args):
 		if not self.preferences.temporary_dir_is_ok():
-			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
+			gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
 			self.__on_preferences ()
 			return
 			
 		# Check if we have space available in our cache dir
 		secs = 0
 		for music in self.masterer.source:
-			if not self.preferences.pool.is_available (music['uri']):
+			if not self.preferences.pool.is_available (music["location"]):
 				secs += music['duration']
 		# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
 		size_needed = secs * 176400L
 		try:
 			s = os.statvfs (self.preferences.temporary_dir)
 		except OSError:
-			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
+			gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
 			self.__on_preferences ()
 			return
 			
 		size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
 		if (size_avail - size_needed) < 0:
 			
-			gtk_util.dialog_error ("Not enough space on cache directory",
+			gtkutil.dialog_error ("Not enough space on cache directory",
 				"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % (self.__hig_bytes(size_needed - size_avail)), self)
 			return
 	
@@ -173,7 +172,7 @@ class Serpentine (gtk.Window):
 			btn = "Record Disk"
 			self.preferences.overburn = False
 		
-		if gtk_util.dialog_ok_cancel (title,
+		if gtkutil.dialog_ok_cancel (title,
 		                              msg,
 		                              self,
 		                              btn) != gtk.RESPONSE_OK:
@@ -193,7 +192,9 @@ class Serpentine (gtk.Window):
 	def on_contents_changed (self, *args):
 		is_sensitive = len(self.masterer.source) > 0
 		self.clear.set_sensitive (is_sensitive)
-		self.burn.set_sensitive (is_sensitive)
+		# Only set it sentitive if the drive is available
+		if self.preferences.drive is not None:
+			self.burn.set_sensitive (is_sensitive)
 
 	def remove_file (self, *args):
 		self.masterer.remove_selected()
@@ -216,10 +217,101 @@ class Serpentine (gtk.Window):
 		self.preferences.dialog.hide ()
 	
 	def __on_about (self, widget, *args):
-		a = gnome.ui.About ("Serpentine", self.preferences.version, "Copyright 2004 Tiago Cogumbreiro", "Audio CD Recording", ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"])
+#		a = gnome.ui.About ("Serpentine",
+#		                    self.preferences.version,
+#		                    "Copyright 2004 Tiago Cogumbreiro",
+#		                    "Audio CD Recording",
+#		                    ["Tiago Cogumbreiro <cogumbreiro@users.sf.net>"],
+#		                    [],
+#		                    "")
+#		a.set_transient_for (self)
+#		a.show ()
+#		a.connect ('destroy', self.__on_about_closed, widget)
+#		widget.set_sensitive (False)
+		a = gtk.AboutDialog ()
+		a.set_name ("Serpentine")
+		a.set_version (self.preferences.version)
+		a.set_website ("http://s1x.homelinux.net/projects/serpentine")
+		a.set_copyright ("2004-2005 Tiago Cogumbreiro")
 		a.set_transient_for (self)
 		a.run ()
-		a.destroy ()
+		a.hide()
+	
+	def __on_about_closed (self, about, widget):
+		widget.set_sensitive (True)
+
+class CacheError (StandardError):
+	CACHE_INVALID = 1
+	CACHE_NO_SPACE = 2
+	def __init__ (self, error):
+		self.__error_id = error
+	
+	error_id = property (lambda self: self.__error_id)
+
+def __hig_bytes (bytes):
+	hig_desc = [("GByte", "GBytes"),
+	            ("MByte", "MBytes"),
+	            ("KByte", "KByte" ),
+	            ("byte" , "bytes" )]
+	value, strings = __decompose_bytes (bytes, 30, hig_desc)
+	return "%.1f %s" % (value, __plural (value, strings))
+
+def __decompose_bytes (bytes, offset, hig_desc):
+	if bytes == 0:
+		return (0.0, hig_desc[-1:])
+	if offset == 0:
+		return (float (bytes), hig_desc[-1:])
+		
+	part = bytes >> offset
+	if part > 0:
+		sub_part = part ^ ((part >> offset) << offset)
+		return ((part * 1024 + sub_part) / 1024.0, hig_desc[0])
+	else:
+		del hig_desc[0]
+		return __decompose_bytes (bytes, offset - 10, hig_desc)
+
+def __plural (value, strings):
+	if value == 1:
+		return strings[0]
+	else:
+		return strings[1]
+
+def record_musiclist (musiclist, parent = None, preferences = None):
+	clear_pool_on_exit = False
+	if preferences is None:
+		preferences = RecordingPreferences (DATA_DIR)
+		clear_pool_on_exit = True
+		
+	if not preferences.temporary_dir_is_ok():
+		gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", parent)
+		raise CacheError
+		
+	# Check if we have space available in our cache dir
+	secs = 0
+	for music in musiclist:
+		if not preferences.pool.is_available (music["location"]):
+			secs += music['duration']
+	# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
+	size_needed = secs * 176400L
+	try:
+		s = os.statvfs (preferences.temporary_dir)
+	except OSError:
+		gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", parent)
+		raise CacheError
+		
+	size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
+	if (size_avail - size_needed) < 0:
+		
+		gtkutil.dialog_error ("Not enough space on cache directory",
+			"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % __hig_bytes(size_needed - size_avail) , parent)
+		raise CacheError
+	
+	r = RecordingMedia (musiclist, preferences, parent)
+	r.start()
+	if clear_pool_on_exit:
+		preferences.pool.clear()
+
+gobject.type_register (Serpentine)
 
 if __name__ == '__main__':
 	s = Serpentine ()

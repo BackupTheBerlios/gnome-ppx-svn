@@ -1,3 +1,42 @@
+2005-02-07 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+	
+	* converting.py:
+	* audio.py:
+	* mastering.py: Renamed from gnome.vfs to gnomevfs, deprecation
+	issues.
+	
+	* preferences.py:
+	* recording.py: Renamed from nautilus_burn to nautilusburn (new name
+	when it was ported to gnome-python-extras).
+	
+	* gtk_util.py: Added a GAW wrapper to FileChooserButton
+	
+	* __init__.py: Now data_dir is automatically found. Thus the argument
+	is optional. TreeView is no longer set insensitive when loading, it
+	uncovered a bug in Gtk+/PyGtk and some theming bugs. Renamed from
+	gtk_util to gtkutil to conform to Python's coding style. Now uses
+	Gtk.AboutDialog instead of GNOME's one. Started refactoring the
+	recording method into a function or class in order for Serpentine to
+	be run from command line or C API.
+
+	* preferences.py: Now uses the Gtk.FileChooserButton (Gtk+ 2.6)
+
+	
+2005-01-14 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* recording.py:
+	* converting.py:
+	* __init__.py:
+	Corrected updated reference introduced in GtkMusicList's new format.
+
+	* __init__.py:
+	Now main window gets insensitve while musics are loaded from previous
+	session. Corrected how About box is displayed. Now Serpentine is
+	recognized as a GObject type.
+
+	* preferences.py:
+	Corrected a bug when there were no recording drives on a system.
+	
 2004-12-28 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
 	* mastering.py: (ErrorTrapper.start): (AddFile):

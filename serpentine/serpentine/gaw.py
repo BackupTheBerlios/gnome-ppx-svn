@@ -22,12 +22,36 @@ Spec.INT = Spec ('int', gconf.VALUE_INT, int, 0)
 Spec.BOOL = Spec ('bool', gconf.VALUE_BOOL, bool, True)
 
 
+def data_file_chooser (button, key, use_directory = False, use_uri = True,client = None):
+	"""
+	Returns a gaw.Data.
+	
+	use_directory - boolean variable setting if it's we're using files or directories.
+	use_uri - boolean variable setting if we're using URI's or normal filenames.
+	
+	Associates a gaw.Data to a gtk.FileChooserButton. 
+	"""
+	if not use_directory and not use_uri:
+		getter = button.get_filename
+		setter = button.set_filename
+	elif not use_directory and use_uri:
+		getter = button.get_uri
+		setter = button.set_uri
+	elif use_directory and not use_uri:
+		getter = button.get_current_folder
+		setter = button.set_current_folder
+	elif use_directory and use_uri:
+		getter = button.get_current_folder_uri
+		setter = button.set_current_folder_uri
+		
+	return Data (button, getter, setter, "selection-changed", key, Spec.STRING, client)
+
 def data_entry (entry, key, data_spec = Spec.STRING, client = None):
-	return Data (entry, entry.get_text, entry.set_text, 'changed', key, data_spec, client)
+	return Data (entry, entry.get_text, entry.set_text, "changed", key, data_spec, client)
 
 def data_spin_button (spinbutton, key, use_int = True, client = None):
 	if use_int:
-		return Data (spinbutton, spinbutton.get_value_as_int, spinbutton.set_value, 'value-changed', key, Spec.INT, client)
+		return Data (spinbutton, spinbutton.get_value_as_int, spinbutton.set_value, "value-changed", key, Spec.INT, client)
 	else:
 		return Data (spinbutton, spinbutton.get_value, spinbutton.set_value, 'value-changed', key, Spec.FLOAT, client)
 
@@ -120,6 +144,8 @@ class Data (object):
 			self.__widget_setter (converter ())
 		else:
 			self.__widget_setter (self.data_spec.default)
+		# Because widgets can validate data, sync the gconf entry again
+		self.sync_gconf()
 	
 	def sync_widget (self):
 		"""

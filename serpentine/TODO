@@ -1,7 +1,9 @@
-- when u have a rw cd it doesn't ask if u want to clean it first (done but should be moved to ncb instead)
+- when u have a rw cd it doesn't ask if u want to clean it first (done but 
+  should be moved to ncb instead)
 - gtk_util.HigProgress should be visible in taskbar, not have a parent and be
-  minizable
-- handle adding operations in a queue when it's already running
-- emit to context when dnd has moved successfully
+  minizable, there should be a minimize text.
+- emit to context when dnd has moved successfully, highlight TreeView
 - add export to playlist and export to CUE/WAVs
-- When a list of files is added order the files which have the same album name and track number
+- When a list of files is added order the files which have the same album name 
+  and track number
+- recent files support (?)
