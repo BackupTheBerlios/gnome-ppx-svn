@@ -1,5 +1,7 @@
 INCLUDES = -I$(TOTEM_PL_PARSER_CFLAGS)
 
+EXTRA_DIST = totemplparser-marshal.list
+
 noinst_LTLIBRARIES = libtotem_pl_parser.la
 
 libtotem_pl_parser_la_SOURCES =    \
