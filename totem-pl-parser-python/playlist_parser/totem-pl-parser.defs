@@ -2,7 +2,7 @@
 ; object definitions ...
 ;; Enumerations and flags ...
 
-(define-enum PlParserResult
+(define-enum ParserResult
   (in-module "Totem")
   (c-name "TotemPlParserResult")
   (gtype-id "TOTEM_TYPE_PL_PARSER_RESULT")
@@ -13,7 +13,7 @@
   )
 )
 
-(define-enum PlParserType
+(define-enum ParserType
   (in-module "Totem")
   (c-name "TotemPlParserType")
   (gtype-id "TOTEM_TYPE_PL_PARSER_TYPE")
@@ -24,7 +24,7 @@
   )
 )
 
-(define-enum PlParserError
+(define-enum ParserError
   (in-module "Totem")
   (c-name "TotemPlParserError")
   (gtype-id "TOTEM_TYPE_PL_PARSER_ERROR")

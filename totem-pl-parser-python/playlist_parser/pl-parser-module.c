@@ -22,7 +22,7 @@
 #include <pygobject.h>
 #include <Python.h>
 void playlist_parser_register_classes (PyObject *d);
-
+void playlist_parser_add_constants (PyObject *module, const gchar *strip_prefix);
 extern PyMethodDef playlist_parser_functions[];
 
 DL_EXPORT(void)
@@ -31,13 +31,15 @@ initplaylist_parser (void)
 	PyObject *m, *d;
 	
 	init_pygobject ();
-	
+	if (PyImport_ImportModule("gnome.vfs") == NULL) {
+        PyErr_SetString(PyExc_ImportError,
+            "could not import gobject");
+        return;
+	}
 	m = Py_InitModule ("playlist_parser", playlist_parser_functions);
 	d = PyModule_GetDict (m);
-
+	
 	playlist_parser_register_classes (d);
-	if (PyErr_Occurred ()) {
-		//PyFatalError ("can't initialize module nautilus.burn");
-	}
+	playlist_parser_add_constants (m, "TOTEM_PL_");
 	
 }
