@@ -18,6 +18,7 @@
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
 from gnome.vfs import URI
+
 def unescape_uri (uri):
 	assert isinstance (uri, URI)
 	if uri.path == '/':
@@ -27,4 +28,3 @@ def unescape_uri (uri):
 		parent = ''
 		
 	return parent + '/' + uri.short_name
-	

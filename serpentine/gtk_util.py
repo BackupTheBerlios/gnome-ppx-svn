@@ -127,10 +127,10 @@ dialog_warn = \
 	lambda primary_text, secondary_text, parent = None:\
 		hig_alert (primary_text, secondary_text, parent,
 		           stock = gtk.STOCK_DIALOG_WARNING,
-		           buttons = gtk.STOCK_CLOSE, gtk.RESPONSE_OK)
+		           buttons = (gtk.STOCK_CLOSE, gtk.RESPONSE_OK))
 
 dialog_ok_cancel = \
-	lambda primary_text, secondary_text, parent = None:\
+	lambda primary_text, secondary_text, parent = None: \
 		hig_alert (primary_text, secondary_text, parent,
 		           stock = gtk.STOCK_DIALOG_WARNING,
 		           buttons = (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,

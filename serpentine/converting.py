@@ -47,9 +47,15 @@ class GetMusic (operations.MeasurableOperation, operations.OperationListener):
 			self.__done ()
 			self.__oper = None
 		else:
-			self.__oper = self.__pool.fetch_music (self.__music)
-			self.__oper.listeners.append (self)
-			self.__oper.start()
+			try:
+				self.__oper = self.__pool.fetch_music (self.__music)
+				self.__oper.listeners.append (self)
+				self.__oper.start()
+			except Exception, e:
+				evt = operations.FinishedEvent (self, operations.ERROR)
+				evt.error = e
+				for l in self.listeners:
+					l.on_finished (evt)
 	
 	def __done (self, success = operations.SUCCESSFUL):
 		e = operations.FinishedEvent (self, success)
@@ -152,10 +158,16 @@ class GstMusicPool (MusicPool):
 		raise NotImplementedError
 	
 	def fetch_music (self, music):
+		"""
+		Can throw a OSError exception in case of the provided temporary dir being
+		invalid.
+		"""
 		assert not self.is_available (music)
 		source = self.get_source (music)
 		sink = gst.element_factory_make ("filesink", "destination")
+		
 		handle, filename = tempfile.mkstemp(suffix = '.wav', dir = self.temporary_dir)
+		os.close (handle)
 		sink.set_property ("location", filename)
 		
 		our_listener = GstSourceToWavListener (self, filename, music)
@@ -214,7 +226,7 @@ class GvfsMusicPool (GstMusicPool):
 					uri.is_local and \
 					gnome.vfs.get_mime_type (music) == 'audio/x-wav':
 			# convert to native filename
-			self.cache[music_id] = GstCacheEntry (gnome_util.unescape_uri (uri), False)
+			self.cache[self.unique_music_id (music)] = GstCacheEntry (gnome_util.unescape_uri (uri), False)
 			on_cache = True
 		del uri
 		return on_cache

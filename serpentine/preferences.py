@@ -1,5 +1,10 @@
 import gtk.glade, nautilus_burn, gtk, gobject
+import gnome_util
 from converting import GvfsMusicPool
+import gconf
+import gaw
+
+gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NONE)
 
 class RecordingPreferences (object):
 	def __init__ (self, simulate = False):
@@ -18,17 +23,17 @@ class RecordingPreferences (object):
 		drv.pack_start (cmb_drv, False, False)
 		
 		# Speed selection
-		self.__speed = g.get_widget ("speed")
-		self.__max_speed = g.get_widget ("use_max_speed")
+		self.__speed = gaw.data_spin_button (g.get_widget ("speed"), '/apps/serpentine/write_speed')
+		self.__use_max_speed = gaw.data_toggle_button (g.get_widget ("use_max_speed"), '/apps/serpentine/use_max_speed')
 		self.__update_speed ()
+		self.__speed.sync_widget()
 	
 		# eject checkbox
-		w = g.get_widget ("eject")
-		w.connect ("toggled", self.__on_eject)
-		self.__on_eject (w)
+		self.__eject = gaw.data_toggle_button (g.get_widget ("eject"), '/apps/serpentine/eject')
 		
 		# temp
-		self.__tmp = g.get_widget ("location_ent")
+		self.__tmp = gaw.data_entry (g.get_widget ("location_ent"), "/apps/serpentine/temporary_dir")
+		self.__tmp.sync_widget()
 		
 		# Pool
 		self.__pool = GvfsMusicPool ()
@@ -40,7 +45,7 @@ class RecordingPreferences (object):
 			
 		speed = self.drive.get_max_speed_write ()
 		assert speed > 0
-		self.__speed.set_range (1, speed)
+		self.__speed.widget.set_range (1, speed)
 
 		
 	def __set_simulate (self, simulate):
@@ -48,9 +53,12 @@ class RecordingPreferences (object):
 		if simulate:
 			self.__write_flags |= nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
 		else:
-			self.__write_flags &= ~ nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
+			self.__write_flags &= ~nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
 	
-	simulate = property (lambda self: (self.__write_flags & nautilus_burn.RECORDER_WRITE_DUMMY_WRITE) == nautilus_burn.RECORDER_WRITE_DUMMY, __set_simulate)
+	def __get_simulate (self):
+		return (self.__write_flags & nautilus_burn.RECORDER_WRITE_DUMMY_WRITE) == nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
+	
+	simulate = property (__get_simulate, __set_simulate)
 	
 	dialog = property (lambda self: self.__dialog)
 	
@@ -63,20 +71,27 @@ class RecordingPreferences (object):
 	def __get_speed_write (self):
 		assert self.drive
 		self.__update_speed()
-		if self.__max_speed.get_active ():
+		if self.__use_max_speed.data:
 			return self.drive.get_max_speed_write ()
-		return self.__speed.get_value_as_int ()
+		print self.__speed.data
+		return self.__speed.data
 		
 	speed_write = property (__get_speed_write)
 	
-	write_flags = property (lambda self: self.__write_flags)
+	def __get_write_flags (self):
+		ret = self.__write_flags
+		if self.__eject.data:
+			ret |= nautilus_burn.RECORDER_WRITE_EJECT
+		return ret
+		
+	write_flags = property (__get_write_flags)
 	
-	def __on_eject (self, check, *args):
-		if check.get_active ():
-			self.__write_flags |= nautilus_burn.RECORDER_WRITE_EJECT
-		else:
-			self.__write_flags &= ~ nautilus_burn.RECORDER_WRITE_EJECT
+#	def __on_eject (self, check, *args):
+#		if check.get_active ():
+#			self.__write_flags |= 
+#		else:
+#			self.__write_flags &= ~ nautilus_burn.RECORDER_WRITE_EJECT
 	
-	temporary_dir = property (lambda self: self.__tmp.get_text())
+	temporary_dir = property (lambda self: self.__tmp.data)
 			
 	pool = property (lambda self: self.__pool)

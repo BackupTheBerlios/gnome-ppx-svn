@@ -41,7 +41,6 @@ class RecordingMedia (operations.OperationsQueueListener):
 		return False
 		
 	def start (self):
-		print self.preferences.drive.get_media_type ()
 		if self.preferences.drive.get_media_type () == nautilus_burn.MEDIA_TYPE_CDRW:
 			gtk_util.dialog_warn ("CD-RW disk will be erased",
 			                      "Please remove your disk if you want to preserve it's contents.",

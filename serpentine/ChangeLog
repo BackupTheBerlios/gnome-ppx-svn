@@ -35,6 +35,15 @@
 	(RecordMusicList.__insert_cd):
 	Added a missing case for the dialog.
 	
+	* preferences.py:
+	Added support for gconf throw the new module gaw.py
+	
+	* converting.py:
+	(GetMusic.start): Made GetMusic more effecting, adding support for operations
+	generators that can throw exceptions (fetch_music method).
+	(GstMusicPool.fetch_music): closes the mkstemp file descriptor.
+	(GvfsMusicPool.is_available): corrected a bug introduced in last commits.
+	
 2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	* serpentine_shell.py:
 	(MainWindow.__init__):
