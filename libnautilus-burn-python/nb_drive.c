@@ -19,12 +19,12 @@
  */
 #include <Python.h>
 #include <glib.h>
-#include <cd-drive.h>
+#include <nautilus-burn-drive.h>
 #include "nb_drive.h"
 staticforward PyTypeObject nb_Drive_Type;
 
 static PyObject *
-nb_drive_new (CDDrive *drive)
+nb_drive_new (NautilusBurnDrive *drive)
 {
 	nb_Drive *self;
 	self = (nb_Drive *) PyObject_NEW (nb_Drive, &nb_Drive_Type);
@@ -36,9 +36,9 @@ nb_drive_new (CDDrive *drive)
 }
 
 PyObject *
-nb_drive_new_from_native (const CDDrive *drive)
+nb_drive_new_from_native (const NautilusBurnDrive *drive)
 {
-	PyObject *ret = nb_drive_new ((CDDrive *) drive);
+	PyObject *ret = nb_drive_new ((NautilusBurnDrive *) drive);
 	((nb_Drive *)ret)->destroy = FALSE;
 	return ret;
 }
@@ -47,26 +47,26 @@ static void
 nb_Drive_dealloc (nb_Drive *self)
 {
 	if (self->destroy)
-		cd_drive_free (self->drive);
+		nautilus_burn_drive_free (self->drive);
 	self->ob_type->tp_free ((PyObject *)self);
 }
 
 static PyObject *
 nb_Drive_get_media_size (nb_Drive *self)
 {
-	return Py_BuildValue("l", cd_drive_get_media_size (self->drive));
+	return Py_BuildValue("l", nautilus_burn_drive_get_media_size (self->drive));
 }
 
 static PyObject *
 nb_Drive_unlock (nb_Drive *self)
 {
-	return Py_BuildValue ("i", cd_drive_unlock (self->drive));
+	return Py_BuildValue ("i", nautilus_burn_drive_unlock (self->drive));
 }
 
 static PyObject *
 nb_Drive_lock (nb_Drive *self)
 {
-	return Py_BuildValue ("i", cd_drive_lock (self->drive, NULL, NULL));
+	return Py_BuildValue ("i", nautilus_burn_drive_lock (self->drive, NULL, NULL));
 }
 
 static PyObject *
@@ -102,7 +102,7 @@ nb_Drive_get_max_speed_write (nb_Drive *self)
 static PyObject *
 nb_Drive_get_media_type (nb_Drive *self)
 {
-	return Py_BuildValue ("i", cd_drive_get_media_type(self->drive));
+	return Py_BuildValue ("i", nautilus_burn_drive_get_media_type(self->drive));
 }
 
 static PyMethodDef nb_Drive_methods[] = {
@@ -169,7 +169,7 @@ static PyTypeObject nb_Drive_Type = {
 };
 
 static PyObject *
-nb_scan_for_cdroms (nb_Drive *self, PyObject *args, PyObject *kwargs)
+nb_get_drives_list (nb_Drive *self, PyObject *args, PyObject *kwargs)
 {
 	int recorders_only, add_image, index, len;
 	GList *cds, *iter;
@@ -181,14 +181,14 @@ nb_scan_for_cdroms (nb_Drive *self, PyObject *args, PyObject *kwargs)
 	if (!PyArg_ParseTupleAndKeywords (args, kwargs, "i|i:get_drives_list", kws, &recorders_only,
 			&add_image))
 		return NULL;
-	cds = scan_for_cdroms (recorders_only, add_image);
+	cds = nautilus_burn_drive_get_list (recorders_only, add_image);
 	len = g_list_length (cds);
 	cds_tuple = PyTuple_New (len);
 	
 	for (iter = g_list_first (cds), index = 0; iter; iter = iter->next, index++) {
 		/* create the new Drive object */
 		assert (iter->data);
-		cd = nb_drive_new ((CDDrive *)iter->data);
+		cd = nb_drive_new ((NautilusBurnDrive *)iter->data);
 		if (!cd) {
 			return NULL;
 		}
@@ -202,7 +202,7 @@ nb_scan_for_cdroms (nb_Drive *self, PyObject *args, PyObject *kwargs)
 }
 
 static PyMethodDef nb_methods[] = {
-	{"get_drives_list", (PyCFunction)nb_scan_for_cdroms, METH_VARARGS | METH_KEYWORDS,
+	{"get_drives_list", (PyCFunction) nb_get_drives_list, METH_VARARGS | METH_KEYWORDS,
 		"Scans for available drives."},
 	{NULL}
 };
@@ -220,19 +220,19 @@ initdrive(void)
         return;
 
     m = Py_InitModule("nautilus_burn", nb_methods);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_BUSY", CD_MEDIA_TYPE_BUSY);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", CD_MEDIA_TYPE_ERROR);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", CD_MEDIA_TYPE_ERROR);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_UNKNOWN", CD_MEDIA_TYPE_UNKNOWN);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_CD", CD_MEDIA_TYPE_CD);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_CDR", CD_MEDIA_TYPE_CDR);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_CDRW", CD_MEDIA_TYPE_CDRW);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD", CD_MEDIA_TYPE_DVD);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVDR", CD_MEDIA_TYPE_DVDR);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVDRW", CD_MEDIA_TYPE_DVDRW);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_RAM", CD_MEDIA_TYPE_DVD_RAM);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_R", CD_MEDIA_TYPE_DVD_PLUS_R);
-	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_RW", CD_MEDIA_TYPE_DVD_PLUS_RW);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_BUSY", NAUTILUS_BURN_MEDIA_TYPE_BUSY);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", NAUTILUS_BURN_MEDIA_TYPE_ERROR);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", NAUTILUS_BURN_MEDIA_TYPE_ERROR);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_UNKNOWN", NAUTILUS_BURN_MEDIA_TYPE_UNKNOWN);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_CD", NAUTILUS_BURN_MEDIA_TYPE_CD);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_CDR", NAUTILUS_BURN_MEDIA_TYPE_CDR);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_CDRW", NAUTILUS_BURN_MEDIA_TYPE_CDRW);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD", NAUTILUS_BURN_MEDIA_TYPE_DVD);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVDR", NAUTILUS_BURN_MEDIA_TYPE_DVDR);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVDRW", NAUTILUS_BURN_MEDIA_TYPE_DVDRW);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_RAM", NAUTILUS_BURN_MEDIA_TYPE_DVD_RAM);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_R", NAUTILUS_BURN_MEDIA_TYPE_DVD_PLUS_R);
+	PyModule_AddIntConstant (m, "MEDIA_TYPE_DVD_PLUS_RW", NAUTILUS_BURN_MEDIA_TYPE_DVD_PLUS_RW);
 	
     Py_INCREF(&nb_Drive_Type);
     PyModule_AddObject(m, "Drive", (PyObject *)&nb_Drive_Type);

@@ -26,7 +26,7 @@ typedef struct {
     PyObject_HEAD
     /* Type-specific fields go here. */
     gboolean destroy;
-   	CDDrive *drive;
+   	NautilusBurnDrive *drive;
 } nb_Drive;
 
-PyObject *nb_drive_new_from_native (const CDDrive *drive);
+PyObject *nb_drive_new_from_native (const NautilusBurnDrive *drive);

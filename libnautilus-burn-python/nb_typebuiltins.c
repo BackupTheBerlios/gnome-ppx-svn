@@ -95,16 +95,16 @@ cd_recorder_write_flags_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GFlagsValue values[] = {
-      { CDRECORDER_EJECT, "CDRECORDER_EJECT", "eject" },
-      { CDRECORDER_BLANK, "CDRECORDER_BLANK", "blank" },
-      { CDRECORDER_DUMMY_WRITE, "CDRECORDER_DUMMY_WRITE", "dummy-write" },
-      { CDRECORDER_DISC_AT_ONCE, "CDRECORDER_DISC_AT_ONCE", "disc-at-once" },
-      { CDRECORDER_DEBUG, "CDRECORDER_DEBUG", "debug" },
-      { CDRECORDER_OVERBURN, "CDRECORDER_OVERBURN", "overburn" },
-      { CDRECORDER_BURNPROOF, "CDRECORDER_BURNPROOF", "burnproof" },
+      { NAUTILUS_BURN_RECORDER_WRITE_EJECT, "NAUTILUS_BURN_RECORDER_WRITE_EJECT", "eject" },
+      { NAUTILUS_BURN_RECORDER_WRITE_BLANK, "NAUTILUS_BURN_RECORDER_WRITE_BLANK", "blank" },
+      { NAUTILUS_BURN_RECORDER_WRITE_DUMMY_WRITE, "NAUTILUS_BURN_RECORDER_WRITE_DUMMY_WRITE", "dummy-write" },
+      { NAUTILUS_BURN_RECORDER_WRITE_DISC_AT_ONCE, "NAUTILUS_BURN_RECORDER_WRITE_DISC_AT_ONCE", "disc-at-once" },
+      { NAUTILUS_BURN_RECORDER_WRITE_DEBUG, "NAUTILUS_BURN_RECORDER_WRITE_DEBUG", "debug" },
+      { NAUTILUS_BURN_RECORDER_WRITE_OVERBURN, "NAUTILUS_BURN_RECORDER_WRITE_OVERBURN", "overburn" },
+      { NAUTILUS_BURN_RECORDER_WRITE_BURNPROOF, "NAUTILUS_BURN_RECORDER_WRITE_BURNPROOF", "burnproof" },
       { 0, NULL, NULL }
     };
-    etype = g_flags_register_static ("CDRecorderWriteFlags", values);
+    etype = g_flags_register_static ("NautilusBurnRecorderWriteFlags", values);
   }
   return etype;
 }
@@ -115,13 +115,13 @@ cd_recorder_actions_get_type (void)
   static GType etype = 0;
   if (etype == 0) {
     static const GEnumValue values[] = {
-      { PREPARING_WRITE, "PREPARING_WRITE", "preparing-write" },
-      { WRITING, "WRITING", "writing" },
-      { FIXATING, "FIXATING", "fixating" },
-      { BLANKING, "BLANKING", "blanking" },
+      { NAUTILUS_BURN_RECORDER_ACTION_PREPARING_WRITE, "NAUTILUS_BURN_RECORDER_ACTION_PREPARING_WRITE", "preparing-write" },
+      { NAUTILUS_BURN_RECORDER_ACTION_WRITING, "NAUTILUS_BURN_RECORDER_ACTION_WRITING", "writing" },
+      { NAUTILUS_BURN_RECORDER_ACTION_FIXATING, "NAUTILUS_BURN_RECORDER_ACTION_FIXATING", "fixating" },
+      { NAUTILUS_BURN_RECORDER_ACTION_BLANKING, "NAUTILUS_BURN_RECORDER_ACTION_BLANKING", "blanking" },
       { 0, NULL, NULL }
     };
-    etype = g_enum_register_static ("CDRecorderActions", values);
+    etype = g_enum_register_static ("NautilusBurnRecorderActions", values);
   }
   return etype;
 }
