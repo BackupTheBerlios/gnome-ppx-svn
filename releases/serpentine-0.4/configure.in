@@ -1,0 +1,29 @@
+AC_INIT(scripts/serpentine)
+
+AM_INIT_AUTOMAKE(serpentine, 0.4)
+
+AM_MAINTAINER_MODE
+
+AC_PATH_PROG(GCONFTOOL, gconftool-2)
+AM_GCONF_SOURCE_2
+dnl AC_PROG_INTLTOOL([0.21])
+
+dnl check for python
+AM_PATH_PYTHON(2.3)
+
+#PKG_CHECK_MODULES(PYGTK, pygtk-2.0)
+#AC_SUBST(PYGTK_CFLAGS)
+#AC_SUBST(PYGTK_LIBS)
+
+dnl ALL_LINGUAS="az ca de en_CA en_GB es et fr hr ja ms nl no pl pt sq sr sr@Latn sv it pt_BR uk"
+
+dnl GETTEXT_PACKAGE=serpentine
+dnl AC_SUBST(GETTEXT_PACKAGE)
+dnl AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The gettext package])
+
+dnl AM_GLIB_GNU_GETTEXT
+
+AC_OUTPUT([
+Makefile
+serpentine/release.py
+])
