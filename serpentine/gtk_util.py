@@ -118,6 +118,11 @@ class SimpleList (gtk.TreeView):
 
 gobject.type_register (SimpleList)
 
+dialog_error = \
+	lambda primary_text, secondary_text, parent = None:\
+		hig_alert (primary_text, secondary_text, parent, stock = gtk.STOCK_DIALOG_ERROR)
+	
+
 dialog_warn = \
 	lambda primary_text, secondary_text, parent = None:\
 		hig_alert (primary_text, secondary_text, parent, stock = gtk.STOCK_DIALOG_WARNING)
@@ -143,6 +148,7 @@ def hig_alert (primary_text, secondary_text, parent = None, flags = 0, buttons =
 	dlg.set_resizable (False)
 	dlg.set_has_separator (False)
 	dlg.get_child().set_spacing (12)
+	dlg.set_title ('')
 	
 	hbox = gtk.HBox(spacing = 12)
 	hbox.set_border_width (6)
@@ -151,7 +157,7 @@ def hig_alert (primary_text, secondary_text, parent = None, flags = 0, buttons =
 	
 	img = gtk.Image()
 	img.set_from_stock (stock, gtk.ICON_SIZE_DIALOG)
-	img.set_alignment (img.get_alignment()[0], 0.5)
+	img.set_alignment (img.get_alignment()[0], 0.0)
 	img.show ()
 	hbox.pack_start (img, False, False)
 	

@@ -1,5 +1,30 @@
-2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+2004-12-22 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
+	* mastering.py:
+	ErrorTrapper, class used to show an error message showing which files were
+	not added.
+	(AddFile.on_finished): now this operation returns the same success value as
+	the metadata fetching operation.
+	(AudioMastering.add_file), (AudioMastering.add_files):
+	Uses ErrorTrapper.
+
+	* audio.py:
+	(AudioMetadata):
+	Now returns the correct operation success value.
+	
+	* serpentine_shell.py:
+	Removed the file dialog title for HIG compliance.
+	
+	* gtk_util.py:
+	New function to show error dialogs: dialog_error
+	(hig_alert):
+	Removed title and corrected image alignment for HIG compliance.
+	
+	* operations.py:
+	(OperationsQueue):
+	Adds support for queues that do not abort on an operation error.
+
+2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	* serpentine_shell.py:
 	(MainWindow.__init__):
 	Handle systems which do not have recorder devices.

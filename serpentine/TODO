@@ -9,3 +9,5 @@
   * check if user has a blank cd or a cdrw
 - gtk_util.HigProgress should be visible in taskbar and not have a parent and 
   minizable
+- add gconf entries
+- handle adding operations in a queue when it's already running

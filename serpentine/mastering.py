@@ -19,6 +19,7 @@
 import gtk, gtk.glade, gobject, os.path
 import operations, audio
 from gtk_util import DictStore
+import gtk_util
 import gnome.vfs
 
 ################################################################################
@@ -27,10 +28,56 @@ import gnome.vfs
 # 
 # 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
 
+class ErrorTrapper (operations.Operation, operations.OperationListener):
+	def __init__ (self, parent = None):
+		operations.Operation.__init__ (self)
+		self.__errors = []
+		self.__parent = parent
+	
+	errors = property (lambda self: self.__errors)
+	parent = property (lambda self: self.__parent)
+	
+	def on_finished (self, event):
+		if event.id == operations.ERROR:
+			self.errors.append (event.source)
+	
+	def start (self):
+		if len (self.errors) == 0:
+			e = operations.FinishedEvent (self, operations.SUCCESSFUL)
+			for l in self.listeners:
+				l.on_finished (e)
+			return
+				
+		elif len (self.errors) > 1:
+			title = "Unsupported file types"
+		else:
+			title = "Unsupported file type"
+			
+		filenames = []
+		for e in self.errors:
+			filenames.append (gnome.vfs.URI(e.uri).short_name)
+		del self.__errors
+		
+		if len (filenames) == 1:
+			msg = "The following files were not added:" + "\n"
+		else:
+			msg = "The following files were not added:" + "\n"
+		
+		msg +=  " " + filenames[0]
+		
+		for f in filenames[1:]:
+			msg += ", " + f
+		gtk_util.dialog_error (title, msg)
+		
+		e = operations.FinishedEvent (self, operations.SUCCESSFUL)
+		for l in self.listeners:
+			l.on_finished (e)
+			
 class AddFile (audio.AudioMetadataListener, operations.Operation):
 	# TODO: Implement full Operation here
 	
 	running = property (lambda self: False)
+
 	def __init__ (self, masterer, uri):
 		operations.Operation.__init__ (self)
 		self.uri = uri
@@ -54,6 +101,7 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 			"duration": track_secs,
 			"time": track_time
 		}
+		
 		del self.uri
 		
 		if metadata.has_key ('title'):
@@ -63,7 +111,7 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 		self.masterer.source.append (row)
 	
 	def on_finished (self, evt):
-		e = operations.FinishedEvent (self, operations.SUCCESSFUL)
+		e = operations.FinishedEvent (self, evt.id)
 		for l in self.listeners:
 			l.on_finished (e)
 
@@ -260,6 +308,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		operations.Listenable.__init__ (self)
 		self.__disk_size = 74 * 60
 		self.queue = operations.OperationsQueue()
+		self.queue.abort_on_failure = False
 		self.update = True
 		self.source = GtkMusicList ()
 		self.source.listeners.append (AudioMasteringMusicListener(self))
@@ -409,19 +458,29 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			doc = "Represents the disc size, in seconds.")
 	
 	def add_file (self, uri):
-		self.queue.append (AddFile (self, uri))
+		trapper = ErrorTrapper ()
+		a = AddFile (self, uri)
+		self.queue.append (a)
+		self.queue.append (trapper)
 		if not self.queue.running:
 			self.queue.start()
 	
 	def add_files (self, uris):
 		# Lock graphical updating on each request and
 		# only refresh the UI later
+		trapper = ErrorTrapper ()
+		
 		self.queue.append (SetGraphicalUpdate (self, False))
 		for uri in uris:
-			self.queue.append (AddFile (self, uri))
+			a = AddFile (self, uri)
+			a.listeners.append (trapper)
+			self.queue.append (a)
+			
 		self.queue.append (SetGraphicalUpdate (self, True))
+		self.queue.append (trapper)
 		if not self.queue.running:
 			self.queue.start()
+
 		
 	def remove_selected (self):
 		store, path_list = self.__selection.get_selected_rows ()

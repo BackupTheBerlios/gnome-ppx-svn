@@ -94,6 +94,7 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 		self.__curr_oper = None
 		self.__progress = 0.0
 		self.__total = 0
+		self.__abort_on_failure = True
 	
 	def __is_running (self):
 		return self.__curr_oper != None
@@ -114,6 +115,14 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 		return (self.__done + partial) / total
 		
 	progress = property (__get_progress)
+	
+	def __set_abort_on_failure (self, val):
+		assert isinstance (val, bool)
+		self.__abort_on_failure = val
+	
+	abort_on_failure = property (lambda self: self.__abort_on_failure,
+	                             __set_abort_on_failure,
+	                             doc = "If one operation stops abort progress and propagate event.")
 		
 	def start (self):
 		"""
@@ -152,13 +161,12 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 		assert isinstance (evt, FinishedEvent), evt
 		# Remove the listener connection
 		evt.source.listeners.remove (self)
-		
 		# One more done
 		self.__done += 1
 		self.__curr_oper = None
 		
 		# Abort on not success
-		if evt.id != SUCCESSFUL:
+		if self.abort_on_failure and evt.id != SUCCESSFUL:
 			# Clear remaining operations
 			self.__operations = []
 			evt.source = self

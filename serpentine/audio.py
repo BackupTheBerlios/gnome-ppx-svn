@@ -96,8 +96,8 @@ class GstOperation (operations.MeasurableOperation):
 			self.__finalize ()
 			evt = operations.FinishedEvent (self, operations.ERROR)
 			evt.error = error
-			for listener in self.listeners:
-				listeners.on_finished (evt)
+			for l in self.listeners:
+				l.on_finished (evt)
 		else:
 			gobject.idle_add (self.__finalize)
 	
@@ -158,7 +158,8 @@ class AudioMetadata (operations.Operation, operations.OperationListener):
 		
 		# 1. source
 		bin.add (source)
-	
+		
+		
 		# typefind helps find more tags
 		typefind = gst.element_factory_make ("typefind")
 		bin.add (typefind)
@@ -191,7 +192,8 @@ class AudioMetadata (operations.Operation, operations.OperationListener):
 		
 	def on_finished (self, event):
 		# When the operation is finished we send the metadata
-		if event.id != operations.ERROR:
+		success = event.id == operations.ABORTED
+		if success:
 			# We've completed the operation successfully
 			self.__metadata['duration'] = self.__oper.element.query(gst.QUERY_TOTAL, gst.FORMAT_TIME) / gst.SECOND
 			evt = operations.Event (self)
@@ -201,7 +203,12 @@ class AudioMetadata (operations.Operation, operations.OperationListener):
 			self.__metadata = None
 			self.__element = None
 		
-		event.source = self
+		if success:
+			success = operations.SUCCESSFUL
+		else:
+			success = operations.ERROR
+			
+		event = operations.FinishedEvent (self, success)
 		for l in self.listeners:
 			l.on_finished (event)
 	
@@ -295,11 +302,20 @@ except:
 if __name__ == '__main__':
 	import sys
 	class L (operations.OperationListener):
+		def on_metadata (self, event, metadata):
+			print metadata
+			
 		def on_finished (self, event):
+			if event.id == operations.ABORTED:
+				print "Aborted!"
+				
+			if event.id == operations.ERROR:
+				print "Error:", event.error
 			gst.main_quit()
 	
 	l = L()
-	f = file_to_wav (sys.argv[1], sys.argv[2])
+	#f = file_to_wav (sys.argv[1], sys.argv[2])
+	f = file_audio_metadata (sys.argv[1])
 	f.listeners.append (l)
 	f.start()
 	l.finished = False

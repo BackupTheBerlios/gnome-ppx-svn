@@ -34,7 +34,7 @@ from operations import MapProxy
 
 class RecordingMedia (operations.OperationsQueueListener):
 	def __init__ (self, music_list, preferences, parent = None):
-		self.__queue = operations.OperationsQueue()
+		self.__queue = operations.OperationsQueue ()
 		self.__queue.listeners.append (self)
 		self.__parent = parent
 		self.__prog = gtk_util.HigProgress (parent)
@@ -152,6 +152,7 @@ class MainWindow (gtk.Window):
 		
 		self.__last_path = None
 		self.__add_file = gtk.FileChooserDialog (buttons = (gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+		self.__add_file.set_title ('')
 		self.__add_file.set_select_multiple (True)
 		simulate = len(sys.argv) == 2 and sys.argv[1] == '--simulate'
 		
