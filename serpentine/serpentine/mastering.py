@@ -16,13 +16,17 @@
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
-import gtk, gtk.glade, gobject, os.path
+import gtk, gtk.glade, gobject, os.path, urllib
+from xml.dom import minidom
+from types import IntType, TupleType
+from urlparse import urlparse, urlunparse
+
 import operations, audio
 from gtk_util import DictStore
 import gtk_util
 import gnome.vfs
 from operations import OperationsQueue
-
+import xspf
 try:
 	import playlist_parser
 except ImportError:
@@ -61,7 +65,7 @@ class ErrorTrapper (operations.Operation, operations.OperationListener):
 			
 		filenames = []
 		for e in self.errors:
-			filenames.append (gnome.vfs.URI(e.uri).short_name)
+			filenames.append (gnome.vfs.URI(e.hints['location']).short_name)
 		del self.__errors
 		
 		if len (filenames) == 1:
@@ -84,41 +88,39 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 	
 	running = property (lambda self: False)
 
-	def __init__ (self, masterer, uri, insert_at = None, insert_before = None):
+	def __init__ (self, masterer, hints, insert = None):
 		operations.Operation.__init__ (self)
-		self.uri = uri
+		self.hints = hints
 		self.masterer = masterer
-		self.insert_at = insert_at
-		self.insert_before = insert_before
+		self.insert = insert
 	
 	def start (self):
-		oper = audio.gvfs_audio_metadata (self.uri)
+		oper = audio.gvfs_audio_metadata (self.hints['location'])
 		oper.listeners.append (self)
 		oper.start()
 	
 	def on_metadata (self, event, metadata):
-		# Real implementation, on gobject's main loop
-		track_secs = int(metadata['duration']) 
-		track_time = "%.2d:%.2d" % (track_secs / 60, track_secs % 60)
 		
 		row = {
-			"uri": self.uri,
-			"filename": "",
-			"title": gnome.vfs.URI(self.uri[:-4]).short_name or "Unknown",
+			"location": self.hints['location'],
+			"cache_location": "",
+			"title": gnome.vfs.URI(self.hints['location'][:-4]).short_name or "Unknown",
 			"artist": "Unknow Artist",
-			"duration": track_secs,
-			"time": track_time
+			"duration": int(metadata['duration']),
 		}
-		
-		del self.uri
 		
 		if metadata.has_key ('title'):
 			row['title'] = metadata['title']
 		if metadata.has_key ('artist'):
 			row['artist'] = metadata['artist']
 			
-		if self.insert_at != None:
-			self.masterer.source.insert (self.insert_at, row)
+		if self.hints.has_key ('title'):
+			row['title'] = self.hints['title']
+		if self.hints.has_key ('artist'):
+			row['artist'] = self.hints['artist']
+				
+		if self.insert != None:
+			self.masterer.source.insert (self.insert, row)
 		else:
 			self.masterer.source.append (row)
 		
@@ -186,15 +188,32 @@ class MusicList (operations.Listenable):
 	
 	def has_key (self, key):
 		pass
-		
+	
+	def from_playlist (self, playlist):
+		rows = []
+		for t in playlist.tracks:
+			rows.append ({'location': t.location,
+			              'duration': t.duration,
+			              'title': t.title,
+			              'artist': t.creator})
+		self.append_many (rows)
 
+	def to_playlist (self, playlist):
+		for r in self:
+			t = xspf.Track()
+			t.location = r['location']
+			t.duration = r['duration']
+			t.title = r['title']
+			t.creator = r['artist']
+			playlist.tracks.append (t)
+			
 class GtkMusicList (MusicList):
 	"Takes care of the data source. Supports events and listeners."
 	SPEC = (
 			# URI is used in converter
-			{"name": "uri", "type": gobject.TYPE_STRING},
+			{"name": "location", "type": gobject.TYPE_STRING},
 			# filename is used in recorder
-			{"name": "filename", "type": gobject.TYPE_STRING},
+			{"name": "cache_location", "type": gobject.TYPE_STRING},
 			# Remaining items are for the list
 			{"name": "duration", "type": gobject.TYPE_INT},
 			{"name": "title", "type": gobject.TYPE_STRING},
@@ -224,7 +243,15 @@ class GtkMusicList (MusicList):
 		for l in self.listeners:
 			l.on_musics_added (e, rows)
 	
+	def __correct_row (self, row):
+		if not row.has_key ('time'):
+			row['time'] = "%.2d:%.2d" % (row['duration'] / 60, row['duration'] % 60)
+		if not row.has_key ('cache_location'):
+			row['cache_location'] = ''
+		return row
+		
 	def append (self, row):
+		row = self.__correct_row(row)
 		self.model.append (row)
 		self.__total_duration += int(row['duration'])
 		if not self.__freezed:
@@ -234,6 +261,7 @@ class GtkMusicList (MusicList):
 				l.on_musics_added (e, rows)
 	
 	def insert (self, index, row):
+		row = self.__correct_row(row)
 		self.model.insert_before (self.model.get_iter (index), row)
 		self.__total_duration += int (row['duration'])
 		
@@ -400,27 +428,29 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def __on_artist_edited (self, cell, path, new_text, user_data = None):
 		self.source[path]["artist"] = new_text
 	
-	def __on_pl_entry (self, parser, uri, title, genre, uris):
-		uris.append(uri)
+	def __on_pl_entry (self, parser, uri, title, genre, hints_list):
+		hints = {'location': uri}
+		if title is not None:
+			hints['title'] = title
+		hints_list.append(hints)
 	
 	def __on_dnd_drop (self, treeview, context, x, y, selection, info, timestamp, user_data = None):
 		data = selection.data
-		uris = []
+		hints_list = []
 		
 		# Insert details
-		insert_at = None
-		insert_before = None
+		insert = None
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		if drop_info:
-			insert_at, insert_before = drop_info
-			assert isinstance(insert_at, tuple), len(insert_at) == 1
-			insert_at, = insert_at
+			insert, insert_before = drop_info
+			assert isinstance(insert, TupleType), len(insert) == 1
+			insert, = insert
 			if (insert_before != gtk.TREE_VIEW_DROP_BEFORE and
 			    insert_before != gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
-				insert_at += 1
-				if insert_at == len (self.source):
-					insert_at = None
-				del insert_before
+				insert += 1
+				if insert == len (self.source):
+					insert = None
+			del insert_before
 				
 		del drop_info
 		
@@ -438,8 +468,8 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			# Remove old row
 			del self.source[path]
 			# Append this row
-			if insert_at != None:
-				self.source.insert (insert_at, row)
+			if insert is not None:
+				self.source.insert (insert, row)
 			else:
 				self.source.append (row)
 			return
@@ -454,20 +484,21 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 					pass
 					# Handle directory importing
 				else:
-					uris.append (line)
+					hint = {'location': line}
+					hints_list.append (hint)
 					
 				del nfo
 				
 			except gnome.vfs.NotFoundError, e:
 				print "file not found"
 				return
-		self.add_files (uris, insert_at)
+		self.add_files (hints_list, insert)
 	
 	def __on_dnd_send (self, widget, context, selection, target_type, timestamp):
 		store, path_list = self.__selection.get_selected_rows ()
 		assert path_list and len(path_list) == 1
 		path, = path_list # unpack the only element
-		selection.set (selection.target, 8, self.source[path]['uri'])
+		selection.set (selection.target, 8, self.source[path]['location'])
 	
 	def __hig_duration (self, duration):
 		hig_duration = ""
@@ -515,60 +546,92 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			__set_disk_size,
 			doc = "Represents the disc size, in seconds.")
 	
-	def add_file (self, uri):
+	def add_file (self, hints):
 		w = gtk_util.get_root_parent (self)
 		assert isinstance(w, gtk.Window)
-		uris = self.__add_playlist (uri)
-		if uris:
-			self.add_files (uris)
+		pls = self.__add_playlist (hints['location'])
+		if pls is not None:
+			self.add_files (pls)
 			return
 			
 		trapper = ErrorTrapper (w)
-		a = AddFile (self, uri)
+		a = AddFile (self, hints)
 		queue = OperationsQueue()
 		queue.abort_on_failure = False
 		queue.append (a)
 		queue.append (trapper)
 		queue.start()
 	
-	def __add_playlist (self, uri):
-		mime = gnome.vfs.get_mime_type (uri)
+	def __add_totemplaylist (self, uri):
+		try:
+			mime = gnome.vfs.get_mime_type (uri)
+		except RuntimeError:
+			return None
 		if mime == "audio/x-mpegurl" or mime == "audio/x-scpls":
-			uris = []
+			hints_list = []
 			p = playlist_parser.Parser()
-			p.connect("entry", self.__on_pl_entry, uris)
+			p.connect("entry", self.__on_pl_entry, hints_list)
 			p.parse(uri, False)
-			return uris
-		return False
+			return hints_list
+		return None
 		
 	# Add a no op when we don't have a paylist parser
 	if playlist_parser == None:
-		__add_playlist = lambda self, uri: None
+		__add_totemplaylist = lambda self, uri: None
 		
-	def add_files (self, uris, insert_at = None, insert_before = None):
+	def __add_playlist (self, uri):
+		try:
+			mime = gnome.vfs.get_mime_type (uri)
+		except RuntimeError:
+			return None
+		if mime == "text/xml":
+			if not os.path.exists (uri):
+				s = urlparse (uri)
+				scheme = s[0]
+				# TODO: handle more urls
+				if scheme == 'file':
+					uri = urllib.unquote (s[2])
+				else:
+					return None
+			hints_list = []
+			p = xspf.Playlist()
+			p.parse (uri)
+			for t in p.tracks:
+				if t.location is None:
+					continue
+				r = {'location': t.location}
+				if t.title is not None:
+					r['title'] = t.title
+				if t.creator is not None:
+					r['artist'] = t.creator
+				hints_list.append (r)
+			return hints_list
+
+		return self.__add_totemplaylist (uri)
+			
+	def add_files (self, hints_list, insert = None):
+		assert insert is None or isinstance (insert, IntType)
 		# Lock graphical updating on each request and
 		# only refresh the UI later
 		w = gtk_util.get_root_parent (self)
 		assert isinstance(w, gtk.Window), type(w)
+		
 		trapper = ErrorTrapper (w)
 		queue = OperationsQueue()
 		queue.abort_on_failure = False
 		queue.append (SetGraphicalUpdate (self, False))
 		i = 0
-		# Convert to an integer if possible
-		if insert_at != None and isinstance (insert_at, tuple):
-			insert_at, = insert_at
 			
-		for uri in uris:
-			uris = self.__add_playlist (uri)
-			if uris:
-				self.add_files(uris)
+		for h in hints_list:
+			pls = self.__add_playlist (h['location'])
+			if pls is not None:
+				self.add_files(pls, insert)
 				continue
 				
-			ins = insert_at
-			if insert_at != None:
+			ins = insert
+			if insert != None:
 				ins += i
-			a = AddFile (self, uri, ins, insert_before)
+			a = AddFile (self, h, ins)
 			a.listeners.append (trapper)
 			queue.append (a)
 			i += 1

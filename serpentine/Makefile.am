@@ -6,12 +6,12 @@ serpentine_PYTHON = \
 	serpentine/__init__.py     \
 	serpentine/preferences.py  \
 	serpentine/converting.py   \
-	serpentine/gnome_util.py   \
 	serpentine/mastering.py    \
 	serpentine/recording.py    \
 	serpentine/export.py       \
 	serpentine/gtk_util.py     \
 	serpentine/operations.py   \
+	serpentine/xspf.py         \
 	serpentine/release.py
 
 # Launcher

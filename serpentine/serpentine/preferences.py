@@ -1,9 +1,26 @@
-import gtk.glade, nautilus_burn, gtk, gobject, os, os.path
-import gnome_util
+# Copyright (C) 2004 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+# Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+import gtk.glade, nautilus_burn, gtk, gobject, os, os.path, gconf, gtk.gdk
+from xml.dom import minidom
+
 from converting import GvfsMusicPool
-import gconf
-import gaw
-import gtk.gdk
+import gaw, xspf
 try:
 	import release
 except Exception:
@@ -79,8 +96,10 @@ class RecordingPreferences (object):
 		
 		# Close button
 		self.__close = g.get_widget ('close_btn')
-		
 	
+	__config_dir = os.path.join (os.path.expanduser ('~'), '.serpentine')
+	config_dir = property (lambda self: self.__config_dir)
+
 	def __update_speed (self):
 		if not self.drive:
 			self.__speed.set_sensitive (False)
@@ -138,7 +157,6 @@ class RecordingPreferences (object):
 		self.__update_speed()
 		if self.__use_max_speed.data:
 			return self.drive.get_max_speed_write ()
-		print self.__speed.data
 		return self.__speed.data
 		
 	speed_write = property (__get_speed_write)
@@ -179,3 +197,22 @@ class RecordingPreferences (object):
 		
 	def __on_specify_speed (self, widget, *args):
 		self.__speed.widget.set_sensitive (widget.get_active ())
+	
+	def save_playlist (self, source):
+		if not os.path.exists (self.config_dir):
+			os.makedirs (self.config_dir)
+		p = xspf.Playlist (title="Serpentine's playlist", creator="Serpentine " + self.version)
+		source.to_playlist (p)
+		doc = minidom.parseString (p.toxml())
+		out = open (os.path.join (self.config_dir, "playlist.xml"), "w")
+		doc.writexml (out, addindent = "\t", newl = "\n")
+		del p
+		out.close()
+	
+	def load_playlist (self, source):
+		if not os.path.exists (self.config_dir):
+			os.makedirs (self.config_dir)
+		p = xspf.Playlist (title="Serpentine's playlist", creator="Serpentine " + self.version)
+		p.parse (os.path.join (self.config_dir, "playlist.xml"))
+		source.from_playlist (p)
+		

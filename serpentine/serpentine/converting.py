@@ -188,9 +188,9 @@ class GstMusicPool (MusicPool):
 	def unique_music_id (self, music):
 		pass
 	
-
+import urllib
+from urlparse import urlparse, urlunparse
 import gnome.vfs
-import gnome_util
 
 class GvfsMusicPool (GstMusicPool):
 	def unique_music_id (self, uri):
@@ -200,24 +200,15 @@ class GvfsMusicPool (GstMusicPool):
 		file:///foo bar
 		/foo bar
 		"""
-		uri = gnome.vfs.URI (uri)
-		if uri.scheme == 'file':
-			return gnome_util.unescape_uri (uri)
+		s = urlparse (uri)
+		scheme = s[1]
+		path = s[2]
+		urllib.unquote(path)
+		if scheme == 'file':
+			return path
 			
-		return self.__g_unique_music_id (uri)
-		
-	
-	def __g_unique_music_id (self, uri):
-	
-		if uri.path == '/':
-			return str(uri)
-			
-		parent = self.__g_unique_music_id (str(uri.resolve_relative ('..')))
-		parent += uri.short_name
-		if uri.path[-1] == '/':
-			parent += '/'
-		return parent
-		
+		s[2] = path
+		return urlunparse (s)
 		
 	def is_available (self, music):
 		on_cache = GstMusicPool.is_available (self, music)
@@ -226,7 +217,8 @@ class GvfsMusicPool (GstMusicPool):
 					uri.is_local and \
 					gnome.vfs.get_mime_type (music) == 'audio/x-wav':
 			# convert to native filename
-			self.cache[self.unique_music_id (music)] = GstCacheEntry (gnome_util.unescape_uri (uri), False)
+			filename = self.unique_music_id (music)
+			self.cache[filename] = GstCacheEntry (filename, False)
 			on_cache = True
 		del uri
 		return on_cache

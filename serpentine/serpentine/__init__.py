@@ -29,6 +29,7 @@ import operations, nautilus_burn, gtk_util
 from preferences import RecordingPreferences
 from operations import MapProxy
 import gnome.ui
+from xml.parsers.expat import ExpatError
 # TODO make this actually beautiful
 
 class Serpentine (gtk.Window):
@@ -37,6 +38,12 @@ class Serpentine (gtk.Window):
 		self.preferences = RecordingPreferences (data_dir)
 		self.preferences.dialog.set_transient_for (self)
 		self.masterer = AudioMastering (self.preferences)
+		try:
+			self.preferences.load_playlist (self.masterer.source)
+		except ExpatError:
+			pass
+		except IOError:
+			pass
 		self.masterer.listeners.append (self)
 		g = gtk.glade.XML (os.path.join (self.preferences.data_dir, "serpentine.glade"),
 		                   "main_window_container")
@@ -89,6 +96,9 @@ class Serpentine (gtk.Window):
 		self.__add_file = gtk.FileChooserDialog (buttons = (gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
 		self.__add_file.set_title ('')
 		self.__add_file.set_select_multiple (True)
+		
+		# update buttons
+		self.on_contents_changed()
 		
 		if not self.preferences.drive:
 			gtk_util.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.", self)
@@ -172,6 +182,7 @@ class Serpentine (gtk.Window):
 		r.start()
 		
 	def quit (self, *args):
+		self.preferences.save_playlist (self.masterer.source)
 		self.preferences.pool.clear()
 		gtk.main_quit()
 		sys.exit (0)
@@ -193,7 +204,10 @@ class Serpentine (gtk.Window):
 	def add_file (self, *args):
 		if self.__add_file.run () == gtk.RESPONSE_OK:
 			files = self.__add_file.get_uris()
-			self.masterer.add_files (files)
+			hints_list = []
+			for uri in files:
+				hints_list.append({'location': uri})
+			self.masterer.add_files (hints_list)
 		self.__add_file.unselect_all()
 		self.__add_file.hide()
 	

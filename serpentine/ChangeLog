@@ -1,5 +1,23 @@
 2004-12-28 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
+	* mastering.py: (ErrorTrapper.start): (AddFile):
+	Now it's possible to set the title and artist while adding files. This
+	affects .pls platlist format and newly added xpsf.
+	(MusicList): Add possibility to load and save from a xspf playlist.
+	
+	* converting.py: (GvfsMusicPool):
+	gnome_util module is no longer needed, since we're using urlparse and urllib
+	to achieve the same effect.
+	
+	* __init__.py: (Serpentine):
+	* preferences: (RecordingPreferences):
+	Loads the default playlist on startup and saves it on exit.
+	
+	* preferences.py:
+	Added copyright notice. Removed an unnecessary debugging 'print'.
+	
+2004-12-28 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
 	* mastering.py: (AddFile.on_metadata): (GtkMusicList):
 	(AudioMastering.__on_dnd_drop):
 	Removed redundant insert_before/insert_after to only an insert method
