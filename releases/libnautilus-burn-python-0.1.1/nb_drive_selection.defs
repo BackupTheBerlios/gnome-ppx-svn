@@ -1,0 +1,48 @@
+;; -*- scheme -*-
+
+(define-object DriveSelection
+  (in-module "NautilusBurn")
+  (parent "GtkComboBox")
+  (c-name "BaconCdSelection")
+  (gtype-id "BACON_TYPE_CD_SELECTION")
+)
+
+(define-function bacon_cd_selection_get_type
+  (c-name "bacon_cd_selection_get_type")
+  (return-type "GtkType")
+)
+
+(define-function bacon_cd_selection_new
+  (c-name "bacon_cd_selection_new")
+  (is-constructor-of "BaconCdSelection")
+  (return-type "GtkWidget*")
+)
+
+(define-method set_device
+  (of-object "BaconCdSelection")
+  (c-name "bacon_cd_selection_set_device")
+  (return-type "none")
+  (parameters
+    '("const-char*" "device")
+  )
+)
+
+(define-method get_device
+  (of-object "BaconCdSelection")
+  (c-name "bacon_cd_selection_get_device")
+  (return-type "const-char*")
+)
+
+(define-method get_default_device
+  (of-object "BaconCdSelection")
+  (c-name "bacon_cd_selection_get_default_device")
+  (return-type "const-char*")
+)
+
+(define-method get_drive
+  (of-object "BaconCdSelection")
+  (c-name "bacon_cd_selection_get_cdrom")
+  (return-type "const-CDDrive*")
+)
+
+

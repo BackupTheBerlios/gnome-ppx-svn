@@ -1,0 +1,160 @@
+%%
+headers
+#define NO_IMPORT_PYGOBJECT
+#include "pygobject.h"
+#include <cd-drive.h>
+#include <bacon-cd-selection.h>
+#include <cd-recorder.h>
+#define BACON_TYPE_CD_SELECTION (bacon_cd_selection_get_type())
+#include "nb_typebuiltins.h"
+#include "nb_drive.h"
+/*#include "nb_track.h"*/
+%%
+modulename burn
+%%
+import gtk.ComboBox as PyGtkComboBox_Type
+import gobject.GObject as PyGObject_Type
+%%
+ignore-glob
+  *_get_type
+%%
+override bacon_cd_selection_new noargs
+static int
+_wrap_bacon_cd_selection_new(PyGObject *self)
+{
+    self->obj = (GObject *)bacon_cd_selection_new();
+
+    if (!self->obj) {
+        PyErr_SetString(PyExc_RuntimeError, "could not create DriveSelection object.");
+        return -1;
+    }
+    pygobject_register_wrapper((PyObject *)self);
+    return 0;
+}
+
+%%
+override bacon_cd_selection_get_cdrom noargs
+static PyObject *
+_wrap_bacon_cd_selection_get_cdrom (PyGObject *self)
+{
+	return nb_drive_new_from_native (bacon_cd_selection_get_cdrom ((BaconCdSelection*)self->obj));
+}
+%%
+override cd_recorder_cancel
+static PyObject *
+_wrap_cd_recorder_cancel (PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+	static char *kwlist[] = {"skip_if_dangerous"};
+	int skip_if_dangerous = TRUE;
+	
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "|i:Recorder.cancel", kwlist, &skip_if_dangerous))
+		return NULL;
+	
+	return Py_BuildValue ("i", cd_recorder_cancel ((CDRecorder *)self->obj, skip_if_dangerous));
+}
+%%
+override cd_recorder_write_tracks
+
+static int
+nb_Object_CheckFromString (PyObject *obj, char *module_name, char *class_name)
+{
+	int ret;
+	PyObject *module, *klass;
+	module = PyImport_ImportModule (module_name);
+	if (!module)
+		return 0;
+	klass = PyObject_GetAttrString (module, class_name);
+	if (!klass)
+		return 0;
+	ret = PyObject_IsInstance (obj, klass);
+	Py_DECREF (klass);
+	Py_DECREF (module);
+	return ret;
+}
+
+static Track *
+nb_track_new_from_object (PyObject *obj)
+{
+	Track *t = g_new (Track, 1);
+	PyObject *data;
+	
+	if (!t)
+		return NULL;
+
+	if (nb_Object_CheckFromString (obj, "nautilus_burn", "AudioTrack")) {
+		t->type = TRACK_TYPE_AUDIO;
+		data = PyObject_GetAttrString (obj, "filename");
+		if (!data || !PyString_Check (data))
+			return NULL;
+		t->contents.audio.filename = g_strdup (PyString_AS_STRING (data));
+		Py_DECREF (data);
+		
+		data = PyObject_GetAttrString (obj, "cdtext");
+		if (!data || !PyString_Check (data))
+			return NULL;
+		t->contents.audio.cdtext = g_strdup (PyString_AS_STRING (data));
+		Py_DECREF (data);
+		return t;
+		
+	} else if (nb_Object_CheckFromString (obj, "nautilus_burn", "DataTrack")) {
+		t->type = TRACK_TYPE_DATA;
+		data = PyObject_GetAttrString (obj, "filename");
+		if (!data || !PyString_Check (data))
+			return NULL;
+		t->contents.data.filename = g_strdup (PyString_AS_STRING (data));
+		Py_DECREF (data);
+		return t;
+	}
+	
+	return NULL;
+}
+
+static PyObject *
+_wrap_cd_recorder_write_tracks (PyGObject *self, PyObject *args, PyObject *kwargs)
+{
+	nb_Drive *drive;
+	PyObject *tracks;
+	Track *t;
+	GList *g_tracks = NULL;
+	PyGILState_STATE gstate;
+	
+	int speed, flags, i, len, ret;
+
+	if (!PyArg_ParseTuple (args, "OOii", &drive, &tracks, &speed, &flags))
+		return NULL;
+	if (!PyList_Check (tracks))
+		return NULL;
+		
+	len = PyList_GET_SIZE (tracks);
+	for (i = 0; i < len; i++) {
+		t = nb_track_new_from_object (PyList_GET_ITEM (tracks, i));
+		if (!t)
+			return NULL;
+		g_tracks = g_list_append (g_tracks, t);
+	}
+	gstate = PyGILState_Ensure();
+	ret = cd_recorder_write_tracks ((CDRecorder*)self->obj, drive->drive, g_tracks, speed, flags);
+	PyGILState_Release(gstate);
+	
+	g_list_foreach (g_tracks, (GFunc)cd_recorder_track_free, NULL);
+	g_list_free (g_tracks);
+	
+	return Py_BuildValue ("i", ret);
+}
+
+%%
+override cd_recorder_new noargs
+static int
+_wrap_cd_recorder_new (PyGObject *self)
+{
+    self->obj = (GObject *)cd_recorder_new();
+
+    if (!self->obj) {
+        PyErr_SetString(PyExc_RuntimeError, "could not create Recorder object.");
+        return -1;
+    }
+    pygobject_register_wrapper((PyObject *)self);
+    return 0;
+}
+
+%%
