@@ -26,6 +26,7 @@ import gnome.vfs
 #
 # 
 # 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
+
 class AddFile (audio.AudioMetadataListener, operations.Operation):
 	# TODO: Implement full Operation here
 	
@@ -299,11 +300,16 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		r = gtk.CellRendererText()
 		col = gtk.TreeViewColumn ("Duration", r, text = self.source.model.index_of("time"))
 		lst.append_column (col)
+		
+		# TreeView Selection
 		self.__selection = lst.get_selection()
 		self.__selection.connect ("changed", self.__selection_changed)
 		self.__selection.set_mode (gtk.SELECTION_MULTIPLE)
-		lst.set_reorderable (True)
+		
 		# Listen for drag-n-drop events
+		lst.set_reorderable (True)
+		#XXX pygtk bug here
+		#lst.drag_source_set (gtk.gdk.BUTTON1_MASK, AudioMastering.DND_TARGETS, gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
 		lst.enable_model_drag_dest ( AudioMastering.DND_TARGETS, gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
 		lst.connect ("drag_data_received", self.__on_dnd_drop)
 	
@@ -320,7 +326,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def __on_artist_edited (self, cell, path, new_text, user_data = None):
 		self.source[path]["artist"] = new_text
 	
-	def __on_dnd_drop (self, treeview, context, x, y, selection, info, timestamp, user_data = None): 
+	def __on_dnd_drop (self, treeview, context, x, y, selection, info, timestamp, user_data = None):
 		data = selection.data
 		uris = []
 		if selection.type == 'application/x-rhythmbox-source':
@@ -348,6 +354,14 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 				return
 		self.add_files (uris)
 	
+	def __on_dnd_send (self, widget, context, selection, target_type, timestamp):
+		data = ""
+		store, path_list = self.__selection.get_selected_rows ()
+		if path_list:
+			assert len(path_list) == 1
+			data = self.source[path_list[0][0]]['uri']
+		selection.set (selection.target, 8, data)
+	
 	def __hig_duration (self, duration):
 		hig_duration = ""
 		minutes = duration / 60
@@ -356,7 +370,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		seconds = duration % 60
 		if seconds:
 			hig_secs = ("%s %s") %(seconds, seconds == 1 and "second" or "seconds")
-			hig_duration += (len (hig_duration) and " ") + hig_secs
+			hig_duration += (len (hig_duration) and " and ") + hig_secs
 		if not len(hig_duration):
 			hig_duration = "Empty"
 		return hig_duration

@@ -1,5 +1,15 @@
 2004-12-21 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
+	* serpentine_shell.py:
+	(MainWindow.__init__):
+	Handle systems which do not have recorder devices.
+	Do not set the default device on DriveSelection (this is done internally).
+	Update speed widget explicitly.
+	
+	* preferences.py:
+	(RecordingPreferences.__update_speed):
+	When user does not have a device turn the speed widget insensitive.
+	
 	* converting.py:
 	unique_music_id was moved up to GstMusicPool and corrected, since it was
 	not working correctly.
@@ -10,6 +20,9 @@
 	* audio.py:
 	(GstOperation.__on_error):
 	Only remove source if it is defined, since sometimes it happens.
+	
+	* mastering.py:
+	Started adding reordering code but postponed because of pygtk bug.
 	
 2004-12-20 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 

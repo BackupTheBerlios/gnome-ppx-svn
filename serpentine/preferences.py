@@ -14,14 +14,13 @@ class RecordingPreferences (object):
 		drv = g.get_widget ("drive")
 		cmb_drv = nautilus_burn.DriveSelection ()
 		cmb_drv.show ()
-		cmb_drv.set_device (cmb_drv.get_default_device ())
 		self.__drive_selection = cmb_drv
 		drv.pack_start (cmb_drv, False, False)
 		
 		# Speed selection
 		self.__speed = g.get_widget ("speed")
 		self.__max_speed = g.get_widget ("use_max_speed")
-		self.speed_write
+		self.__update_speed ()
 	
 		# eject checkbox
 		w = g.get_widget ("eject")
@@ -35,10 +34,14 @@ class RecordingPreferences (object):
 		self.__pool = GvfsMusicPool ()
 	
 	def __update_speed (self):
+		if not self.drive:
+			self.__speed.set_sensitive (False)
+			return
+			
 		speed = self.drive.get_max_speed_write ()
 		assert speed > 0
 		self.__speed.set_range (1, speed)
-		#self.__speed.set_value (speed)
+
 		
 	def __set_simulate (self, simulate):
 		assert isinstance (simulate, bool)
@@ -58,6 +61,7 @@ class RecordingPreferences (object):
 		return False
 	
 	def __get_speed_write (self):
+		assert self.drive
 		self.__update_speed()
 		if self.__max_speed.get_active ():
 			return self.drive.get_max_speed_write ()
