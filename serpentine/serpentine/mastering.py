@@ -279,7 +279,7 @@ class GtkMusicList (MusicList):
 ################################################################################
 # Audio Mastering widget
 #	
-import sys
+import sys, os.path
 
 class AudioMasteringMusicListener (MusicListListener):
 	def __init__ (self, audio_mastering):
@@ -303,7 +303,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		('text/plain', 0, 1),
 		('STRING', 0, 2),
 	]
-	def __init__ (self):
+	def __init__ (self, preferences):
 		gtk.VBox.__init__ (self)
 		operations.Listenable.__init__ (self)
 		self.__disk_size = 74 * 60
@@ -313,7 +313,8 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		self.source = GtkMusicList ()
 		self.source.listeners.append (AudioMasteringMusicListener(self))
 		gtk.VBox.__init__ (self)
-		g = gtk.glade.XML ("serpentine.glade", "audio_container")
+		g = gtk.glade.XML (os.path.join (preferences.data_dir, "serpentine.glade"),
+		                   "audio_container")
 		self.add (g.get_widget ("audio_container"))
 		self.__setup_track_list (g)
 		self.__setup_container_misc (g)

@@ -1,1 +1,2 @@
 version = "@VERSION@"
+data_dir = "@prefix@/@DATADIRNAME@/serpentine"

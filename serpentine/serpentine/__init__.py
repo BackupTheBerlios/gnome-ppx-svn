@@ -21,23 +21,23 @@ This is the window widget which will contain the audio mastering widget
 defined in audio_widgets.AudioMastering. 
 """
 
-import os
-
-import gtk, gtk.glade, gobject, sys
+import os, os.path, gtk, gtk.glade, gobject, sys
 
 from mastering import AudioMastering
 from recording import RecordMusicList, RecordingMedia
 import operations, nautilus_burn, gtk_util
 from preferences import RecordingPreferences
 from operations import MapProxy
-	
 # TODO make this actually beautiful
-class Shell (gtk.Window):
-	def __init__ (self, masterer, version):
+class Serpentine (gtk.Window):
+	def __init__ (self, masterer = None):
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
+		self.preferences = RecordingPreferences ()
+		masterer = AudioMastering (self.preferences)
 		self.masterer = masterer
 		self.masterer.listeners.append (self)
-		g = gtk.glade.XML ("serpentine.glade", "main_window_container")
+		g = gtk.glade.XML (os.path.join (self.preferences.data_dir, "serpentine.glade"),
+		                   "main_window_container")
 		self.add (g.get_widget ("main_window_container"))
 		self.set_title ("Serpentine")
 		
@@ -83,9 +83,7 @@ class Shell (gtk.Window):
 		self.__add_file = gtk.FileChooserDialog (buttons = (gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
 		self.__add_file.set_title ('')
 		self.__add_file.set_select_multiple (True)
-		simulate = len(sys.argv) == 2 and sys.argv[1] == '--simulate'
 		
-		self.preferences = RecordingPreferences (simulate)
 		if not self.preferences.drive:
 			gtk_util.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.")
 			g.get_widget ("preferences_mni").set_sensitive (False)
@@ -132,6 +130,7 @@ class Shell (gtk.Window):
 		self.preferences.dialog.hide ()
 
 if __name__ == '__main__':
-	m = Shell (AudioMastering())
-	m.show()
+	s = Serpentine ()
+	s.preferences.simulate = len(sys.argv) == 2 and sys.argv[1] == '--simulate'
+	s.show()
 	gtk.main()

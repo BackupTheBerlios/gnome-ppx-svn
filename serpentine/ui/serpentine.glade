@@ -187,10 +187,8 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="about_mni">
 		      <property name="visible">True</property>
-		      <property name="sensitive">False</property>
 		      <property name="label" translatable="yes">_About</property>
 		      <property name="use_underline">True</property>
-		      <signal name="activate" handler="on_about1_activate" last_modification_time="Sat, 06 Nov 2004 09:56:44 GMT"/>
 		    </widget>
 		  </child>
 		</widget>

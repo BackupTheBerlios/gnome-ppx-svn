@@ -4,15 +4,27 @@ from converting import GvfsMusicPool
 import gconf
 import gaw
 import gtk.gdk
-
+try:
+	import release
+except Exception:
+	release = None
+	
 gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NONE)
 
 class RecordingPreferences (object):
-	def __init__ (self, simulate = False):
+	def __init__ (self):
 		self.__write_flags = 0
-		self.simulate = simulate
 		
-		g = gtk.glade.XML ("serpentine.glade", "preferences_dialog")
+		# Sets up data dir and version
+		if release:
+			self.__version = release.version
+			self.__data_dir = release.data_dir
+		else:
+			self.__version = "testing"
+			self.__data_dir = "ui"
+		
+		# setup ui
+		g = gtk.glade.XML (os.path.join(self.data_dir, "serpentine.glade"), "preferences_dialog")
 		self.__dialog = g.get_widget ("preferences_dialog")
 		self.dialog.connect ('destroy-event', self.__on_destroy)
 		
@@ -55,14 +67,7 @@ class RecordingPreferences (object):
 		
 		# Close button
 		self.__close = g.get_widget ('close_btn')
-	
-	def __on_tmp_changed (self, *args):
-		is_ok = self.temporary_dir_is_ok ()
-		if is_ok:
-			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#FFF"))
-		else:
-			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#F88"))
-		self.__close.set_sensitive (is_ok)
+		
 	
 	def __update_speed (self):
 		if not self.drive:
@@ -85,14 +90,12 @@ class RecordingPreferences (object):
 		return (self.__write_flags & nautilus_burn.RECORDER_WRITE_DUMMY_WRITE) == nautilus_burn.RECORDER_WRITE_DUMMY_WRITE
 	
 	simulate = property (__get_simulate, __set_simulate)
-	
 	dialog = property (lambda self: self.__dialog)
-	
+	version = property (lambda self: self.__version)
+	data_dir = property (lambda self: self.__data_dir)
 	drive = property (lambda self: self.__drive_selection.get_drive())
-	
-	def __on_destroy (self, *args):
-		self.dialog.hide ()
-		return False
+	temporary_dir = property (lambda self: self.__tmp.data)
+	pool = property (lambda self: self.__pool)
 	
 	def __get_speed_write (self):
 		assert self.drive
@@ -112,10 +115,6 @@ class RecordingPreferences (object):
 		
 	write_flags = property (__get_write_flags)
 	
-	temporary_dir = property (lambda self: self.__tmp.data)
-			
-	pool = property (lambda self: self.__pool)
-	
 	def temporary_dir_is_ok (self):
 		tmp = self.__tmp.data
 		is_ok = False
@@ -129,3 +128,15 @@ class RecordingPreferences (object):
 		if self.__tmp_dlg.run () == gtk.RESPONSE_OK:
 			self.__tmp.data = self.__tmp_dlg.get_filename ()
 		self.__tmp_dlg.hide ()
+
+	def __on_destroy (self, *args):
+		self.dialog.hide ()
+		return False
+
+	def __on_tmp_changed (self, *args):
+		is_ok = self.temporary_dir_is_ok ()
+		if is_ok:
+			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#FFF"))
+		else:
+			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#F88"))
+		self.__close.set_sensitive (is_ok)
