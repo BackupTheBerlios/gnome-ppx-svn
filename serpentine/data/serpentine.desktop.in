@@ -1,7 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=Serpentine
+_Name=Serpentine
+_Comment=Create audio CDs from music files
 Type=Application
 Exec=serpentine
 Icon=gnome-dev-cdrom-audio.png
