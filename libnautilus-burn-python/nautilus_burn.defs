@@ -1,9 +1,8 @@
 ;; -*- scheme -*-
-; object definitions ...
 ; Enumerations and flags ...
 
 (define-flags RecorderWriteFlags
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (c-name "NautilusBurnRecorderWriteFlags")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_WRITE_FLAGS")
   (values
@@ -18,7 +17,7 @@
 )
 
 (define-enum NautilusBurnRecorderActions
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (c-name "NautilusBurnRecorderActions")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_ACTIONS")
   (values
@@ -30,7 +29,7 @@
 )
 
 (define-enum NautilusBurnRecorderMedia
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (c-name "NautilusBurnRecorderMedia")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_MEDIA")
   (values
@@ -40,7 +39,7 @@
 )
 
 (define-enum NautilusBurnRecorderBlankType
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (c-name "NautilusBurnRecorderBlankType")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_BLANK_TYPE")
   (values
@@ -50,7 +49,7 @@
 )
 
 (define-enum NautilusBurnRecorderResult
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (c-name "NautilusBurnRecorderResult")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER_RESULT")
   (values
@@ -61,16 +60,13 @@
   )
 )
 
-;; From /usr/include/libnautilus-burn/bacon-cd-selection.h
+;; From nautilus-burn-drive-selection.h
 (include "nb_drive_selection.defs")
 
-;; From /usr/include/libnautilus-burn/cd-drive.h
-;(include "nb_cd_drive.defs")
-
-;; From /usr/include/libnautilus-burn/cd-recorder.h
+;; From nautilus-burn-recorder.h
 
 (define-object Recorder
-  (in-module "Burn")
+  (in-module "NautilusBurn")
   (parent "GObject")
   (c-name "NautilusBurnRecorder")
   (gtype-id "NAUTILUS_BURN_TYPE_RECORDER")
@@ -130,5 +126,3 @@
   (c-name "nautilus_burn_recorder_get_error_message_details")
   (return-type "const-char*")
 )
-
-

@@ -24,9 +24,6 @@ import imp
 imp.load_dynamic ("nautilusburn", base_path + "/nautilusburn.so")
 del base_path
 del imp
-# Defines the nautilus burn version and API interface
-version = (0,1,0)
-api_interface = (1,0,0)
 
 class Track (object):
 	def __init__ (self):

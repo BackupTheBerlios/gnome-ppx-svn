@@ -170,7 +170,7 @@ static PyTypeObject nb_Track_Type = {
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    Py_TPFLAGS_DEFAULT, /*tp_flags*/
     "Represents a recorder's track.",           /* tp_doc */
 };
 
@@ -217,7 +217,7 @@ static PyTypeObject nb_AudioTrack_Type = {
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    Py_TPFLAGS_DEFAULT, /*tp_flags*/
     "Represents a recorder's audio track.", /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
@@ -228,7 +228,7 @@ static PyTypeObject nb_AudioTrack_Type = {
     0,                     /* tp_methods */
     0,                     /* tp_members */
     nb_AudioTrack_getseters,   /* tp_getset */
-    0,                         /* tp_base */
+    &nb_Track_Type,            /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
@@ -259,7 +259,7 @@ static PyTypeObject nb_DataTrack_Type = {
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    Py_TPFLAGS_DEFAULT, /*tp_flags*/
     "Represents a recorder's data track.", /* tp_doc */
     0,		               /* tp_traverse */
     0,		               /* tp_clear */
@@ -270,7 +270,7 @@ static PyTypeObject nb_DataTrack_Type = {
     0,                     /* tp_methods */
     0,                     /* tp_members */
     nb_DataTrack_getseters,   /* tp_getset */
-    0,                         /* tp_base */
+    &nb_Track_Type,            /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
@@ -279,6 +279,18 @@ static PyTypeObject nb_DataTrack_Type = {
     0,                         /* tp_alloc */
     nb_Track_new,                 /* tp_new */
 };
+
+int
+nb_AudioTrack_Check (PyObject *object)
+{
+	return PyObject_TypeCheck (object, &nb_AudioTrack_Type);
+}
+
+int
+nb_DataTrack_Check (PyObject *object)
+{
+	return PyObject_TypeCheck (object, &nb_DataTrack_Type);
+}
 
 int
 nb_track_init (PyObject *module)

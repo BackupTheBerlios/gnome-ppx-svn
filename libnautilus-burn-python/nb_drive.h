@@ -29,4 +29,7 @@ typedef struct {
    	NautilusBurnDrive *drive;
 } nb_Drive;
 
+/* returns 0 on success, -1 on failure */
+int nb_drive_init(PyObject *module);
 PyObject *nb_drive_new_from_native (const NautilusBurnDrive *drive);
+PyObject *nb_drive_new (NautilusBurnDrive *drive);

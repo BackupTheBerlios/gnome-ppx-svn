@@ -7,8 +7,9 @@ headers
 #include <nautilus-burn-recorder.h>
 #include "nb_typebuiltins.h"
 #include "nb_drive.h"
+#include "nb_track.h"
 %%
-modulename burn
+modulename nautilusburn
 %%
 import gtk.ComboBox as PyGtkComboBox_Type
 import gobject.GObject as PyGObject_Type
@@ -58,66 +59,12 @@ _wrap_nautilus_burn_recorder_cancel (PyGObject *self, PyObject *args)
 %%
 override nautilus_burn_recorder_write_tracks
 
-static int
-nb_Object_CheckFromString (PyObject *obj, char *module_name, char *class_name)
-{
-	int ret;
-	PyObject *module, *klass;
-	module = PyImport_ImportModule (module_name);
-	if (!module)
-		return 0;
-	klass = PyObject_GetAttrString (module, class_name);
-	if (!klass)
-		return 0;
-	ret = PyObject_IsInstance (obj, klass);
-	Py_DECREF (klass);
-	Py_DECREF (module);
-	return ret;
-}
-
-static NautilusBurnRecorderTrack *
-nb_track_new_from_object (PyObject *obj)
-{
-	NautilusBurnRecorderTrack *t = g_new (NautilusBurnRecorderTrack, 1);
-	PyObject *data;
-	
-	if (!t)
-		return NULL;
-
-	if (nb_Object_CheckFromString (obj, "nautilusburn", "AudioTrack")) {
-		t->type = NAUTILUS_BURN_RECORDER_TRACK_TYPE_AUDIO;
-		data = PyObject_GetAttrString (obj, "filename");
-		if (!data || !PyString_Check (data))
-			return NULL;
-		t->contents.audio.filename = g_strdup (PyString_AS_STRING (data));
-		Py_DECREF (data);
-		
-		data = PyObject_GetAttrString (obj, "cdtext");
-		if (!data || !PyString_Check (data))
-			return NULL;
-		t->contents.audio.cdtext = g_strdup (PyString_AS_STRING (data));
-		Py_DECREF (data);
-		return t;
-		
-	} else if (nb_Object_CheckFromString (obj, "nautilusburn", "DataTrack")) {
-		t->type = NAUTILUS_BURN_RECORDER_TRACK_TYPE_DATA;
-		data = PyObject_GetAttrString (obj, "filename");
-		if (!data || !PyString_Check (data))
-			return NULL;
-		t->contents.data.filename = g_strdup (PyString_AS_STRING (data));
-		Py_DECREF (data);
-		return t;
-	}
-	
-	return NULL;
-}
-
 static PyObject *
 _wrap_nautilus_burn_recorder_write_tracks (PyGObject *self, PyObject *args, PyObject *kwargs)
 {
 	nb_Drive *drive;
+	nb_Track *track;
 	PyObject *tracks, *py_flags;
-	NautilusBurnRecorderTrack *t;
 	GList *g_tracks = NULL;
 	PyGILState_STATE gstate;
 	
@@ -134,10 +81,15 @@ _wrap_nautilus_burn_recorder_write_tracks (PyGObject *self, PyObject *args, PyOb
 		
 	len = PyList_GET_SIZE (tracks);
 	for (i = 0; i < len; i++) {
-		t = nb_track_new_from_object (PyList_GET_ITEM (tracks, i));
-		if (!t)
+		track = (nb_Track *)PyList_GET_ITEM (tracks, i);
+		if (!nb_AudioTrack_Check ((PyObject*)track) && !nb_DataTrack_Check ((PyObject*)track)) {
+			PyErr_SetString(PyExc_TypeError, "Elements must be "
+			                "nautilusburn.AudioTrack or "
+			                "nautilusburn.DataTrack");
+			g_list_free (g_tracks);
 			return NULL;
-		g_tracks = g_list_append (g_tracks, t);
+		}
+		g_tracks = g_list_append (g_tracks, &track->track);
 	}
 	gstate = PyGILState_Ensure();
 	ret = nautilus_burn_recorder_write_tracks ((NautilusBurnRecorder*)self->obj, 
@@ -147,7 +99,6 @@ _wrap_nautilus_burn_recorder_write_tracks (PyGObject *self, PyObject *args, PyOb
 	                                           flags);
 	PyGILState_Release(gstate);
 	
-	g_list_foreach (g_tracks, (GFunc)nautilus_burn_recorder_track_free, NULL);
 	g_list_free (g_tracks);
 	
 	return pyg_enum_from_gtype(NAUTILUS_BURN_TYPE_RECORDER_RESULT, ret);
