@@ -6,7 +6,7 @@
 	* __init__.py: serpentine_shell.py was renamed to __init__.py.
 	There is no mastering object sent through argument, one is constructed
 	inside. data_dir is sent through argument and fed to RecordingPreferences.
-	About dialog was implemented.
+	About dialog was implemented. Changed the default size to 450x350.
 	
 	* preferences.py:
 	the releases file will have the version.

@@ -41,6 +41,7 @@ class Serpentine (gtk.Window):
 		                   "main_window_container")
 		self.add (g.get_widget ("main_window_container"))
 		self.set_title ("Serpentine")
+		self.set_default_size (450, 350)
 		
 		# Add a file button
 		g.get_widget ("add").connect ("clicked", self.add_file)
