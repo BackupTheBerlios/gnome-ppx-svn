@@ -1,5 +1,12 @@
 2004-12-24 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
+	*__init__.py: (Serpentine.burn): Now the space left on the cache location
+	is checked before starting the burning procedure.
+	
+=== 0.3 ===
+
+2004-12-24 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
 	* serpentine:
 	A new relocable script for running Serpentine.
 	
@@ -128,3 +135,5 @@
 	
 	* serpentine.glade:
 	Updated a few widget names. Menu items now have a '_mni' suffix.
+
+=== 0.2 ===

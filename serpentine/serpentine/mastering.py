@@ -26,7 +26,6 @@ import gnome.vfs
 # Operations used on AudioMastering
 #
 # 
-# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
 
 class ErrorTrapper (operations.Operation, operations.OperationListener):
 	def __init__ (self, parent = None):

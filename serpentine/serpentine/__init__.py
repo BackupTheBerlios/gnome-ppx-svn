@@ -21,7 +21,7 @@ This is the window widget which will contain the audio mastering widget
 defined in audio_widgets.AudioMastering. 
 """
 
-import os, os.path, gtk, gtk.glade, gobject, sys
+import os, os.path, gtk, gtk.glade, gobject, sys, statvfs
 
 from mastering import AudioMastering
 from recording import RecordMusicList, RecordingMedia
@@ -90,13 +90,56 @@ class Serpentine (gtk.Window):
 		self.__add_file.set_select_multiple (True)
 		
 		if not self.preferences.drive:
-			gtk_util.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.")
+			gtk_util.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.", self)
 			g.get_widget ("preferences_mni").set_sensitive (False)
 			self.burn.set_sensitive (False)
+	
+	def __hig_bytes (self, bytes):
+		hig_desc = [("GByte", "GBytes"),
+		            ("MByte", "MBytes"),
+		            ("KByte", "KByte" ),
+		            ("byte" , "bytes" )]
+		value, strings = self.__decompose_bytes (bytes, 30, hig_desc)
+		return "%.1f %s" % (value, self.__plural (value, strings))
+	
+	def __decompose_bytes (self, bytes, offset, hig_desc):
+		if bytes == 0:
+			return (0.0, hig_desc[-1:])
+		if offset == 0:
+			return (float (bytes), hig_desc[-1:])
 			
+		part = bytes >> offset
+		if part > 0:
+			sub_part = part ^ ((part >> offset) << offset)
+			return ((part * 1024 + sub_part) / 1024.0, hig_desc[0])
+		else:
+			del hig_desc[0]
+			return self.__decompose_bytes (bytes, offset - 10, hig_desc)
+
+	def __plural (self, value, strings):
+		if value == 1:
+			return strings[0]
+		else:
+			return strings[1]
+		
 	def burn (self, *args):
+		# Check if we have space available in our cache dir
+		secs = 0
+		for music in self.masterer.source:
+			if not self.preferences.pool.is_available (music['uri']):
+				secs += music['duration']
+		# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
+		size_needed = secs * 176400L
+		s = os.statvfs (self.preferences.temporary_dir)
+		size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
+		if (size_avail - size_needed) < 0:
+			
+			gtk_util.dialog_error ("Not enough space on cache directory",
+				"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % (self.__hig_bytes(size_needed - size_avail)), self)
+			return
+	
 		if not self.preferences.temporary_dir_is_ok():
-			gtk_util.dialog_warn ("Temporary directory location unavailable", "Please check if the temporary exists and has writable permissions.")
+			gtk_util.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
 			self.__on_preferences ()
 			return
 		if gtk_util.dialog_ok_cancel ("Do you want to continue?", "You are about to record a media disk. Canceling a writing operation will make your disk unusable.", self) != gtk.RESPONSE_OK:
