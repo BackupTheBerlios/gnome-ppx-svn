@@ -92,6 +92,10 @@ class MainWindow (gtk.Window):
 			self.burn.set_sensitive (False)
 			
 	def burn (self, *args):
+		if not self.preferences.temporary_dir_is_ok():
+			gtk_util.dialog_warn ("Temporary directory location unavailable", "Please check if the temporary exists and has writable permissions.")
+			self.__on_preferences ()
+			return
 		if gtk_util.dialog_ok_cancel ("Do you want to continue?", "You are about to record a media disk. Canceling a writing operation will make your disk unusable.", self) != gtk.RESPONSE_OK:
 			return
 		r = RecordingMedia (self.masterer.source, self.preferences, self)

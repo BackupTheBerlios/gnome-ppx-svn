@@ -94,7 +94,7 @@ class Data (object):
 	def __set_data (self, data):
 		assert isinstance (data, self.data_spec.py_type)
 		try:
-			self.__gconf_setter (data)
+			self.__gconf_setter (self.key, data)
 		except gobject.GError:
 			# when something goes wrong there's nothing we can do about it
 			pass

@@ -1,8 +1,9 @@
-import gtk.glade, nautilus_burn, gtk, gobject
+import gtk.glade, nautilus_burn, gtk, gobject, os, os.path
 import gnome_util
 from converting import GvfsMusicPool
 import gconf
 import gaw
+import gtk.gdk
 
 gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NONE)
 
@@ -32,11 +33,36 @@ class RecordingPreferences (object):
 		self.__eject = gaw.data_toggle_button (g.get_widget ("eject"), '/apps/serpentine/eject')
 		
 		# temp
-		self.__tmp = gaw.data_entry (g.get_widget ("location_ent"), "/apps/serpentine/temporary_dir")
+		self.__tmp = gaw.data_entry (g.get_widget ('location_ent'), "/apps/serpentine/temporary_dir")
+		if self.__tmp.data == '':
+			self.__tmp.data = '/tmp'
+			
+		self.__tmp.widget.connect ('changed', self.__on_tmp_changed)
 		self.__tmp.sync_widget()
+		self.dialog.connect ('show', self.__on_tmp_changed)
+		g.get_widget ('location_btn').connect ('clicked', self.__on_tmp_choose)
+		self.__tmp_dlg = gtk.FileChooserDialog (action = gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+		                                        parent = self.dialog,
+		                                        buttons = (gtk.STOCK_CANCEL,
+		                                                   gtk.RESPONSE_CANCEL,
+		                                                   gtk.STOCK_OPEN,
+		                                                   gtk.RESPONSE_OK))
+		self.__tmp_dlg.set_local_only (True)
+		self.__tmp_dlg.set_filename (self.__tmp.data)
 		
 		# Pool
 		self.__pool = GvfsMusicPool ()
+		
+		# Close button
+		self.__close = g.get_widget ('close_btn')
+	
+	def __on_tmp_changed (self, *args):
+		is_ok = self.temporary_dir_is_ok ()
+		if is_ok:
+			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#FFF"))
+		else:
+			self.__tmp.widget.modify_base (gtk.STATE_NORMAL, gtk.gdk.color_parse ("#F88"))
+		self.__close.set_sensitive (is_ok)
 	
 	def __update_speed (self):
 		if not self.drive:
@@ -86,12 +112,20 @@ class RecordingPreferences (object):
 		
 	write_flags = property (__get_write_flags)
 	
-#	def __on_eject (self, check, *args):
-#		if check.get_active ():
-#			self.__write_flags |= 
-#		else:
-#			self.__write_flags &= ~ nautilus_burn.RECORDER_WRITE_EJECT
-	
 	temporary_dir = property (lambda self: self.__tmp.data)
 			
 	pool = property (lambda self: self.__pool)
+	
+	def temporary_dir_is_ok (self):
+		tmp = self.__tmp.data
+		is_ok = False
+		try:
+			is_ok = os.path.isdir (tmp) and os.access (tmp, os.W_OK)
+		except OSError, err:
+			pass
+		return is_ok
+	
+	def __on_tmp_choose (self, *args):
+		if self.__tmp_dlg.run () == gtk.RESPONSE_OK:
+			self.__tmp.data = self.__tmp_dlg.get_filename ()
+		self.__tmp_dlg.hide ()

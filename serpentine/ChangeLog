@@ -1,3 +1,14 @@
+2004-12-23 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* preferences.py:
+	Directory browsing button now works.
+	
+	* serpentine_shell.py:
+	(MainWindow.burn): Now check if the temporary directory is available.
+	
+	* gaw.py:
+	(Data.__set_data): forgot pass the gconf key as an argument.
+	
 2004-12-22 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
 	* mastering.py:
