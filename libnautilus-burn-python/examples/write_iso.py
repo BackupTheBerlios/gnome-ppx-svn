@@ -1,6 +1,6 @@
 import sys
 sys.path.append ('..')
-import nautilus_burn
+import nautilusburn
 import gtk
 import gobject
 
@@ -12,10 +12,11 @@ if len(sys.argv) != 2:
 def on_progress_changed (recorder, fract):
 	print fract
 	
-r = burn.CdRecorder()
-cd, = burn.scan_for_cdroms(True)
-t = burn.DataTrack()
+r = nautilusburn.Recorder()
+drives = nautilusburn.get_drives_list(True)
+d = drives[0]
+t = nautilusburn.DataTrack()
 t.filename = sys.argv[1]
 r.connect ('progress-changed', on_progress_changed)
-r.write_tracks (cd, [t], cd.get_max_speed_write(), burn.RECORDER_WRITE_DUMMY_WRITE)
+r.write_tracks (d, [t], d.get_max_speed_write(), nautilusburn.RECORDER_WRITE_DUMMY_WRITE)
 print "done"

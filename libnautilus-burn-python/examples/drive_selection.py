@@ -2,9 +2,9 @@ import sys
 # load module beneath
 sys.path.append ('..')
 import gtk, gobject
-import nautilus_burn
+import nautilusburn
 
-s = nautilus_burn.DriveSelection()
+s = nautilusburn.DriveSelection()
 
 def foo ():
 	global s;

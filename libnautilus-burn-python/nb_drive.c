@@ -219,7 +219,7 @@ initdrive(void)
     if (PyType_Ready(&nb_Drive_Type) < 0)
         return;
 
-    m = Py_InitModule("nautilus_burn", nb_methods);
+    m = Py_InitModule("nautilusburn", nb_methods);
     /*
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_BUSY", NAUTILUS_BURN_MEDIA_TYPE_BUSY);
 	PyModule_AddIntConstant (m, "MEDIA_TYPE_ERROR", NAUTILUS_BURN_MEDIA_TYPE_ERROR);

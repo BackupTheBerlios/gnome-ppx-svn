@@ -6,7 +6,7 @@ LDFLAGS = `pkg-config --libs $(PACKAGES)`
 LIBNAUTILUS_DIR = `pkg-config --variable=includedir pygtk-2.0`/libnautilus-burn
 LIBNAUTILUS_SOURCES = $(LIBNAUTILUS_DIR)/*.h
 
-all: nautilus_burn.pyd
+all: nautilusburn.so
 
 install:
 	python setup.py install
@@ -18,7 +18,7 @@ nautilus_burn.c: nautilus_burn.defs nautilus_burn.override
 	-o nautilus_burn.override \
 	nautilus_burn.defs > $@
 
-nautilusburn.pyd: nautilus_burn.o nb_module.o nb_typebuiltins.o nb_drive.o
+nautilusburn.so: nautilus_burn.o nb_module.o nb_typebuiltins.o nb_drive.o
 	$(CC) $(LDFLAGS) -shared $^ -o $@
 
 clean:

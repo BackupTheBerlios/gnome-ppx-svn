@@ -34,7 +34,6 @@ initnautilusburn(void)
 	init_pygobject ();
 	
 	m = Py_InitModule ("nautilusburn", nautilus_burn_functions);
-	nautilus_burn_add_constants (m, "NAUTILUS_BURN_");
 #if 0
 	/* CDRecorderWriteFlags */
 	PyModule_AddIntConstant (m, "RECORDER_WRITE_EJECT", CDRECORDER_EJECT);
@@ -62,6 +61,7 @@ initnautilusburn(void)
 	d = PyModule_GetDict (m);
 
 	nautilus_burn_register_classes (d);
+	nautilus_burn_add_constants (m, "NAUTILUS_BURN_");
 	initdrive();
 	if (PyErr_Occurred ()) {
 		//PyFatalError ("can't initialize module nautilus.burn");

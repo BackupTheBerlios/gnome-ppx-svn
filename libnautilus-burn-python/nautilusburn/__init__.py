@@ -21,7 +21,7 @@ base_path = os.path.dirname (os.path.abspath(__file__)) + '/..'
 base_path = os.path.abspath (base_path)
 del os
 import imp
-imp.load_dynamic ("nautilus_burn", base_path + "/nautilus_burn.pyd")
+imp.load_dynamic ("nautilusburn", base_path + "/nautilusburn.so")
 del base_path
 del imp
 # Defines the nautilus burn version and API interface
