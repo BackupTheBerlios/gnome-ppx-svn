@@ -32,8 +32,8 @@ from preferences import RecordingPreferences
 from operations import MapProxy
 	
 # TODO make this actually beautiful
-class MainWindow (gtk.Window):
-	def __init__ (self, masterer):
+class Shell (gtk.Window):
+	def __init__ (self, masterer, version):
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
 		self.masterer = masterer
 		self.masterer.listeners.append (self)
@@ -132,6 +132,6 @@ class MainWindow (gtk.Window):
 		self.preferences.dialog.hide ()
 
 if __name__ == '__main__':
-	m = MainWindow (AudioMastering())
+	m = Shell (AudioMastering())
 	m.show()
 	gtk.main()
