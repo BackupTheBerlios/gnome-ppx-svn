@@ -37,7 +37,13 @@ override bacon_cd_selection_get_cdrom noargs
 static PyObject *
 _wrap_bacon_cd_selection_get_cdrom (PyGObject *self)
 {
-	return nb_drive_new_from_native (bacon_cd_selection_get_cdrom ((BaconCdSelection*)self->obj));
+	const CDDrive *drive;
+	drive = bacon_cd_selection_get_cdrom ((BaconCdSelection*)self->obj);
+	if (drive == NULL) {
+		Py_INCREF (Py_None);
+		return Py_None;
+	}
+	return nb_drive_new_from_native (drive);
 }
 %%
 override cd_recorder_cancel
