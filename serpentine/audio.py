@@ -37,6 +37,7 @@ class GstOperation (operations.MeasurableOperation):
 			self.__bin = gst.Pipeline()
 		else:
 			self.__bin = gst.Thread()
+		self.__source = None
 		self.__bin.connect ('error', self.__on_error)
 		self.__bin.connect ('eos', self.__on_eos)
 		self.__progress = 0.0
@@ -74,6 +75,8 @@ class GstOperation (operations.MeasurableOperation):
 		self.__running = True
 		if THREADS_BROKEN:
 			self.__source = gobject.idle_add (self.bin.iterate)
+			
+		
 	
 	def __on_eos (self, element, user_data = None):
 		if THREADS_BROKEN:
@@ -88,7 +91,8 @@ class GstOperation (operations.MeasurableOperation):
 	def __on_error (self, pipeline, element, error, user_data = None):
 		if THREADS_BROKEN:
 			# Do not continue processing it
-			gobject.source_remove (self.__source)
+			if self.__source:
+				gobject.source_remove (self.__source)
 			self.__finalize ()
 			evt = operations.FinishedEvent (self, operations.ERROR)
 			evt.error = error

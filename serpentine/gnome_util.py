@@ -22,7 +22,7 @@ def unescape_uri (uri):
 	assert isinstance (uri, URI)
 	if uri.path == '/':
 		return uri.path
-	parent = unescape_uri (u.resolve_relative ('..'))
+	parent = unescape_uri (uri.resolve_relative ('..'))
 	if parent == '/':
 		parent = ''
 		

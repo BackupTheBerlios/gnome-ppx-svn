@@ -115,14 +115,14 @@ class GstCacheEntry:
 		self.filename = filename
 
 class GstSourceToWavListener (operations.OperationListener):
-	def __init__ (self, filename, cache, music):
+	def __init__ (self, parent, filename, music):
 		self.__filename = filename
-		self.__cache = cache
 		self.__music = music
+		self.__parent = parent
 	
 	def on_finished (self, event):
 		if event.id == operations.SUCCESSFUL:
-			self.__cache[self.__music] = GstCacheEntry (self.__filename, True)
+			self.__parent.cache[self.__parent.unique_music_id (self.__music)] = GstCacheEntry (self.__filename, True)
 		else:
 			os.unlink (self.__filename)
 		
@@ -142,11 +142,11 @@ class GstMusicPool (MusicPool):
 	temporary_dir = property (lambda self: self.__temp_dir, __set_temp_dir)
 	
 	def is_available (self, music):
-		return self.cache.has_key (music)
+		return self.cache.has_key (self.unique_music_id (music))
 	
 	def get_filename (self, music):
 		assert self.is_available (music)
-		return self.cache[music].filename
+		return self.cache[self.unique_music_id (music)].filename
 		
 	def get_source (self, music):
 		raise NotImplementedError
@@ -158,7 +158,7 @@ class GstMusicPool (MusicPool):
 		handle, filename = tempfile.mkstemp(suffix = '.wav', dir = self.temporary_dir)
 		sink.set_property ("location", filename)
 		
-		our_listener = GstSourceToWavListener (filename, self.cache, music)
+		our_listener = GstSourceToWavListener (self, filename, music)
 		oper = audio.source_to_wav (source, sink)
 		oper.listeners.append (our_listener)
 		return oper
@@ -173,27 +173,42 @@ class GstMusicPool (MusicPool):
 	def __del__ (self):
 		self.clear()
 	
+	def unique_music_id (self, music):
+		pass
+	
 
 import gnome.vfs
 import gnome_util
 
 class GvfsMusicPool (GstMusicPool):
-	def __unique_uri (self, uri):
+	def unique_music_id (self, uri):
 		"""
 		Provides a way of uniquely identifying URI's, in case of user sends:
 		file:///foo%20bar
 		file:///foo bar
 		/foo bar
 		"""
+		uri = gnome.vfs.URI (uri)
+		if uri.scheme == 'file':
+			return gnome_util.unescape_uri (uri)
+			
+		return self.__g_unique_music_id (uri)
 		
+	
+	def __g_unique_music_id (self, uri):
+	
 		if uri.path == '/':
 			return str(uri)
-		parent = self.__normalize_uri (uri.resolve_relative ('..'))
-		return parent + uri.short_name + (uri.self.path[-1] == '/' and '/')
+			
+		parent = self.__g_unique_music_id (str(uri.resolve_relative ('..')))
+		parent += uri.short_name
+		if uri.path[-1] == '/':
+			parent += '/'
+		return parent
+		
 		
 	def is_available (self, music):
-		music_id = self.__unique_uri (gnome.vfs.URI (music))
-		on_cache = GstMusicPool.is_available (self, music_id)
+		on_cache = GstMusicPool.is_available (self, music)
 		uri = gnome.vfs.URI (music)
 		if not on_cache and \
 					uri.is_local and \
@@ -203,12 +218,6 @@ class GvfsMusicPool (GstMusicPool):
 			on_cache = True
 		del uri
 		return on_cache
-	
-	def get_filename (self, music):
-		return GstMusicPool.get_filename (self, self.__unique_uri (music))
-	
-	def fetch_music (self, music):
-		return GstMusicPool.fetch_music (self, self.__unique_uri (music))
 	
 	def get_source (self, music):
 		src = gst.element_factory_make ("gnomevfssrc", "source")

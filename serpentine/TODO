@@ -7,3 +7,5 @@
   * lock the drive before converting
   * check if user has a cdrw inserted
   * check if user has a blank cd or a cdrw
+- gtk_util.HigProgress should be visible in taskbar and not have a parent and 
+  minizable
