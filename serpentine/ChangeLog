@@ -1,5 +1,13 @@
 2004-12-25 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
-
+	
+	* gtk_util.py: (DictStore):
+	Added insert_before and insert_after. Corrected a bug on __delitem__, now
+	items are deletable.
+	
+	* mastering.py: (GtkMusicList): Added a field for private handling in 
+	DND_TARGETS. Now GtkMusicList fully supports DND with row insertion (as
+	opposed to append-only) and row reordering.
+	
 	* mastering.py: recording.py: __init__.py: serpentine.glade:
 	Added main window on dialogs as parent and ensure they are centered on
 	parent for HIG compliance.

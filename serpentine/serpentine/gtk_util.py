@@ -49,11 +49,21 @@ class DictStore (gtk.ListStore):
 			index += 1
 		gtk.ListStore.__init__ (self, *tuple(spec))
 		
-	def append (self, row):
+	def __dict_to_list (self, row):
 		values = []
 		for key in self.cols:
 			values.append (row[key])
-		gtk.ListStore.append (self, values)
+		return values
+		
+	def append (self, row):
+		gtk.ListStore.append (self, self.__dict_to_list (row))
+	
+	def insert_before (self, iter, row):
+		gtk.ListStore.insert_before (self, iter, self.__dict_to_list (row))
+	
+	def insert_after (self, iter, row):
+		gtk.ListStore.insert_after (self, iter, self.__dict_to_list (row))
+		
 	def index_of (self, key):
 		return self.indexes[key]
 	def get (self, index):
@@ -250,7 +260,8 @@ class HigProgress (gtk.Dialog):
 gobject.type_register (HigProgress)
 
 def get_root_parent (widget):
+	assert widget != None
 	p = widget.get_parent ()
-	if p:
-		return get_root_parent (p)
-	return p
+	if not p:
+		return widget
+	return get_root_parent (p)

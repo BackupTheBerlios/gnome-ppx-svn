@@ -71,16 +71,18 @@ class ErrorTrapper (operations.Operation, operations.OperationListener):
 		e = operations.FinishedEvent (self, operations.SUCCESSFUL)
 		for l in self.listeners:
 			l.on_finished (e)
-			
+
 class AddFile (audio.AudioMetadataListener, operations.Operation):
 	# TODO: Implement full Operation here
 	
 	running = property (lambda self: False)
 
-	def __init__ (self, masterer, uri):
+	def __init__ (self, masterer, uri, insert_at = None, insert_before = None):
 		operations.Operation.__init__ (self)
 		self.uri = uri
 		self.masterer = masterer
+		self.insert_at = insert_at
+		self.insert_before = insert_before
 	
 	def start (self):
 		oper = audio.gvfs_audio_metadata (self.uri)
@@ -107,12 +109,21 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 			row['title'] = metadata['title']
 		if metadata.has_key ('artist'):
 			row['artist'] = metadata['artist']
-		self.masterer.source.append (row)
+			
+		if self.insert_at != None:
+			if self.insert_before:
+				self.masterer.source.insert_before (self.insert_at, row)
+			else:
+				self.masterer.source.insert_after (self.insert_at, row)
+		else:
+			self.masterer.source.append (row)
+		
 	
 	def on_finished (self, evt):
 		e = operations.FinishedEvent (self, evt.id)
 		for l in self.listeners:
 			l.on_finished (e)
+			
 
 class SetGraphicalUpdate (operations.Operation):
 	def __init__ (self, masterer, update):
@@ -218,12 +229,20 @@ class GtkMusicList (MusicList):
 			for l in self.listeners:
 				l.on_musics_added (e, rows)
 	
+	def insert_before (self, index, row):
+		self.model.insert_before (self.model.get_iter (index), row)
+		self.__total_duration += int (row['duration'])
+	
+	def insert_after (self, index, row):
+		self.model.insert_after (self.model.get_iter (index), row)
+		self.__total_duration += int (row['duration'])
+	
 	def __len__ (self):
 		return len(self.model)
 	
 	def __delitem__ (self, index):
 		# Copy native row
-		row = dict(self.model[index])
+		row = dict(self[index])
 		del self.model[index]
 		self.__total_duration -= row['duration']
 		rows = (row,)
@@ -298,9 +317,10 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	disk_sizes = [74 * 60, 80 * 60, 90 * 60]
 	
 	DND_TARGETS = [
-		('text/uri-list', 0, 0),
-		('text/plain', 0, 1),
-		('STRING', 0, 2),
+		('SERPENTINE_ROW', gtk.TARGET_SAME_WIDGET, 0),
+		('text/uri-list', 0, 1),
+		('text/plain', 0, 2),
+		('STRING', 0, 3),
 	]
 	def __init__ (self, preferences):
 		gtk.VBox.__init__ (self)
@@ -358,9 +378,16 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		# Listen for drag-n-drop events
 		lst.set_reorderable (True)
 		#XXX pygtk bug here
-		#lst.drag_source_set (gtk.gdk.BUTTON1_MASK, AudioMastering.DND_TARGETS, gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
-		lst.enable_model_drag_dest ( AudioMastering.DND_TARGETS, gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
+		lst.enable_model_drag_source (gtk.gdk.BUTTON1_MASK,
+		                              AudioMastering.DND_TARGETS,
+		                              gtk.gdk.ACTION_DEFAULT |
+		                              gtk.gdk.ACTION_MOVE)
+
+		lst.enable_model_drag_dest (AudioMastering.DND_TARGETS,
+		                            gtk.gdk.ACTION_DEFAULT |
+		                            gtk.gdk.ACTION_MOVE)
 		lst.connect ("drag_data_received", self.__on_dnd_drop)
+		lst.connect ("drag_data_get", self.__on_dnd_send)
 	
 	def __generate_track (self, col, renderer, tree_model, treeiter, user_data = None):
 		index = tree_model.get_path(treeiter)[0]
@@ -378,9 +405,40 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def __on_dnd_drop (self, treeview, context, x, y, selection, info, timestamp, user_data = None):
 		data = selection.data
 		uris = []
+		
+		# Insert details
+		insert_at = None
+		insert_before = None
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+		if drop_info:
+			insert_at, insert_before = drop_info
+			insert_before = (insert_before == gtk.TREE_VIEW_DROP_BEFORE or
+			                 insert_before == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+		del drop_info
+		
 		if selection.type == 'application/x-rhythmbox-source':
 			#TODO: handle rhythmbox playlists
 			return
+		elif selection.type == 'SERPENTINE_ROW':
+			# Private row
+			store, path_list = self.__selection.get_selected_rows ()
+			if not path_list or len (path_list) != 1:
+				return
+			path, = path_list
+			# Copy the row
+			row = dict(self.source[path])
+			# Remove old row
+			del self.source[path]
+			# Append this row
+			if insert_at != None:
+				if insert_before:
+					self.source.insert_before (insert_at, row)
+				else:
+					self.source.insert_after (insert_at, row)
+			else:
+				self.source.append (row)
+			return
+			
 		for line in data.split("\n"):
 			line = line.strip()
 			if len (line) < 1:
@@ -401,15 +459,13 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			except gnome.vfs.NotFoundError, e:
 				print "file not found"
 				return
-		self.add_files (uris)
+		self.add_files (uris, insert_at, insert_before)
 	
 	def __on_dnd_send (self, widget, context, selection, target_type, timestamp):
-		data = ""
 		store, path_list = self.__selection.get_selected_rows ()
-		if path_list:
-			assert len(path_list) == 1
-			data = self.source[path_list[0][0]]['uri']
-		selection.set (selection.target, 8, data)
+		assert path_list and len(path_list) == 1
+		path, = path_list # unpack the only element
+		selection.set (selection.target, 8, self.source[path]['uri'])
 	
 	def __hig_duration (self, duration):
 		hig_duration = ""
@@ -467,23 +523,34 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		if not self.queue.running:
 			self.queue.start()
 	
-	def add_files (self, uris):
+	def add_files (self, uris, insert_at = None, insert_before = None):
 		# Lock graphical updating on each request and
 		# only refresh the UI later
-		trapper = ErrorTrapper ()
+		w = gtk_util.get_root_parent (self)
+		assert isinstance(w, gtk.Window), type(w)
+		trapper = ErrorTrapper (w)
 		
 		self.queue.append (SetGraphicalUpdate (self, False))
+		i = 0
+		# Convert to an integer if possible
+		if insert_at != None and isinstance (insert_at, tuple):
+			insert_at, = insert_at
+			
 		for uri in uris:
-			a = AddFile (self, uri)
+			ins = insert_at
+			if insert_at != None:
+				ins += i
+				
+			a = AddFile (self, uri, ins, insert_before)
 			a.listeners.append (trapper)
 			self.queue.append (a)
+			i += 1
 			
 		self.queue.append (SetGraphicalUpdate (self, True))
 		self.queue.append (trapper)
 		if not self.queue.running:
 			self.queue.start()
 
-		
 	def remove_selected (self):
 		store, path_list = self.__selection.get_selected_rows ()
 		if not path_list:
