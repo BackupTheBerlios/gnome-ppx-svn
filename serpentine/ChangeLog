@@ -1,3 +1,5 @@
+=== 0.4 ===
+
 2004-12-25 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	
 	* gtk_util.py: (DictStore):
