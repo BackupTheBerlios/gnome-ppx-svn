@@ -5,7 +5,7 @@
 
 <widget class="GtkWindow" id="main_window">
   <property name="visible">True</property>
-  <property name="title" translatable="yes">Serpentine Audio Mastring</property>
+  <property name="title" translatable="yes">Serpentine Audio Mastering</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
@@ -38,7 +38,7 @@
 		<widget class="GtkMenu" id="menuitem1_menu">
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="export">
+		    <widget class="GtkImageMenuItem" id="export_mni">
 		      <property name="visible">True</property>
 		      <property name="sensitive">False</property>
 		      <property name="label" translatable="yes">Export...</property>
@@ -108,7 +108,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="quit">
+		    <widget class="GtkImageMenuItem" id="quit_mni">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-quit</property>
 		      <property name="use_stock">True</property>
@@ -130,7 +130,7 @@
 		<widget class="GtkMenu" id="edit1_menu">
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="add">
+		    <widget class="GtkImageMenuItem" id="add_mni">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-add</property>
 		      <property name="use_stock">True</property>
@@ -139,7 +139,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="remove">
+		    <widget class="GtkImageMenuItem" id="remove_mni">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-remove</property>
 		      <property name="use_stock">True</property>
@@ -148,7 +148,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="clear">
+		    <widget class="GtkImageMenuItem" id="clear_mni">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-clear</property>
 		      <property name="use_stock">True</property>
@@ -163,7 +163,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="mni_preferences">
+		    <widget class="GtkImageMenuItem" id="preferences_mni">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-preferences</property>
 		      <property name="use_stock">True</property>
@@ -185,7 +185,7 @@
 		<widget class="GtkMenu" id="menuitem4_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="about1">
+		    <widget class="GtkMenuItem" id="about_mni">
 		      <property name="visible">True</property>
 		      <property name="sensitive">False</property>
 		      <property name="label" translatable="yes">_About</property>

@@ -21,3 +21,15 @@
 	Musics are passed through __unique_uri.
 	(FetchMusicListPriv.on_finished):
 	GetMusic operations when are finished in an unsuccessful state are ignored.
+	
+	* operations.py:
+	Added two new classes for simplifying multiple widgets for the same purpose
+	factor: MapProxy and MapFunctor (used by the previous).
+	
+	* serpentine_shell.py:
+	(MainWindow.on_contents_changed), (MainWindow.__init__),
+	(MainWindow.on_selection_changed):
+	Updated to use MapProxy instance.
+	
+	* serpentine.glade:
+	Updated a few widget names. Menu items now have a '_mni' suffix.

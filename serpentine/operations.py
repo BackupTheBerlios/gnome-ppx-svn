@@ -173,4 +173,43 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 	def stop (self):
 		assert self.can_stop, "Check if the operation can be stopped first."
 		self.__curr_oper.stop ()
+	
+class MapFunctor (object):
+	def __init__ (self, funcs):
+		self.__funcs = funcs
 		
+	def __call__ (self, *args, **keyws):
+		r = []
+		for f in self.__funcs:
+			r.append (f(*args, **keyws))
+		return tuple (r)
+
+class MapProxy (object):
+	"""
+	This class acts as a hub or a proxy for calling methods on multiple objects.
+	The method called from an instance of this class will be transparently
+	called in all elements contained in this instance. The added elements is of
+	a dictionary type and can be accessed by the __getitem__ and __setitem__ of
+	this instance.
+	"""
+	def __init__ (self, elements):
+		self.__elements = elements
+	
+	def __getattr__ (self, attr):
+		funcs = []
+		for key in self.__elements:
+			funcs.append (getattr (self.__elements[key], attr))
+		
+		return MapFunctor (funcs)
+	
+	def __getitem__ (self, key):
+		return self.__elements[key]
+	
+	def __setitem__ (self, key, value):
+		self.__elements[key] = value
+	
+	def __delitem__ (self, key):
+		del self.__elements[key]
+	
+	def has_key (self, key):
+		return self.__elements.has_key (key)

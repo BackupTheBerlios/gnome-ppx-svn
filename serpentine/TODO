@@ -2,4 +2,8 @@
 - Make recording cancelable (currently lib-n-b ignores it)
 - check for temp size and verify perms
 - when u have a rw cd it doesn't ask if u want to clean it first
-- learn how many bytes are a WAVE second
+- serpentine_shell.py needs looove!
+- we need to have handle the recording process better:
+  * lock the drive before converting
+  * check if user has a cdrw inserted
+  * check if user has a blank cd or a cdrw
