@@ -21,6 +21,13 @@ import operations, audio
 from gtk_util import DictStore
 import gtk_util
 import gnome.vfs
+from operations import OperationsQueue
+
+try:
+	import playlist_parser
+except ImportError:
+	print "No playlist parsers found!"
+	playlist_parser = None
 
 ################################################################################
 # Operations used on AudioMastering
@@ -326,7 +333,6 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		gtk.VBox.__init__ (self)
 		operations.Listenable.__init__ (self)
 		self.__disk_size = 74 * 60
-		self.queue = operations.OperationsQueue()
 		self.queue.abort_on_failure = False
 		self.update = True
 		self.source = GtkMusicList ()
@@ -402,6 +408,9 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def __on_artist_edited (self, cell, path, new_text, user_data = None):
 		self.source[path]["artist"] = new_text
 	
+	def __on_pl_entry (self, parser, uri, title, genre, uris):
+		uris.append(uri)
+	
 	def __on_dnd_drop (self, treeview, context, x, y, selection, info, timestamp, user_data = None):
 		data = selection.data
 		uris = []
@@ -448,9 +457,6 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 				if nfo.type == gnome.vfs.FILE_TYPE_DIRECTORY:
 					pass
 					# Handle directory importing
-				elif gnome.vfs.get_mime_type (line) == 'audio/x-mpegurl':
-					# Handle m3u playlists
-					pass
 				else:
 					uris.append (line)
 					
@@ -516,40 +522,64 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def add_file (self, uri):
 		w = gtk_util.get_root_parent (self)
 		assert isinstance(w, gtk.Window)
+		uris = self.__add_playlist (uri)
+		if uris:
+			self.add_files (uris)
+			return
+			
 		trapper = ErrorTrapper (w)
 		a = AddFile (self, uri)
-		self.queue.append (a)
-		self.queue.append (trapper)
-		if not self.queue.running:
-			self.queue.start()
+		queue = OperationsQueue()
+		queue.abort_on_failure = False
+		queue.append (a)
+		queue.append (trapper)
+		queue.start()
 	
+	def __add_playlist (self, uri):
+		mime = gnome.vfs.get_mime_type (uri)
+		if mime == "audio/x-mpegurl" or mime == "audio/x-scpls":
+			uris = []
+			p = playlist_parser.Parser()
+			p.connect("entry", self.__on_pl_entry, uris)
+			p.parse(uri, False)
+			return uris
+		return False
+		
+	# Add a no op when we don't have a paylist parser
+	if playlist_parser == None:
+		__add_playlist = lambda self, uri: None
+		
 	def add_files (self, uris, insert_at = None, insert_before = None):
 		# Lock graphical updating on each request and
 		# only refresh the UI later
 		w = gtk_util.get_root_parent (self)
 		assert isinstance(w, gtk.Window), type(w)
 		trapper = ErrorTrapper (w)
-		
-		self.queue.append (SetGraphicalUpdate (self, False))
+		queue = OperationsQueue()
+		queue.abort_on_failure = False
+		queue.append (SetGraphicalUpdate (self, False))
 		i = 0
 		# Convert to an integer if possible
 		if insert_at != None and isinstance (insert_at, tuple):
 			insert_at, = insert_at
 			
 		for uri in uris:
+			uris = self.__add_playlist (uri)
+			if uris:
+				self.add_files(uris)
+				continue
+				
 			ins = insert_at
 			if insert_at != None:
 				ins += i
-				
 			a = AddFile (self, uri, ins, insert_before)
 			a.listeners.append (trapper)
-			self.queue.append (a)
+			queue.append (a)
 			i += 1
 			
-		self.queue.append (SetGraphicalUpdate (self, True))
-		self.queue.append (trapper)
-		if not self.queue.running:
-			self.queue.start()
+		queue.append (SetGraphicalUpdate (self, True))
+		queue.append (trapper)
+		queue.start()
 
 	def remove_selected (self):
 		store, path_list = self.__selection.get_selected_rows ()

@@ -1,3 +1,10 @@
+2004-12-27 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
+
+	* mastering.py: (AudioMastering.add_file): (AudioMastering.add_files):
+	Made queue's local versus global, this corrects concurrency problems.
+	Added dynamic support to playlists which is available when the
+	totem-pl-parser-python package is installed.
+	
 2004-12-26 Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 	
 	* preferences.py: (RecordingPreferences): Made speed radio button's position
