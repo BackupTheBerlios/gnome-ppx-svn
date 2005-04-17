@@ -1,19 +1,25 @@
-pythondir = $(PYTHON_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages
-pkgpythondir = $(pythondir)
-libdir = $(pkgpythondir)
+#pythondir = $(PYTHON_PREFIX)/lib/python$(PYTHON_VERSION)/site-packages
+#pkgpythondir = $(pythondir)
+#libdir = $(pkgpythondir)/totem
+
+pkgpythondir = $(pyexecdir)/gtk-2.0
+pkgpyexecdir = $(pyexecdir)/gtk-2.0
+pytotemdir = $(pkgpythondir)/totem
+pytotemexecdir = $(pkgpyexecdir)/totem
+
+pytotemexec_LTLIBRARIES = plparser.la
+pytotem_PYTHON = __init__.py
 
 INCLUDES = \
 	-I$(PL_PARSER_CFLAGS) \
 	$(PYTHON_INCLUDES)    \
 	-I$(top_srcdir)/totem
 
-python_LTLIBRARIES = playlist_parser.la
+plparser_la_SOURCES = pl-parser-module.c playlist_parser.c
 
-playlist_parser_la_SOURCES = pl-parser-module.c playlist_parser.c
+plparser_la_LDFLAGS = -module -avoid-version -export-symbols-regex initplparser
 
-playlist_parser_la_LDFLAGS = -module -avoid-version
-
-playlist_parser_la_LIBADD = \
+plparser_la_LIBADD = \
 	$(PL_PARSER_LIBS)   \
 	$(top_builddir)/totem/libtotem_pl_parser.la
 

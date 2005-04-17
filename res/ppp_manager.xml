@@ -1,6 +1,0 @@
-<class name="manager" namespace="ppp">
-	<property name="glade_file" type="String"/>
-	<var modifier="private" name="status" type="PppStatus*"/>
-	<var modifier="private" name="tray" type="PppTray*"/>
-	<var modifier="private" name="progress" type="PppStatus*"/>
-</class>

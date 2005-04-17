@@ -1,5 +1,0 @@
-#ifndef __CONFIGURE_H__
-#define __CONFIGURE_H__
-#define VERSION "@VERSION@"
-#define PACKAGE "@PACKAGE@"
-#endif

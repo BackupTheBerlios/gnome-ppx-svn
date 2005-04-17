@@ -4,6 +4,5 @@ import sys, os
 if os.system ("make"):
 	sys.exit (1)
 setup (name = 'nautilus_burn',
-       version = '1.0',
-       packages = ['nautilus_burn'],
-       data_files = [(get_python_lib(), ['nautilus_burn.pyd'])])
+       version = '0.2.0',
+       data_files = [(get_python_lib(), ['nautilusburn.so'])])

@@ -1,4 +1,0 @@
-<class name="dialer" namespace="pppoe">
-	<var name="status" type="PppoeStatus*" modifier="private"/>
-	<method name="run" type="void"/>
-</class>
