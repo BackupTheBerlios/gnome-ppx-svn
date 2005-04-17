@@ -1,0 +1,6 @@
+<class name="account" namespace="pppoe">
+	<property name="label" type="gchar*"/>
+	<property name="username" type="gchar*"/>
+	<property name="password" type="gchar*"/>
+	<property name="interface" type="gchar*"/>
+</class>

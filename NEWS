@@ -1,0 +1,4 @@
+* A new utilities modules was created tlib. 
+  It has alot of handy functions, check it out!
+* Core was totally redone. Now users must extend ppp::Dialer class and use
+ppp::Manager

@@ -1,0 +1,90 @@
+<gconfschemafile>
+  <schemalist>
+    
+    <schema>
+      <key>/schemas/apps/gnome-pptp/username</key>
+      <applyto>/apps/gnome-pptp/username</applyto>
+      <owner>gnome-pptp</owner>
+      <type>string</type>
+      <locale name="C">
+        <short>Username</short>
+        <long>Account's username.</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnome-pptp/password</key>
+      <applyto>/apps/gnome-pptp/password</applyto>
+      <owner>gnome-pptp</owner>
+      <type>string</type>
+      <locale name="C">
+        <short>Password</short>
+        <long>Account's password.</long>
+      </locale>
+    </schema>
+  
+    <schema>
+      <key>/schemas/apps/gnome-pptp/keep_password</key>
+      <applyto>/apps/gnome-pptp/keep_password</applyto>
+      <owner>gnome-pptp</owner>
+      <type>bool</type>
+      <default>false</default>
+      <locale name="C">
+        <short>Save password?</short>
+        <long>
+	Defines if password will be saved in configuration file or not.
+	When it's not saved it will be asked by ppp-get-password plugin.
+	</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnome-pptp/server</key>
+      <applyto>/apps/gnome-pptp/server</applyto>
+      <owner>gnome-pptp</owner>
+      <type>string</type>
+      <default></default>
+      <locale name="C">
+        <short>ISP's server</short>
+        <long>The server you will connect too.</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnome-pptp/pppd_path</key>
+      <applyto>/apps/gnome-pptp/pppd_path</applyto>
+      <owner>gnome-pptp</owner>
+      <type>string</type>
+      <default>/usr/sbin/pppd</default>
+      <locale name="C">
+        <short>pppd's path</short>
+        <long>The path to the 'pppd' deamon.</long>
+      </locale>
+    </schema>
+    
+    <schema>
+      <key>/schemas/apps/gnome-pptp/pptp_path</key>
+      <applyto>/apps/gnome-pptp/pptp_path</applyto>
+      <owner>gnome-pptp</owner>
+      <type>string</type>
+      <default>/usr/sbin/pptp</default>
+      <locale name="C">
+        <short>pptp's path</short>
+        <long>The path to the user-space PPPTP client.</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/gnome-pptp/use_tray</key>
+      <applyto>/apps/gnome-pptp/use_tray</applyto>
+      <owner>gnome-pptp</owner>
+      <type>bool</type>
+      <default>true</default>
+      <locale name="C">
+        <short>Use notification icon</short>
+        <long>Enables or disables if notification icon should be used.</long>
+      </locale>
+    </schema>
+
+  </schemalist>
+</gconfschemafile>

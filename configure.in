@@ -1,0 +1,128 @@
+dnl**************
+dnl
+dnl Project spec
+dnl
+dnl**************
+
+AC_INIT(libpppd/src/pppd.h)
+AM_INIT_AUTOMAKE(gnome-ppx, 0.6.1)
+
+dnl****************
+dnl
+dnl Auto* includes
+dnl
+dnl****************
+
+dnl Standard stuff
+AM_MAINTAINER_MODE
+AC_PROG_CC
+AC_ISC_POSIX
+AC_HEADER_STDC
+AM_PROG_LIBTOOL
+
+dnl Include binreloc
+sinclude(ac-helpers/binreloc.m4)
+AM_BINRELOC
+
+
+dnl We need glib 2.0 and gtk 2.0
+AM_PATH_GLIB_2_0
+AM_PATH_GTK_2_0(2.4.0)
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
+dnl i18n
+AC_PROG_INTLTOOL
+
+GETTEXT_PACKAGE=gnome-ppx
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE")
+ALL_LINGUAS="pt_PT"
+AM_GLIB_GNU_GETTEXT
+gnomeppxlocaledir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(gnomeppxlocaledir)
+
+dnl***************************
+dnl GConf-2
+AC_ARG_ENABLE(schemas-install,AC_HELP_STRING([--disable-schemas-install],
+                                             [Disable installation of the gconf schemas]))
+AM_CONDITIONAL(SCHEMAS_INSTALL, test x$enable_schemas_install != xno)
+AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
+if test x"$GCONFTOOL" = xno; then
+        AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
+fi
+AM_GCONF_SOURCE_2
+
+
+dnl***************************
+dnl
+dnl Define includes and ld's:
+dnl
+dnl***************************
+
+PKG_CHECK_MODULES(GNOME, [
+        gtk+-2.0 >= 2.4.0
+	libgnomeui-2.0 >= 2.6.0
+	libglade-2.0 >= 2.0.0
+	libxml-2.0 >= 2.0
+])
+
+dnl**************************
+dnl
+dnl Compilation variables
+dnl
+dnl**************************
+
+PPPD_CFLAGS="-I\$(top_srcdir)/tlib -I\$(top_srcdir)/libpppd/src $GNOME_CFLAGS"
+AC_SUBST(PPPD_CFLAGS)
+
+PPPD_LIBS="\
+-L\$(top_srcdir)/tlib \
+\$(top_srcdir)/tlib/tlib/libtlib.a \
+-L\$(top_srcdir)/libpppd/src \
+-lpppd \
+\$(top_srcdir)/libpppd/src/libpppd.a \
+$GNOME_LIBS"
+AC_SUBST(PPPD_LIBS)
+
+PPPD_GNOME_CFLAGS="\
+-I\$(top_srcdir) \
+$PPPD_CFLAGS \
+-I\$(top_srcdir)/binreloc \
+-I\$(top_srcdir)/libpppd-gnome/src"
+AC_SUBST(PPPD_GNOME_CFLAGS)
+
+PPPD_GNOME_LIBS="\
+-L\$(top_srcdir)/libpppd-gnome/src \
+-lpppd_gnome \
+\$(top_srcdir)/libpppd-gnome/src/libpppd_gnome.a \
+\$(top_srcdir)/binreloc/prefix.o \
+$PPPD_LIBS"
+AC_SUBST(PPPD_GNOME_LIBS)
+
+dnl********************
+dnl
+dnl Generate Makefiles
+dnl
+dnl********************
+
+AC_OUTPUT([
+specs/gnome-ppx.mspec
+config.h
+Makefile
+binreloc/Makefile
+libpppd/Makefile
+libpppd/src/Makefile
+tlib/Makefile
+tlib/tlib/Makefile
+libpppd-gnome/Makefile
+libpppd-gnome/src/Makefile
+libpppd-gnome/glade/Makefile
+libpppd-gnome/test/Makefile
+gnome-pppoe/Makefile
+gnome-pppoe/src/Makefile
+gnome-pptp/Makefile
+gnome-pptp/src/Makefile
+gnome-pppoa/Makefile
+gnome-pppoa/src/Makefile
+po/Makefile.in
+])

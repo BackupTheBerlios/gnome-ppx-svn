@@ -1,0 +1,1477 @@
+# Portuguese translation of PACKAGE.
+# Copyright (C) 2004 Free Software Foundation, Inc.
+# Tiago Cogumbreiro <cogumbreiro@users.sf.net>, 2004.
+# tiago <(null)>, 2004.
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-09-17 00:49+0000\n"
+"PO-Revision-Date: 2004-09-17 00:37+0000\n"
+"Last-Translator: Tiago Cogumbreiro <cogumbreiro@users.sf.net>\n"
+"Language-Team: Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+
+#. setup GUI
+#: gnome-pptp/src/pptp_dialer.c:103 gnome-pptp/src/pptp_dialer.c:210
+#: gnome-pptp/pptp_dialer.desktop.in.h:2
+msgid "PPTP Dialer"
+msgstr "Aplica��o de Liga��o PPTP"
+
+#: gnome-pptp/src/pptp_dialer.c:110
+msgid "Server:"
+msgstr "Servidor:"
+
+#: tlib/tlib/ttrayicon.c:104
+msgid "Tray's tooltip"
+msgstr "Dica do Painel"
+
+#: tlib/tlib/ttrayicon.c:105
+msgid "Sets the tray's tooltip."
+msgstr "Altera a dica do painel."
+
+#: tlib/tlib/ttrayicon.c:110
+msgid "Default window"
+msgstr "Janela Principal"
+
+#: tlib/tlib/ttrayicon.c:111
+msgid ""
+"The default window which will be shown/hidden when user left clicks on tray."
+msgstr ""
+"A janela principal que vai ser vis�vel/invis�vel quando o utilizador clicar "
+"no �cone."
+
+#: tlib/tlib/ttrayicon.c:116
+msgid "Tray image"
+msgstr "Imagem do painel"
+
+#: tlib/tlib/ttrayicon.c:117
+msgid "The image that will be shown in the tray."
+msgstr "A imagem que ser� vis�vel no painel."
+
+#: tlib/tlib/ttrayicon.c:122
+msgid "Tray menu"
+msgstr "Menu do Painel"
+
+#: tlib/tlib/ttrayicon.c:123
+msgid "The popup menu that will be shown when user right clicks on tray."
+msgstr ""
+"O menu que estar� vis�vel quando o utilizador carregar no painel com o bot�o "
+"direito do rato."
+
+#: tlib/tlib/tutil.c:140
+#, c-format
+msgid "Program %s was not found."
+msgstr "O programa %s n�o foi encontrado."
+
+#: tlib/tlib/eggtrayicon.c:118
+msgid "Orientation"
+msgstr "Orienta��o"
+
+#: tlib/tlib/eggtrayicon.c:119
+msgid "The orientation of the tray."
+msgstr "A orienta��o do painel."
+
+#. load db
+#: tlib/tlib/tcountries.c:39
+msgid "Afghanistan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:40
+msgid "Albania"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:41
+msgid "Algeria"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:42
+msgid "American Samoa"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:43
+msgid "Andorra"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:44
+msgid "Angola"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:45
+msgid "Anguilla"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:46
+msgid "Antarctica"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:47
+msgid "Antigua and Barbuda"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:48
+msgid "Argentina"
+msgstr "Argentina"
+
+#: tlib/tlib/tcountries.c:49
+msgid "Armenia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:50
+msgid "Aruba"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:51
+msgid "Australia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:52
+msgid "Austria"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:53
+msgid "Azerbaijan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:54
+msgid "Bahamas"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:55
+msgid "Bahrain"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:56
+msgid "Bangladesh"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:57
+msgid "Barbados"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:58
+msgid "Belarus"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:59
+msgid "Belgium"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:60
+msgid "Belize"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:61
+msgid "Benin"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:62
+msgid "Bermuda"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:63
+msgid "Bhutan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:64
+msgid "Bolivia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:65
+msgid "Bosnia and Herzegowina"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:66
+msgid "Botswana"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:67
+msgid "Bouvet Island"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:68
+msgid "Brazil"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:69
+msgid "British Indian Ocean Territory"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:70
+msgid "Brunei Darussalam"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:71
+msgid "Bulgaria"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:72
+msgid "Burkina Faso"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:73
+msgid "Burundi"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:74
+msgid "Cambodia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:75
+msgid "Cameroon"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:76
+msgid "Canada"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:77
+msgid "Cape Verde"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:78
+msgid "Cayman Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:79
+msgid "Central African Republic"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:80
+msgid "Chad"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:81
+msgid "Chile"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:82
+msgid "China"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:83
+msgid "Christmas Island"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:84
+msgid "Cocos (Keeling) Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:85
+msgid "Colombia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:86
+msgid "Comoros"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:87
+msgid "Congo, Democratic Republic of (Was Zaire)"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:88
+msgid "Congo, People'S Republic of"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:89
+msgid "Cook Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:90
+msgid "Costa Rica"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:91
+msgid "Cote D'Ivoire"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:92
+msgid "Croatia (Local Name: Hrvatska)"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:93
+msgid "Cuba"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:94
+msgid "Cyprus"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:95
+msgid "Czech Republic"
+msgstr "Rep�blica Checa"
+
+#: tlib/tlib/tcountries.c:96
+msgid "Denmark"
+msgstr "Dinamarca"
+
+#: tlib/tlib/tcountries.c:97
+msgid "Djibouti"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:98
+msgid "Dominica"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:99
+msgid "Dominican Republic"
+msgstr "Rep�blica Dominicana"
+
+#: tlib/tlib/tcountries.c:100
+msgid "East Timor"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:101
+msgid "Ecuador"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:102
+msgid "Egypt"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:103
+msgid "El Salvador"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:104
+msgid "Equatorial Guinea"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:105
+msgid "Eritrea"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:106
+msgid "Estonia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:107
+msgid "Ethiopia"
+msgstr "Eti�pia"
+
+#: tlib/tlib/tcountries.c:108
+msgid "Falkland Islands (Malvinas)"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:109
+msgid "Faroe Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:110
+msgid "Fiji"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:111
+msgid "Finland"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:112
+msgid "France"
+msgstr "Fran�a"
+
+#: tlib/tlib/tcountries.c:113
+msgid "France, Metropolitan"
+msgstr "Fran�a, Metropolitana"
+
+#: tlib/tlib/tcountries.c:114
+msgid "French Guiana"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:115
+msgid "French Polynesia"
+msgstr "Polin�sia Francesa"
+
+#: tlib/tlib/tcountries.c:116
+msgid "French Southern Territories"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:117
+msgid "Gabon"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:118
+msgid "Gambia"
+msgstr "G�mbia"
+
+#: tlib/tlib/tcountries.c:119
+msgid "Georgia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:120
+msgid "Germany"
+msgstr "Alemanha"
+
+#: tlib/tlib/tcountries.c:121
+msgid "Ghana"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:122
+msgid "Gibraltar"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:123
+msgid "Greece"
+msgstr "Gr�cia"
+
+#: tlib/tlib/tcountries.c:124
+msgid "Greenland"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:125
+msgid "Grenada"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:126
+msgid "Guadeloupe"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:127
+msgid "Guam"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:128
+msgid "Guatemala"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:129
+msgid "Guinea"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:130
+msgid "Guinea-Bissau"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:131
+msgid "Guyana"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:132
+msgid "Haiti"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:133
+msgid "Heard and Mc Donald Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:134
+msgid "Honduras"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:135
+msgid "Hong Kong"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:136
+msgid "Hungary"
+msgstr "Hung�ria"
+
+#: tlib/tlib/tcountries.c:137
+msgid "Iceland"
+msgstr "Isl�ndia"
+
+#: tlib/tlib/tcountries.c:138
+msgid "India"
+msgstr "�ndia"
+
+#: tlib/tlib/tcountries.c:139
+msgid "Indonesia"
+msgstr "Indon�sia"
+
+#: tlib/tlib/tcountries.c:140
+msgid "Iran (Islamic Republic of)"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:141
+msgid "Iraq"
+msgstr "Iraque"
+
+#: tlib/tlib/tcountries.c:142
+msgid "Ireland"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:143
+msgid "Israel"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:144
+msgid "Italy"
+msgstr "It�lia"
+
+#: tlib/tlib/tcountries.c:145
+msgid "Jamaica"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:146
+msgid "Japan"
+msgstr "Jap�o"
+
+#: tlib/tlib/tcountries.c:147
+msgid "Jordan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:148
+msgid "Kazakhstan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:149
+msgid "Kenya"
+msgstr "Qu�nia"
+
+#: tlib/tlib/tcountries.c:150
+msgid "Kiribati"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:151
+msgid "Korea, Democratic People'S Republic of"
+msgstr "Koreia, Rep�blica Democr�tica da"
+
+#: tlib/tlib/tcountries.c:152
+msgid "Korea, Republic of"
+msgstr "Coreia, R�publica da"
+
+#: tlib/tlib/tcountries.c:153
+msgid "Kuwait"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:154
+msgid "Kyrgyzstan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:155
+msgid "Lao People'S Democratic Republic"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:156
+msgid "Latvia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:157
+msgid "Lebanon"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:158
+msgid "Lesotho"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:159
+msgid "Liberia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:160
+msgid "Libyan Arab Jamahiriya"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:161
+msgid "Liechtenstein"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:162
+msgid "Lithuania"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:163
+msgid "Luxembourg"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:164
+msgid "Macau"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:165
+msgid "Macedonia, The Former Yugoslav Republic of"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:166
+msgid "Madagascar"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:167
+msgid "Malawi"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:168
+msgid "Malaysia"
+msgstr "Mal�sia"
+
+#: tlib/tlib/tcountries.c:169
+msgid "Maldives"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:170
+msgid "Mali"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:171
+msgid "Malta"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:172
+msgid "Marshall Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:173
+msgid "Martinique"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:174
+msgid "Mauritania"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:175
+msgid "Mauritius"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:176
+msgid "Mayotte"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:177
+msgid "Mexico"
+msgstr "M�xico"
+
+#: tlib/tlib/tcountries.c:178
+msgid "Micronesia, Federated States of"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:179
+msgid "Moldova, Republic of"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:180
+msgid "Monaco"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:181
+msgid "Mongolia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:182
+msgid "Montserrat"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:183
+msgid "Morocco"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:184
+msgid "Mozambique"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:185
+msgid "Myanmar"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:186
+msgid "Namibia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:187
+msgid "Nauru"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:188
+msgid "Nepal"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:189
+msgid "Netherlands"
+msgstr "Hol�nda"
+
+#: tlib/tlib/tcountries.c:190
+msgid "Netherlands Antilles"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:191
+msgid "New Caledonia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:192
+msgid "New Zealand"
+msgstr "Nova Zel�ndia"
+
+#: tlib/tlib/tcountries.c:193
+msgid "Nicaragua"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:194
+msgid "Niger"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:195
+msgid "Nigeria"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:196
+msgid "Niue"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:197
+msgid "Norfolk Island"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:198
+msgid "Northern Mariana Islands"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:199
+msgid "Norway"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:200
+msgid "Oman"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:201
+msgid "Pakistan"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:202
+msgid "Palau"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:203
+msgid "Palestinian Territory, Occupied"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:204
+msgid "Panama"
+msgstr "Panam�"
+
+#: tlib/tlib/tcountries.c:205
+msgid "Papua New Guinea"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:206
+msgid "Paraguay"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:207
+msgid "Peru"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:208
+msgid "Philippines"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:209
+msgid "Pitcairn"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:210
+msgid "Poland"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:211
+msgid "Portugal"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:212
+msgid "Puerto Rico"
+msgstr "Porto Rico"
+
+#: tlib/tlib/tcountries.c:213
+msgid "Qatar"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:214
+msgid "Reunion"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:215
+msgid "Romania"
+msgstr "Rom�nia"
+
+#: tlib/tlib/tcountries.c:216
+msgid "Russian Federation"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:217
+msgid "Rwanda"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:218
+msgid "Saint Kitts and Nevis"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:219
+msgid "Saint Lucia"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:220
+msgid "Saint Vincent and The Grenadines"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:221
+msgid "Samoa"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:222
+msgid "San Marino"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:223
+msgid "Sao Tome and Principe"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:224
+msgid "Saudi Arabia"
+msgstr "Ar�bia Saudita"
+
+#: tlib/tlib/tcountries.c:225
+msgid "Senegal"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:226
+msgid "Seychelles"
+msgstr ""
+
+#: tlib/tlib/tcountries.c:227
+msgid "Sierra Leone"
+msgstr "Serra Leoa"
+
+#: tlib/tlib/tcountries.c:228
+msgid "Singapore"
+msgstr "Singapura"
+
+#: tlib/tlib/tcountries.c:229
+msgid "Slovakia (Slovak Republic)"
+msgstr "Eslov�quia"
+
+#: tlib/tlib/tcountries.c:230
+msgid "Slovenia"
+msgstr "Eslov�nia"
+
+#: tlib/tlib/tcountries.c:231
+msgid "Solomon Islands"
+msgstr "Ilhas Salom�o"
+
+#: tlib/tlib/tcountries.c:232
+msgid "Somalia"
+msgstr "Som�lia"
+
+#: tlib/tlib/tcountries.c:233
+msgid "South Africa"
+msgstr "�frica do Sul"
+
+#: tlib/tlib/tcountries.c:234
+msgid "South Georgia and The South Sandwich Islands"
+msgstr "Ilhas Ge�rgia do Sul e Sandwich do Sul"
+
+#: tlib/tlib/tcountries.c:235
+msgid "Spain"
+msgstr "Espanha"
+
+#: tlib/tlib/tcountries.c:236
+msgid "Sri Lanka"
+msgstr "Sri Lanka"
+
+#: tlib/tlib/tcountries.c:237
+msgid "St. Helena"
+msgstr "Saint Helena"
+
+#: tlib/tlib/tcountries.c:238
+msgid "St. Pierre and Miquelon"
+msgstr "Saint Pierre e Miquelon"
+
+#: tlib/tlib/tcountries.c:239
+msgid "Sudan"
+msgstr "Sud�o"
+
+#: tlib/tlib/tcountries.c:240
+msgid "Suriname"
+msgstr "Suriname"
+
+#: tlib/tlib/tcountries.c:241
+msgid "Svalbard and Jan Mayen Islands"
+msgstr "Ilhas Svalbard e Jan Mayen"
+
+#: tlib/tlib/tcountries.c:242
+msgid "Swaziland"
+msgstr "Swaziland"
+
+#: tlib/tlib/tcountries.c:243
+msgid "Sweden"
+msgstr "Su�cia"
+
+#: tlib/tlib/tcountries.c:244
+msgid "Switzerland"
+msgstr "Sui�a"
+
+#: tlib/tlib/tcountries.c:245
+msgid "Syrian Arab Republic"
+msgstr "S�ria, Re�blica �rabe da"
+
+#: tlib/tlib/tcountries.c:246
+msgid "Taiwan"
+msgstr "Taiwan"
+
+#: tlib/tlib/tcountries.c:247
+msgid "Tajikistan"
+msgstr "Tajiquist�o"
+
+#: tlib/tlib/tcountries.c:248
+msgid "Tanzania, United Republic of"
+msgstr "Tanz�nia, Rep�blica Unida da"
+
+#: tlib/tlib/tcountries.c:249
+msgid "Thailand"
+msgstr "Tail�ndia"
+
+#: tlib/tlib/tcountries.c:250
+msgid "Togo"
+msgstr "Togo"
+
+#: tlib/tlib/tcountries.c:251
+msgid "Tokelau"
+msgstr "Tokelau"
+
+#: tlib/tlib/tcountries.c:252
+msgid "Tonga"
+msgstr "Tonga"
+
+#: tlib/tlib/tcountries.c:253
+msgid "Trinidad and Tobago"
+msgstr "Trinidade e Tobago"
+
+#: tlib/tlib/tcountries.c:254
+msgid "Tunisia"
+msgstr "Tun�sia"
+
+#: tlib/tlib/tcountries.c:255
+msgid "Turkey"
+msgstr "Turquia"
+
+#: tlib/tlib/tcountries.c:256
+msgid "Turkmenistan"
+msgstr "Turcomenist�o"
+
+#: tlib/tlib/tcountries.c:257
+msgid "Turks and Caicos Islands"
+msgstr "Ilhas de Turks e Caicos"
+
+#: tlib/tlib/tcountries.c:258
+msgid "Tuvalu"
+msgstr "Tuvalu"
+
+#: tlib/tlib/tcountries.c:259
+msgid "Uganda"
+msgstr "Uganda"
+
+#: tlib/tlib/tcountries.c:260
+msgid "Ukraine"
+msgstr "Ucr�nia"
+
+#: tlib/tlib/tcountries.c:261
+msgid "United Arab Emirates"
+msgstr "Emirados �rabes Unidos"
+
+#: tlib/tlib/tcountries.c:262
+msgid "United Kingdom"
+msgstr "Reino Unido"
+
+#: tlib/tlib/tcountries.c:263
+msgid "United States"
+msgstr "Estados Unidos"
+
+#: tlib/tlib/tcountries.c:264
+msgid "United States Minor Outlying Islands"
+msgstr "Estados Federados da Micron�sia"
+
+#: tlib/tlib/tcountries.c:265
+msgid "Uruguay"
+msgstr "Uruguai"
+
+#: tlib/tlib/tcountries.c:266
+msgid "Uzbekistan"
+msgstr "Usbequist�o"
+
+#: tlib/tlib/tcountries.c:267
+msgid "Vanuatu"
+msgstr "Vanuatu"
+
+#: tlib/tlib/tcountries.c:268
+msgid "Vatican City State (Holy See)"
+msgstr "Estado do Vatic�no"
+
+#: tlib/tlib/tcountries.c:269
+msgid "Venezuela"
+msgstr "Venezu�la"
+
+#: tlib/tlib/tcountries.c:270
+msgid "Viet Nam"
+msgstr "Vietname"
+
+#: tlib/tlib/tcountries.c:271
+msgid "Virgin Islands (British)"
+msgstr "Ilhas Virg�nia (Bret�s)"
+
+#: tlib/tlib/tcountries.c:272
+msgid "Virgin Islands (U.S.)"
+msgstr "Ilhas Virg�nia (E.U.)"
+
+#: tlib/tlib/tcountries.c:273
+msgid "Wallis and Futuna Islands"
+msgstr "Ilhas Wallis e Futuna"
+
+#: tlib/tlib/tcountries.c:274
+msgid "Western Sahara"
+msgstr "Sara Ocidental"
+
+#: tlib/tlib/tcountries.c:275
+msgid "Yemen"
+msgstr "�emen"
+
+#: tlib/tlib/tcountries.c:276
+msgid "Yugoslavia"
+msgstr "Jugosl�via"
+
+#: tlib/tlib/tcountries.c:277
+msgid "Zambia"
+msgstr "Z�mbia"
+
+#: tlib/tlib/tcountries.c:278
+msgid "Zimbabwe"
+msgstr "Zimbabwe"
+
+#. setup GUI
+#: gnome-pppoe/src/pppoe_dialer.c:115 gnome-pppoe/src/pppoe_dialer.c:277
+#: gnome-pppoe/pppoe_dialer.desktop.in.h:2
+msgid "PPPoE Dialer"
+msgstr "Aplica��o de Liga��o PPPoE"
+
+#: gnome-pppoe/src/pppoe_dialer.c:122
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:21
+msgid "Interface:"
+msgstr "Interface:"
+
+#: gnome-pppoe/src/pppoe_dialer.c:184
+#, c-format
+msgid "Cannot find interface <i>%s</i>"
+msgstr "N�o consegui encontrar o interface <i>%s</i>"
+
+#: gnome-pppoe/src/pppoe_dialer.c:185
+msgid "The interface might be plugged off or not correctly configured."
+msgstr ""
+"O interface poder� estar desligado ou n�o est� correctamente configurado."
+
+#. translators: change this string with your name
+#.
+#: gnome-pppoe/src/pppoe_dialer.c:269
+msgid "No translators assigned"
+msgstr "Tradu��o Portuguesa: Tiago Cogumbreiro <cogumbreiro@users.berlios.de>"
+
+#: gnome-pppoe/src/network.c:111
+#, c-format
+msgid ": unable to open AF_INET socket: %s\n"
+msgstr ": n�o � poss�vel abrir a socket AF_INET: %s\n"
+
+#: gnome-pppoe/src/network.c:120
+#, c-format
+msgid ": unable to obtain hardware address: %s\n"
+msgstr ": n�o � poss�vel obter o endere�o de hardware: %s\n"
+
+#: libpppd-gnome/src/ppp_dialer.c:424 libpppd-gnome/src/ppp_dialer.c:474
+msgid "Could not find <i>pppd</i> program"
+msgstr "Porgrama <i>pppd</i> n�o encontrado"
+
+#: libpppd-gnome/src/ppp_dialer.c:434
+msgid "Installation corrupted"
+msgstr "Instala��o corrupta"
+
+#: libpppd-gnome/src/ppp_dialer.c:435
+msgid "Please reinstall GNOME PPX, there are some files missing."
+msgstr "Por favor reinstale GNOME PPX, alguns ficheiros est�o em falta."
+
+#: libpppd-gnome/src/ppp_dialer.c:463
+msgid "Could not get username"
+msgstr "N�o consegui obter o utilizador"
+
+#: libpppd-gnome/src/ppp_dialer.c:464 libpppd-gnome/src/ppp_dialer.c:475
+msgid "There was an error getting the entry from configuration storage."
+msgstr ""
+"Ocurreu um erro ao tentar obter uma entrada da configura��o do sistema."
+
+#: libpppd-gnome/src/ppp_dialer.c:616
+#, c-format
+msgid "You are not root and <i>%s</i> does not have suid bit set."
+msgstr "N�o � root e o programa <i>%s</i> n�o tem a o bit suid definido."
+
+#. PPPoA must have root access
+#: libpppd-gnome/src/ppp_dialer.c:617 gnome-pppoa/src/main.c:32
+msgid "Insuficient privileges"
+msgstr "Previl�gios Insuficientes"
+
+#: libpppd-gnome/src/ppp_progress.c:128
+msgid "Connecting"
+msgstr "A ligar"
+
+#: libpppd-gnome/src/ppp_progress.c:128
+msgid "Establishing connection to server..."
+msgstr "Estabelecendo liga��o ao servidor..."
+
+#: libpppd-gnome/src/ppp_progress.c:154
+msgid "Connected"
+msgstr "Liga��o efectuada"
+
+#: libpppd-gnome/src/ppp_progress.c:156
+msgid "Connection successfull."
+msgstr "Liga��o com sucesso."
+
+#: libpppd-gnome/src/ppp_progress.c:158
+msgid "Connection was already up."
+msgstr "J� estava ligado ao anfitri�o."
+
+#: libpppd-gnome/src/ppp_progress.c:165
+msgid "Details are accessible through the notification icon."
+msgstr "Pode consultar mais detalhes no �cone de notifca��o."
+
+#: libpppd-gnome/src/ppp_progress.c:218
+msgid "Error trying to start connection."
+msgstr "Erro ao iniciar a liga��o."
+
+#: libpppd-gnome/src/ppp_status.c:90
+msgid "Connection Properties"
+msgstr "Propriedades da Liga��o"
+
+#: libpppd-gnome/src/ppp_tray.c:96
+msgid "Connection status"
+msgstr "Estado da liga��o"
+
+#: libpppd-gnome/src/ppp_manager.c:458
+msgid "Connection will not be terminated."
+msgstr "A liga��o n�o vai ser terminada."
+
+#: libpppd-gnome/src/ppp_manager.c:459
+msgid ""
+"Closing the application will only stop monitoring the connection, not "
+"terminate it. You can resume the connection monitoring by restarting this "
+"dialer."
+msgstr ""
+"Fechar a aplica��o apenas vai parar a monitoriza��o da liga��o, n�o vai "
+"disconnect�-la. Pode continuar a monitoriza��o reiniciando a aplica��o."
+
+#: libpppd-gnome/src/ppp_manager.c:486
+msgid "Are you sure you want to terminate the connection?"
+msgstr "Tem a certeza que deseja terminar a liga��o?"
+
+#: gnome-pppoa/src/main.c:32
+msgid "PPPoA dialer requires root privileges to run."
+msgstr ""
+"A aplica��o de liga��o PPPoA precisa de previl�gios de root para correr."
+
+#: gnome-pppoa/src/pppoa_dialer.c:174 gnome-pppoa/src/pppoa_dialer.c:295
+#: gnome-pppoa/pppoa_dialer.desktop.in.h:2
+msgid "PPPoA Dialer"
+msgstr "Aplica��o de Liga��o PPPoA"
+
+#. Country
+#: gnome-pppoa/src/pppoa_dialer.c:182
+msgid "Country:"
+msgstr "Pa�s:"
+
+#. ISP
+#: gnome-pppoa/src/pppoa_dialer.c:191
+msgid "ISP:"
+msgstr "ISP:"
+
+#: gnome-pppoe/pppoe_dialer.desktop.in.h:1
+msgid "GNOME PPX - PPPoE Dialer"
+msgstr "GNOME PPX - Aplica��o de Liga��o PPPoE"
+
+#: gnome-pppoa/pppoa_dialer.desktop.in.h:1
+msgid "GNOME PPX - PPPoA Dialer"
+msgstr "GNOME PPX - Aplica��o de Liga��o PPPoA"
+
+#: gnome-pptp/pptp_dialer.desktop.in.h:1
+msgid "GNOME PPX - PPTP Dialer"
+msgstr "GNOME PPX - Aplica��o de Liga��o PPTP"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:1
+msgid "    "
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:2
+#: libpppd-gnome/glade/ppp_get_password.glade.h:1
+msgid "*"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:3
+msgid "12 Mb"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:4
+msgid "192.168.0.1"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:5
+msgid "20:04:29"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:6
+msgid "255.255.255.0"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:7
+msgid "34 Mb"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:8
+msgid "<b><big>Dialer Name</big></b>"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:9
+msgid ""
+"<b><big>Error trying to start connection</big></b>\n"
+"\n"
+msgstr ""
+"<b><big>Erro ao iniciar a liga��o.</big></b>\n"
+"\n"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:12
+msgid "<b>Network</b>"
+msgstr "<b>Rede</b>"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:13
+msgid "<b>Statistics</b>"
+msgstr "<b>Estat�sticas</b>"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:14
+msgid "Address:"
+msgstr "Endere�o:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:15
+msgid "Connect"
+msgstr "Ligar"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:16
+msgid "Connection Status"
+msgstr "Estado da Liga��o"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:17
+msgid "Connection log"
+msgstr "Hist�rico da liga��o"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:18
+msgid "Disconnects from host"
+msgstr "Desligar do anfitri�o"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:19
+msgid "Duration:"
+msgstr "Dura��o:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:20
+msgid "Error"
+msgstr "Erro"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:22
+msgid "Netmask:"
+msgstr "M�scara:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:23
+msgid "Password:"
+msgstr "Palavra-passe:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:24
+msgid "Recieved:"
+msgstr "Recebido:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:25
+msgid "Remember password"
+msgstr "Guardar a palavra-passe"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:26
+msgid "Sent:"
+msgstr "Enviado:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:27
+msgid "Toggle _Properties"
+msgstr "Mostrar _Propriedades"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:28
+msgid "Toggles connection properties"
+msgstr "Alterna visibilidade das propriedades da liga��o"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:29
+msgid "Username:"
+msgstr "Utilizador:"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:30
+msgid "_Disconnect"
+msgstr "_Desligar"
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:31
+msgid "ppp0"
+msgstr ""
+
+#: libpppd-gnome/glade/libpppd-gnome.glade.h:32
+msgid "window title"
+msgstr "titulo da janela"
+
+#: libpppd-gnome/glade/ppp_get_password.glade.h:2
+msgid "Authentication Required"
+msgstr "� Necess�rio Autotentica��o"
+
+#: libpppd-gnome/glade/ppp_get_password.glade.h:4
+#, no-c-format
+msgid ""
+"Enter the password for user <b>%u</b>\n"
+"on server <b>%s</b>"
+msgstr ""
+"Introduza a palavra-passe do utilizador <b>%u</b>\n"
+"no servidor <b>%s</b>"
+
+#~ msgid "PPPoAtm Dialer"
+#~ msgstr "Aplica��o de Liga��o PPPoAtm"
+
+#, fuzzy
+#~ msgid ""
+#~ "<b><big>Connected</big></b>\n"
+#~ "\n"
+#~ "Connection was already up.\n"
+#~ "Details are accessible through the notification icon."
+#~ msgstr ""
+#~ "A "
+#~ "ligaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o jÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¡ "
+#~ "existe.\n"
+#~ "Pode consultar mais detalhes no "
+#~ "ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ­cone do "
+#~ "painel."
+
+#~ msgid ""
+#~ "<b><big>Connected</big></b>\n"
+#~ "\n"
+#~ "Connection successfull."
+#~ msgstr ""
+#~ "<b><big>Ligado</big></b>\n"
+#~ "\n"
+#~ "LigaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o efectuada com sucesso."
+
+#~ msgid ""
+#~ "<b><big>Connected</big></b>\n"
+#~ "\n"
+#~ "Connection was already up."
+#~ msgstr ""
+#~ "<b><big>Ligado</big></b>\n"
+#~ "\n"
+#~ "JÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¡ estava "
+#~ "ligado."
+
+#, fuzzy
+#~ msgid ""
+#~ "Are you sure you want to close the application? It will only stop "
+#~ "monitoring it."
+#~ msgstr ""
+#~ "<b><big>A "
+#~ "ligaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o "
+#~ "nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o "
+#~ "irÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¡ "
+#~ "terminar.</big></b>\n"
+#~ "\n"
+#~ "Tem a certeza que deseja fechar a "
+#~ "aplicaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o?\n"
+#~ "Apenas "
+#~ "deixarÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¡ "
+#~ "de ter acesso ao monitor."
+
+#~ msgid "GNOME PPTP"
+#~ msgstr "GNOME PPTP"
+
+#~ msgid "GNOME PPPoE"
+#~ msgstr "GNOME PPPoE"
+
+#, fuzzy
+#~ msgid "GNOME PPPoAtm"
+#~ msgstr "GNOME PPPOA"
+
+#~ msgid "Vpi.Vci:"
+#~ msgstr "Vpi.Vci:"
+
+#~ msgid "No ethernet device specified."
+#~ msgstr ""
+#~ "NÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o foi especificado um dispositivo Ethernet."
+
+#~ msgid ""
+#~ "<span weight=\"bold\" size=\"larger\">Connected</span>\n"
+#~ "\n"
+#~ "After you  close this window a tray monitor will appear."
+#~ msgstr ""
+#~ "<span weight=\"bold\" size=\"larger\">Ligado</span>\n"
+#~ "\n"
+#~ "ApÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ³s "
+#~ "fechar esta janela, um "
+#~ "ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ­"
+#~ "cone "
+#~ "serÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¡ "
+#~ "colocado no seu painel."
+
+#~ msgid "_Show Window"
+#~ msgstr "_Mostrar Janela"
+
+#~ msgid "application title"
+#~ msgstr ""
+#~ "titulo da "
+#~ "aplicaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o"
+
+#~ msgid ""
+#~ "<b><big>Error changing configuration details.</big></b>\n"
+#~ "\n"
+#~ "%s"
+#~ msgstr ""
+#~ "<b><big>Erro ao alterar a "
+#~ "configuraÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o.</big></b>\n"
+#~ "\n"
+#~ "%s"
+
+#~ msgid ""
+#~ "<b><big>Program <i>%s</i> was not found in your system.</big></b>\n"
+#~ "\n"
+#~ "Please consult GNOME PPPoE Dialer manual for further info."
+#~ msgstr ""
+#~ "<b><big>O programa <i>%s</i> "
+#~ "nÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o foi encontrado no seu sistema.</big></b>\n"
+#~ "\n"
+#~ "Por favor consulte o manual para obter mais "
+#~ "informaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂµes."
+
+#~ msgid "PPPOA Dialer"
+#~ msgstr ""
+#~ "AplicaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o de "
+#~ "LigaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ�"
+#~ "�o PPPOA"
+
+#~ msgid "Enter the password for user <b>%s</b> on server <b>%s</b>"
+#~ msgstr ""
+#~ "Introduza a password para o utilizador <b>%s</b> no servidor <b>%s</b>"
+
+#~ msgid "Enter the account password%s%s"
+#~ msgstr "Introduza a password da conta%s%s"
+
+#~ msgid "Enter the password for server <b>%s%s</b>"
+#~ msgstr "Introduza a password do servidor <b>%s%s</b>"
+
+#~ msgid "Enter the password for user <b>%s%s</b>"
+#~ msgstr "Introduza a password do utilizador <b>%s%s</b>"
+
+#~ msgid "could not write to file descriptor\n"
+#~ msgstr "no foi possvel escrever para o ficheiro\n"
+
+#~ msgid "Expecting 3 arguments."
+#~ msgstr "Preciso de 3 parmetros."
+
+#~ msgid "Environment variables not set."
+#~ msgstr "As variveis de ambiente no esto definidas."

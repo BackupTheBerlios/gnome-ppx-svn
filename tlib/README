@@ -1,0 +1,8 @@
+tlib is a number of general utility modules for aiding Gtk+/GNOME programming.
+It includes:
+
+ - Macros for handling GError's
+ - Refbag, a memory manager
+ - TrayIcon a straightforward general tray icon
+ - A utility for handling programs in gconf
+ - A module for adding validation to glade UI's
