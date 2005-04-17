@@ -1,0 +1,28 @@
+Summary of changes from gnome-ppx 0.6 to 0.7
+===============================================
+<cogumbreiro@users.sf.net>
+	* Dialers check if suid is set, also ask for root pass if user has libgnomesu.
+	* The pppd output appears in the dialog when connection fails
+	* Dialers now bail out and refuses to dial if ppp_get_password is not available.
+	* Minor changes in core API
+
+Summary of changes from gnome-ppx 0.5 to 0.6
+===============================================
+<cogumbreiro@users.sf.net>
+	* Made all dialogs HIG compliant
+	* Corrected versioning on about dialogs and versioning in window titles
+	* PPPoE dialer now does not start with invalid interfaces
+	* Added the interface name in the status dialog
+	* Rewrote code completely, new classes: 
+		- ppp::Progress
+		- ppp::Manager
+		- ppp::Tray
+		- ppp::Status
+		- ppp::StateListener
+	* Refactoring created a new module: tlib which is an utilities module
+	* A new PPPoA dialer which actually works
+	* Corrected some translatable messages
+	* Fixed all compiler warning messages
+	* Corrected launcher locations, now they belong to system tools, instead of internet.
+	* Corrected PPTP laucher typo
+	* Changed all nomenclature to <type> Dialer, instead of GNOME <type>

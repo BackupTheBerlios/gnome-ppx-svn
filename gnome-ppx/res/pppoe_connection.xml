@@ -1,0 +1,4 @@
+<class name="Connection" namespace="Pppoe">
+	<property name="dialer" type="PppoeDialer*" ref="gobject"/>
+	<method name="get_dialog" type="GtkWidget*"/>
+</class>

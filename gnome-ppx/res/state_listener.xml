@@ -1,0 +1,7 @@
+<class name="state_listener" namespace="Util" interface="true">
+	<method name="on_state_changed" type="void">
+		<param name="origin" type="gpointer"/>
+		<param name="state_id" type="gint"/>
+		<param name="data" type="gpointer"/>
+	</method>
+</class>

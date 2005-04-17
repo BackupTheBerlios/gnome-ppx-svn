@@ -1,0 +1,58 @@
+
+[executer]
+RunInTerminal=true
+
+[Project State]
+clean before build=false
+
+[filenumbers]
+0=97
+1=45
+2=48
+3=11
+4=55
+5=17
+6=14
+7=240
+8=417
+9=16
+10=17
+11=18
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+5=
+6=
+7=
+8=
+9=
+10=
+11=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[filelist]
+0=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tmodule.c
+1=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tmodule.h
+2=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tsu-gksu.c
+3=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tsu-gnomesu.c
+4=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tsu.c
+5=/home/tiago/Projects/svn/gnome-ppx/tlib/tlib/tsu.h
+6=/home/tiago/Projects/svn/gnome-ppx/TODO
+
+[Project Tree]
+0=0
+1=0:0
+2=0:1
+3=0:2
+4=0:3
+
+[File Tree]
+0=0

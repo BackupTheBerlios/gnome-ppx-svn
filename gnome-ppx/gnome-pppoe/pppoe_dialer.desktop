@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=PPPoE Dialer
+Name[pt_PT]=Aplicação de Ligação PPPoE
+Comment=GNOME PPX - PPPoE Dialer
+Comment[pt_PT]=GNOME PPX - Aplicação de Ligação PPPoE
+Exec=pppoe_dialer
+Icon=network-config.png
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Application;System;Dialup;GNOME;

@@ -1,0 +1,110 @@
+<address_book version="1.0">
+	<country code="pt">
+		<isp name="PT (Sapo, Adsl.pt)">
+			<vpi>0</vpi>
+			<vci>35</vci>
+		</isp>
+		<isp name="Via Networks">
+			<vpi>0</vpi>
+			<vci>35</vci>
+		</isp>
+		<isp name="Oninet">
+			<vpi>0</vpi>
+			<vci>35</vci>
+		</isp>
+	</country>
+	
+	<country code="fr">
+		<isp name="Wanadoo">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+		<isp name="FT">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+		<isp name="Free dégroupé">
+			<vpi>8</vpi>
+			<vci>36</vci>
+		</isp>
+	</country>
+	
+	<country code="fi">
+		<isp name="Sonera">
+			<vpi>0</vpi>
+			<vci>100</vci>
+		</isp>
+	</country>
+	
+	<country code="be">
+		<isp name="Belgacom">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+	</country>
+	
+	<country code="de">
+		<isp name="DT">
+			<vpi>1</vpi>
+			<vci>32</vci>
+		</isp>
+	</country>
+
+	<country code="hu">
+		<isp name="Matav">
+			<vpi>1</vpi>
+			<vci>32</vci>
+		</isp>
+	</country>
+
+	<country code="it">
+		<isp name="Telecom Italia">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+	</country>
+
+	<country code="nl">
+		<isp name="KPN">
+			<vpi>8</vpi>
+			<vci>48</vci>
+		</isp>
+	</country>
+
+	<country code="pl">
+		<isp name="NETIA">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+		<isp name="TPSA">
+			<vpi>0</vpi>
+			<vci>35</vci>
+		</isp>
+	</country>
+
+	<country code="es">
+		<isp name="Retevision">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+
+		<isp name="Telefonica">
+			<vpi>8</vpi>
+			<vci>32</vci>
+		</isp>
+	</country>
+
+	<country code="se">
+		<isp name="Telia">
+			<vpi>8</vpi>
+			<vci>35</vci>
+		</isp>
+	</country>
+
+	<country code="gb">
+		<isp name="BT">
+			<vpi>0</vpi>
+			<vci>38</vci>
+		</isp>
+	</country>
+</address_book>

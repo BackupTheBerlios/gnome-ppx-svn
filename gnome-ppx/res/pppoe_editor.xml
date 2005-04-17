@@ -1,0 +1,5 @@
+<class name="Editor" namespace="Pppoe">
+	<extends><class name="Widget" type="Bin"/></extends>
+
+	<property name="account" type="PppoeAccount*" ref="gobject"/>
+</class>

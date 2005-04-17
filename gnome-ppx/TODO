@@ -1,0 +1,55 @@
+
+* change directories from gnome-pppoe to pppoe-dialer
+
+* ppp_get_password: brush it up
+
+* make pppdfe more glib'ish, removing the src dir and renaming it to pppdfe
+
+* merge lipppd-gnome and libpppd modules into pppdfe (pppd front end library)
+
+* tmodule: make the lookup for libraries better.
+
+----> 0.7 release
+
+----> release that needs PPTP beta tester
+
+* pptp: on forum, there was somthing about connection successuflly done but
+  pptp_dialer saying it didn't.
+  
+* pptp: something about routing, need more info about this one
+
+* pptp: make msppe an option
+
+* pptp: specify the type of encryption
+
+----> 0.7 release
+
+* make pppoa possible to be run from user, despit it must be run as root.
+
+* make a program for putting suid on pppd, pppoe and pptp.
+
+* pppoe: Humanize interface names
+ethtool -i <eth0> to grab the <bus-info>
+lspci -s <bus-info> -> pretty name
+uses lib/pci.h:pci_filter_parse_slot() and sends the <bus-info> there.
+
+Get nas? mac address and probe for speedtouch's pseudo-mac.
+on /proc/bus/usb/devices we have:
+SerialNumber=0090D0511E00
+And:
+nas0      Link encap:Ethernet  HWaddr 00:90:D0:51:1E:00
+So there you go, we can get bot of them.
+
+----> 0.8 release
+
+* Create a GNOME PPX wizzard.
+
+* Add support for multiple accounts.
+
+* add docs
+
+* ppp_dialer: add a message layer, with a warning icon, maybe blinking
+  explaining the user why the connect button is insensitive, intead of
+  poping off dialogs when user presses connect button
+  
+----> 1.0 release!

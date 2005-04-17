@@ -1,0 +1,12 @@
+<class name="state_listener_impl" namespace="Util">
+	<implements>
+		<interface name="state_listener" namespace="util"/>
+	</implements>
+
+	<method name="on_state_changed" type="void">
+		<param name="origin" type="gpointer"/>
+		<param name="state_id" type="gint"/>
+		<param name="data" type="gpointer"/>
+		<extended name="state_listener" namespace="util"/>
+	</method>
+</class>

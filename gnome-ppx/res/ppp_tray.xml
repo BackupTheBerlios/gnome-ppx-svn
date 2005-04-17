@@ -1,0 +1,36 @@
+<class name="tray" namespace="ppp">
+	<extends>
+		<class name="tray_icon" namespace="basic"/>
+	</extends>
+	<property name="glade_file" type="String"/>
+	<implements>
+		<interface name="state_listener" namespace="ppp"/>
+	</implements>
+
+	<method name="on_idle" type="void">
+		<param name="origin" type="GObject*"/>
+		<extended name="state_listener" namespace="ppp"/>
+	</method>
+	
+	<method name="on_connecting" type="void">
+		<param name="origin" type="GObject*"/>
+		<extended name="state_listener" namespace="ppp"/>
+	</method>
+
+	<method name="on_startup" type="void">
+		<param name="origin" type="GObject*"/>
+		<extended name="state_listener" namespace="ppp"/>
+	</method>
+
+	<method name="on_connected" type="void">
+		<param name="origin" type="GObject*"/>
+		<param name="new_connection" type="gboolean"/>
+		<extended name="state_listener" namespace="ppp"/>
+	</method>
+
+	<method name="on_tray_usage" type="void">
+		<param name="origin" type="GObject*"/>
+		<param name="use_tray" type="gboolean"/>
+		<extended name="state_listener" namespace="ppp"/>
+	</method>
+</class>
