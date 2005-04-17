@@ -306,7 +306,7 @@ class HigProgress (gtk.Window):
 		if not self.cancel_button.get_property ("sensitive"):
 			return True
 		# click on the cancel button
-		self.cancel_button.do_clicked ()
+		self.cancel_button.clicked ()
 		# let the clicked event close the window if it likes too
 		return True
 		

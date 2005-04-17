@@ -182,6 +182,8 @@ class OperationsQueue (MeasurableOperation, OperationListener):
 		assert self.can_stop, "Check if the operation can be stopped first."
 		self.__curr_oper.stop ()
 	
+	__len__ = lambda self: len (self.__operations)
+	
 class MapFunctor (object):
 	def __init__ (self, funcs):
 		self.__funcs = funcs

@@ -65,9 +65,10 @@ class RecordingMedia (MeasurableOperation, OperationsQueueListener):
 		self.__can_start = False
 		self.__prog.show ()
 		if self.preferences.drive.get_media_type () == nautilusburn.MEDIA_TYPE_CDRW:
-			gtkutil.dialog_warn ("CD-RW disk will be erased",
-			                      "Please remove your disk if you want to preserve it's contents.",
-			                      self.__prog)
+			gtkutil.dialog_warn ("CD-RW disc will be erased",
+			                     "Please remove your disc if you want to "\
+			                     "preserve it's contents.",
+			                     self.__prog)
 		self.__blocked = False
 		self.preferences.pool.temporary_dir = self.preferences.temporary_dir
 		oper = FetchMusicList(self.__music_list, self.preferences.pool)
@@ -153,6 +154,8 @@ class RecordMusicList (MeasurableOperation):
 	preferences = property (lambda self: self.__preferences)
 	
 	def start (self):
+		# TODO: Compare media size with music list duration
+		# If it's bigger then current eject media and ask for another one
 		self.__running = True
 		tracks = []
 		for m in self.music_list:

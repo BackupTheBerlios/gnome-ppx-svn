@@ -32,54 +32,133 @@ from preferences import RecordingPreferences
 from operations import MapProxy, OperationListener
 import constants
 
-try:
-	import services, dbus
-except ImportError:
-	services = None
+from plugins import plugins
 
 class SerpentineError (StandardError): pass
 
-class Serpentine (gtk.Window, OperationListener):
-	def __init__ (self, data_dir = None):
-		if services:
-			bus = dbus.SessionBus ()
-			dbus_srv = bus.get_service ("org.freedesktop.DBus")
-			dbus_obj = dbus_srv.get_object ("/org/freedesktop/DBus", "org.freedesktop.DBus")
-			if services.SERVICE_NAME in dbus_obj.ListServices ():
-				raise SerpentineError("Serpentine is already running.")
+class SerpentineCacheError (SerpentineError):
+	INVALID = 1
+	NO_SPACE = 2
+	def __init__ (self, args):
+		self.__error_id, self.__error_message = args
+	
+	error_id = property (lambda self: self.__error_id)
+	error_message = property (lambda self: self.__error_message)
+	
+	def __str__ (self):
+		return "[Error %d] %s" % (self.error_id, self.error_message)
+
+class SerpentineApplication (operations.Operation):
+	"""When no operations are left in SerpentineApplication it will exit.
+	An operation can be writing the files to cd or showing the main window.
+	This enables us to close the main window and continue showing the progress
+	dialog. This object should be simple enough for D-Bus export.
+	"""
+	def __init__ (self):
+		operations.Operation.__init__ (self)
+		self.__preferences = RecordingPreferences ()
+		self.__window = SerpentineWindow (self)
+		self.__window.listeners.append (self)
+		# Load Plugins
+		self.__plugins = []
+		for plug in plugins:
+			# TODO: Do not add plugins that throw exceptions calling this method
+			self.__plugins.append (plugins[plug].create_plugin (self))
+		self.__operations = []
+
+	window_widget = property (lambda self: self.__window)
+	
+	operations = property (lambda self: self.__operations)
+	
+	preferences = property (lambda self: self.__preferences)
+	
+	music_list = property (lambda self: self.__window.music_list)
+	
+	can_stop = property (lambda self: len (self.operations) == 0)
+	
+	# The window is only none when the operation has finished
+	can_start = property (lambda self: self.__window is not None)
+	
+	# TODO: decouple the window from SerpentineApplication ?
+	def show_window (self):
+		# Starts the window operation
+		self.__window.start ()
+		self.operations.append (self.__window)
+	
+	def close_window (self):
+		# Stops the window operation
+		if self.__window.running:
+			self.__window.stop ()
+	
+	def on_finished (self, event):
+		# We listen to operations we contain, when they are finished we remove them
+		self.operations.remove (event.source)
+		if self.can_stop:
+			self.stop ()
+		
+	def stop (self):
+		assert self.can_stop, "Check if you can stop the operation first."
+		self.preferences.save_playlist (self.music_list)
+		self.preferences.pool.clear()
+		# Warn listeners
+		evt = operations.FinishedEvent (self, operations.SUCCESSFUL)
+		for listener in self.listeners:
+			listener.on_finished (evt)
 			
-			# Start the service since it isn't available
-			self.__service = dbus.Service (services.SERVICE_NAME, bus=bus)
-			self.__application = services.Application (self.__service, self)
-				
-		self.__recording = []
-		self.__initialized = False
+		# Clean window object
+		self.__window.destroy ()
+		del self.__window
+		self.__window = None
+		
+		# Cleanup plugins
+		del self.__plugins
+	
+	def write_files (self):
+		# TODO: we should add a confirmation dialog
+		r = RecordingMedia (self.music_list, self.preferences, self.__window)
+		# Add this operation to the recording
+		self.operations.append (r)
+		r.listeners.append (self)
+		r.start()
+	
+	# TODO: should these be moved to MusicList object?
+	# TODO: have a better definition of a MusicList
+	def add_hints_filter (self, location_filter):
+		self.__window.music_list_widget.add_hints_filter (location_filter)
+		
+	def remove_hints_filter (self, location_filter):
+		self.__window.music_list_widget.remove_hints_filter (location_filter)
+		
+class SerpentineWindow (gtk.Window, OperationListener, operations.Operation):
+	# TODO: finish up implementing an Operation
+	def __init__ (self, application):
 		gtk.Window.__init__ (self, gtk.WINDOW_TOPLEVEL)
+		operations.Operation.__init__ (self)
+		self.__application = application
+		self.__masterer = AudioMastering ()
+		# Variable related to this being an Operation
+		self.__running = False
+		self.connect ("show", self.__on_show)
+		# We listen for GtkMusicList events
+		self.music_list_widget.listeners.append (self)
 
-		if data_dir is None:
-			data_dir = constants.data_dir
-		self.preferences = RecordingPreferences (data_dir)
-		self.preferences.dialog.set_transient_for (self)
-		self.masterer = AudioMastering (self.preferences)
-		self.masterer.listeners.append (self)
-
-		glade_file = os.path.join (data_dir, "serpentine.glade")
+		glade_file = os.path.join (constants.data_dir, "serpentine.glade")
 		g = gtk.glade.XML (glade_file, "main_window_container")
 		self.add (g.get_widget ("main_window_container"))
 		self.set_title ("Serpentine")
 		self.set_default_size (450, 350)
 		
 		# Add a file button
-		g.get_widget ("add").connect ("clicked", self.add_file)
-		g.get_widget ("add_mni").connect ("activate", self.add_file)
+		g.get_widget ("add").connect ("clicked", self.__on_add_file)
+		g.get_widget ("add_mni").connect ("activate", self.__on_add_file)
 		
 		# record button
-		g.get_widget("burn").connect ("clicked", self.burn)
+		g.get_widget("burn").connect ("clicked", self.__on_write_files)
 		
 		# masterer widget
 		box = self.get_child()
-		self.masterer.show()
-		box.add (self.masterer)
+		self.music_list_widget.show()
+		box.add (self.music_list_widget)
 		
 		# preferences
 		g.get_widget ("preferences_mni").connect ('activate', self.__on_preferences)
@@ -88,13 +167,13 @@ class Serpentine (gtk.Window, OperationListener):
 		self.remove = MapProxy ({'menu': g.get_widget ("remove_mni"),
 		                         'button': g.get_widget ("remove")})
 
-		self.remove["menu"].connect ("activate", self.remove_file)
-		self.remove["button"].connect ("clicked", self.remove_file)
+		self.remove["menu"].connect ("activate", self.__on_remove_file)
+		self.remove["button"].connect ("clicked", self.__on_remove_file)
 		self.remove.set_sensitive (False)
 		
 		# setup record button
-		self.burn = g.get_widget ("burn")
-		self.burn.set_sensitive (False)
+		self.__on_write_files = g.get_widget ("burn")
+		self.__on_write_files.set_sensitive (False)
 		
 		# setup clear buttons
 		self.clear = MapProxy ({'menu': g.get_widget ("clear_mni"),
@@ -104,8 +183,8 @@ class Serpentine (gtk.Window, OperationListener):
 		self.clear.set_sensitive (False)
 		
 		# setup quit menu item
-		g.get_widget ("quit_mni").connect ('activate', self.quit)
-		self.connect("delete-event", self.quit)
+		g.get_widget ("quit_mni").connect ('activate', self.stop)
+		self.connect("delete-event", self.stop)
 		
 		# About dialog
 		g.get_widget ("about_mni").connect ('activate', self.__on_about)
@@ -118,149 +197,125 @@ class Serpentine (gtk.Window, OperationListener):
 		# update buttons
 		self.on_contents_changed()
 		
-		if self.preferences.drive is None:
+		if self.__application.preferences.drive is None:
 			gtkutil.dialog_warn ("No recording drive found", "No recording drive found on your system, therefore some of Serpentine's functionalities will be disabled.", self)
 			g.get_widget ("preferences_mni").set_sensitive (False)
-			self.burn.set_sensitive (False)
-		self.__load_playlist()
+			self.__on_write_files.set_sensitive (False)
 	
-	recording = property (lambda self: self.__recording)
+		# Load internal XSPF playlist
+		self.__load_playlist()
+		
+	music_list_widget = property (lambda self: self.__masterer)
+	
+	music_list = property (lambda self: self.__masterer.music_list)
+	
+	can_start = property (lambda self: True)
+	# TODO: handle the can_stop property better
+	can_stop = property (lambda self: True)
 	
 	def __on_show (self, *args):
-		if self.__initialized:
-			return
-		self.set_sensitive(True)
-		gobject.idle_add (self.__load_playlist)
-		self.__initialized = True
+		self.__running = True
 	
 	def __load_playlist (self):
+		#TODO: move it to SerpentineApplication ?
+		"""Private method for loading the internal playlist."""
 		try:
-			self.preferences.load_playlist (self.masterer.source)
+			self.__application.preferences.load_playlist (self.music_list_widget.source)
 		except ExpatError:
 			pass
 		except IOError:
 			pass
 			
-			
-	def burn (self, *args):
-		if not self.preferences.temporary_dir_is_ok():
-			gtkutil.dialog_warn ("Cache directory location unavailable",
-			                     "Please check if the cache location exists and has writable permissions.",
-			                     self)
-			self.__on_preferences ()
-			return
-			
-		# Check if we have space available in our cache dir
-		secs = 0
-		for music in self.masterer.source:
-			if not self.preferences.pool.is_available (music["location"]):
-				secs += music['duration']
-		# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
-		size_needed = secs * 176400L
-		try:
-			s = os.statvfs (self.preferences.temporary_dir)
-		except OSError:
-			gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", self)
-			self.__on_preferences ()
-			return
-			
-		size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
-		if (size_avail - size_needed) < 0:
-			
-			gtkutil.dialog_error ("Not enough space on cache directory",
-				"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % (self.__hig_bytes(size_needed - size_avail)), self)
-			return
-	
-		if self.masterer.source.total_duration > self.masterer.disk_size:
-			title = "Do you want to overburn your disk?"
-			msg = "You are about to record a media disk in overburn mode." + " " + \
-			      "This may not work on all drives and shouldn't give you more then a couple of minutes."
-			btn = "Overburn Disk"
-			self.preferences.overburn = True
-		else:
-			title = "Do you want to record your musics?"
-			msg = "You are about to record a media disk." + " " + \
-			      "Canceling a writing operation will make your disk unusable."
-			btn = "Record Disk"
-			self.preferences.overburn = False
-		
-		if gtkutil.dialog_ok_cancel (title, msg, self, btn) != gtk.RESPONSE_OK:
-			return
-		r = RecordingMedia (self.masterer.source, self.preferences, self)
-		
-		r.start()
-		r.listeners.append (self)
-		self.burn.set_sensitive (False)
-		dev = r.drive.get_device ()
-		assert dev not in self.__recording
-		self.__recording.append (dev)
-		
-	def quit (self, *args):
-		if self.recording:
-			gtkutil.dialog_warn ("Stop recording first", "Serpentine can only exit if you cancel the recording operation first.", self)
-			return True
-		self.preferences.save_playlist (self.masterer.source)
-		self.preferences.pool.clear()
-		gtk.main_quit()
-		sys.exit (0)
-		
 	def on_selection_changed (self, *args):
-		self.remove.set_sensitive (self.masterer.count_selected() > 0)
+		self.remove.set_sensitive (self.music_list_widget.count_selected() > 0)
 		
 	def on_contents_changed (self, *args):
-		is_sensitive = len(self.masterer.source) > 0
+		is_sensitive = len(self.music_list_widget.source) > 0
 		self.clear.set_sensitive (is_sensitive)
 		# Only set it sentitive if the drive is available and is not recording
-		if self.preferences.drive is not None and not self.recording:
-			self.burn.set_sensitive (is_sensitive)
+		if self.__application.preferences.drive is not None:
+			self.__on_write_files.set_sensitive (is_sensitive)
 
-	def remove_file (self, *args):
-		self.masterer.remove_selected()
+	def __on_remove_file (self, *args):
+		self.music_list_widget.remove_selected()
 		
 	def clear_files (self, *args):
-		self.masterer.source.clear()
+		self.music_list_widget.source.clear()
 		
-	def add_file (self, *args):
+	def __on_add_file (self, *args):
+		# Triggered by add button
 		if self.__add_file.run () == gtk.RESPONSE_OK:
 			files = self.__add_file.get_uris()
 			hints_list = []
 			for uri in files:
 				hints_list.append({'location': uri})
-			self.masterer.add_files (hints_list)
+			self.music_list_widget.add_files (hints_list)
 		self.__add_file.unselect_all()
 		self.__add_file.hide()
 	
 	def __on_preferences (self, *args):
-		self.preferences.dialog.run ()
-		self.preferences.dialog.hide ()
+		# Triggered by preferences menu item
+		self.__application.preferences.dialog.run ()
+		self.__application.preferences.dialog.hide ()
 	
 	def __on_about (self, widget, *args):
+		# Triggered by the about menu item
 		a = gtk.AboutDialog ()
 		a.set_name ("Serpentine")
-		a.set_version (self.preferences.version)
+		a.set_version (self.__application.preferences.version)
 		a.set_website ("http://s1x.homelinux.net/projects/serpentine")
 		a.set_copyright ("2004-2005 Tiago Cogumbreiro")
 		a.set_transient_for (self)
 		a.run ()
 		a.hide()
 	
-	def __on_about_closed (self, about, widget):
-		widget.set_sensitive (True)
-	
-	# This method is associated with the listener to the recording operation
-	def on_finished (self, event):
-		dev = event.source.drive.get_device ()
-		assert dev in self.__recording, (dev, self.__recording)
-		self.__recording.remove (dev)
-		self.on_contents_changed ()
+	def __on_write_files (self, *args):
+		# TODO: move this to SerpentineApplication.write_files ?
+		try:
+			# Try to validate music list
+			validate_music_list (self.music_list_widget.source, self.__application.preferences)
+		except SerpentineCacheError, err:
+			show_prefs = False
+			
+			if err.error_id == SerpentineCacheError.INVALID:
+				title = "Cache directory location unavailable"
+				show_prefs = True
+				
+			elif err.error_id == SerpentineCacheError.NO_SPACE:
+				title = "Not enough space on cache directory"
+			
+			gtkutil.dialog_warn (title, err.error_message)
+			return
 
-class CacheError (StandardError):
-	CACHE_INVALID = 1
-	CACHE_NO_SPACE = 2
-	def __init__ (self, error):
-		self.__error_id = error
+		# TODO: move this to recording module?
+		if self.music_list_widget.source.total_duration > self.music_list_widget.disc_size:
+			title = "Do you want to overburn your disc?"
+			msg = "You are about to record a media disc in overburn mode. " \
+			      "This may not work on all drives and shouldn't give you " \
+			      "more then a couple of minutes."
+			btn = "Overburn Disk"
+			self.__application.preferences.overburn = True
+		else:
+			title = "Do you want to record your musics?"
+			msg = "You are about to record a media disc. " \
+			      "Canceling a writing operation will make your disc unusable."
+			btn = "Record Disk"
+			self.__application.preferences.overburn = False
+		
+		if gtkutil.dialog_ok_cancel (title, msg, self, btn) != gtk.RESPONSE_OK:
+			return
+		
+		self.__application.write_files ()
 	
-	error_id = property (lambda self: self.__error_id)
+	# Start is the same as showing a window, we do it every time
+	start = gtk.Window.show
+
+	def stop (self, *args):
+		evt = operations.FinishedEvent (self, operations.SUCCESSFUL)
+		for listener in self.listeners:
+			listener.on_finished (evt)
+		self.hide ()
+	
 
 def __hig_bytes (bytes):
 	hig_desc = [("GByte", "GBytes"),
@@ -290,42 +345,35 @@ def __plural (value, strings):
 	else:
 		return strings[1]
 
-def record_musiclist (musiclist, parent = None, preferences = None):
-	clear_pool_on_exit = False
-	if preferences is None:
-		preferences = RecordingPreferences (DATA_DIR)
-		clear_pool_on_exit = True
-		
-	if not preferences.temporary_dir_is_ok():
-		gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", parent)
-		raise CacheError
-		
+def validate_music_list (music_list, preferences):
 	# Check if we have space available in our cache dir
 	secs = 0
-	for music in musiclist:
+	for music in music_list:
+		# When music is not available it will have to be converted
 		if not preferences.pool.is_available (music["location"]):
-			secs += music['duration']
+			secs += music["duration"]
 	# 44100hz * 16bit * 2channels / 8bits = 176400 bytes per sec
 	size_needed = secs * 176400L
+	
+	# Now check if cache location is ok
 	try:
 		s = os.statvfs (preferences.temporary_dir)
-	except OSError:
-		gtkutil.dialog_warn ("Cache directory location unavailable", "Please check if the cache location exists and has writable permissions.", parent)
-		raise CacheError
-		
+		# Raise exception if temporary dir is not ok
+		assert preferences.temporary_dir_is_ok
+	except OSError, AssertionError:
+		raise SerpentineCacheError (SerpentineCacheError.INVALID, "Please "    \
+		                            "check if the cache location exists and "  \
+		                            "has writable permissions.")
+	
 	size_avail = s[statvfs.F_BAVAIL] * long(s[statvfs.F_BSIZE])
 	if (size_avail - size_needed) < 0:
-		
-		gtkutil.dialog_error ("Not enough space on cache directory",
-			"Remove some music tracks or make sure your cache location location has enough free space (about %s)." % __hig_bytes(size_needed - size_avail) , parent)
-		raise CacheError
-	
-	r = RecordingMedia (musiclist, preferences, parent)
-	r.start()
-	if clear_pool_on_exit:
-		preferences.pool.clear()
+		raise SerpentineCacheError (SerpentineCacheError.NO_SPACE, "Remove "   \
+		                            "some music tracks or make sure your "     \
+		                            "cache location location has enough free " \
+		                            "space (about %s)." \
+		                            % __hig_bytes(size_needed - size_avail))
 
-gobject.type_register (Serpentine)
+gobject.type_register (SerpentineWindow)
 
 if __name__ == '__main__':
 	s = Serpentine ()

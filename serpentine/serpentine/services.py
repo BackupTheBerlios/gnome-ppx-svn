@@ -16,84 +16,100 @@
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
-import dbus, os.path, os, time
-from subprocess import Popen
-import constants
-SERVICE_NAME = "de.berlios.Serpentine"
-DOMAIN = "/de/berlios/Serpentine"
+import dbus, nautilusburn
 
-class Application (dbus.Object):
-	"""Provides services for Serpentine itself."""
+import mastering
+SERVICE_DOMAIN = "de.berlios.Serpentine"
+OBJECT_DOMAIN = "/de/berlios/Serpentine"
+
+
+class Manager (dbus.Object):
+	"""Provides services for Serpentine. It launches all needed services.
+	It registers the de.berlios.Serpentine.Manager, 
+	de.berlios.Serpentine.Playlist and de.berlios.Serpentine.Recorder
+	interfaces.
+	"""
 	def __init__ (self, service, serpentine_object):
-		dbus.Object.__init__ (self, DOMAIN + "/Application", service, [
+		dbus.Object.__init__ (self,
+		                      OBJECT_DOMAIN + "/Manager",
+		                      service, [
 			self.Quit,
-			self.Record,
-			self.GetFiles
+			self.RecordPlaylist
 		])
 		self.__serp = serpentine_object
-		self.__pid = None
+		# Register the Playlist
+		self.__playlist = Playlist (OBJECT_DOMAIN + "/Playlist", self.serpentine.masterer.source)
+		self.__update_drives ()
+	
+	def __update_drives (self):
+		self.__drives = {}
+		for dev in nautilusburn.get_drives_list (True):
+			device = dev.get_device ()
+			self.__drives[device] = Recorder (serpentine_object, device)
 	
 	serpentine = property (lambda self: self.__serp)
+	playlist = property (lambda self: self.__playlist)
 	
 	def Quit (self, message):
 		self.serpentine.quit ()
 	
-	def Record (self, message):
+	def RecordPlaylist (self, message):
 		self.serpentine.burn ()
 	
-	def GetFiles (self, message):
-		filenames = []
-		for music in self.serpentine.masterer:
-			filenames.append (music['location'])
-		return filenames
+
+class Playlist (dbus.Object):
+	"""Represents the serpentine storage."""
+	def __init__ (self, domain, service, music_list):
+		dbus.Object.__init__ (self,
+		                      domain,
+		                      service, [
+			self.Clear,
+			self.Remove,
+			self.Add
+		])
+		self.__music_list = music_list
+		
+	music_list = property (lambda self: self.__music_list)
 	
-	def GetFileTitle (self, message, location):
-		for music in self.serpentine.masterer:
-			if music['location'] == location:
-				return music['title']
-		return None
-	
-	def GetFileArtist (self, message, location):
-		for music in self.serpentine.masterer:
-			if music['location'] == location:
-				return music['artist']
-		return None
-	
-	def RecordFiles (self, message, files):
-		pass
-	
+	def Clear (self, message):
+		self.music_list.clear ()
+		
+	def Remove (self, message, music):
+		for music in self.music_list:
+			if music['location'] == music:
+				music_list.remove (music)
+				return
+
+	def Add (self, message, music):
+		hints = {"location": music}
+		add_oper = mastering.AddFile (self.music_list, hints)
+		# TODO: add a listener and a signal event for this
+		add_oper.start ()
 
 
-def __start_service (bus):
-	"""Private function for starting the Serpentine service"""
-	# First we try to find out if the service has already started
-	dbus_srv = bus.get_service ("org.freedesktop.DBus")
-	dbus_obj = dbus_srv.get_object ("/org/freedesktop/DBus", "org.freedesktop.DBus")
-	if SERVICE_NAME not in dbus_obj.ListServices ():
-		proc = Popen ([os.path.join (constants.bin_dir, "serpentine-service")])
-		print "Launching serpentine-service daemon."
-		while SERVICE_NAME not in dbus_obj.ListServices ():
-			# Check if process is still alive
-			# TODO catch OSError
-			os.kill (proc.pid, 0)
-			time.sleep (0.1)
-		print "Serpentine service started with pid", proc.pid
-			
-
-def __get_dbus_object (name, domain, service_name):
-	"""Private helper function to return objects with a certain standard."""
-	bus = dbus.SessionBus()
-	__start_service (bus)
-	service = bus.get_service (service_name)
-	return service.get_object ("%s/%s" % (domain, name), "%s.%s" % (service_name, name))
-
-def get_drives_manager ():
-	"""Returns the drives manager, which takes care of Drives' allocation and
-	deallocation, providing a way for serpentine to be aware of exclusivity of
-	drives."""
-	return __get_dbus_object ("DrivesManager", DOMAIN, SERVICE_NAME)
+class AudioRecorder (dbus.Object):
+	"""Represents a recorder that can write audio tracks directly."""
+	def __init__ (self, domain, device):
+		if device.startswith ("/"):
+			name = device[1:].replacewith ("/", ".")
+		
+		dbus.Object.__init__ (self,
+		                      domain + "/" + name,
+		                      "de.berlios.Serpentine.AudioRecorder", [
+			self.WriteFiles,
+			self.IsRecording,
+			self.GetDevice
+		])
+		
+		self.__device = device
 	
-def get_application ():
-	"""Provides an interface to access common used methods of serpentine."""
-	return __get_dbus_object ("Application", DOMAIN, SERVICE_NAME)
-
+	device = property (lambda self: self.__device)
+	
+	def WriteFiles (self, message, files):
+		return "There is no multiple drives preference yet."
+		
+	def IsRecording (self, message):
+		return self.device in self.serpentine.recording
+	
+	def GetDevice (self, message):
+		return self.device

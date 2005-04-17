@@ -16,22 +16,14 @@
 #
 # Authors: Tiago Cogumbreiro <cogumbreiro@users.sf.net>
 
-import gtk, gtk.glade, gobject, os.path, urllib
+import gtk, gtk.glade, gobject, os.path, urllib, gnomevfs
 from xml.dom import minidom
 from types import IntType, TupleType
 from urlparse import urlparse, urlunparse
 
-import operations, audio
+import operations, audio, xspf, constants, gtkutil
 from gtkutil import DictStore
-import gtkutil
-import gnomevfs
 from operations import OperationsQueue
-import xspf
-try:
-	from totem import plparser
-except ImportError:
-	print "No playlist parsers found!"
-	plparser = None
 
 ################################################################################
 # Operations used on AudioMastering
@@ -88,10 +80,10 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 	
 	running = property (lambda self: False)
 
-	def __init__ (self, masterer, hints, insert = None):
+	def __init__ (self, music_list, hints, insert = None):
 		operations.Operation.__init__ (self)
 		self.hints = hints
-		self.masterer = masterer
+		self.music_list = music_list
 		self.insert = insert
 	
 	def start (self):
@@ -119,10 +111,10 @@ class AddFile (audio.AudioMetadataListener, operations.Operation):
 		if self.hints.has_key ('artist'):
 			row['artist'] = self.hints['artist']
 				
-		if self.insert != None:
-			self.masterer.source.insert (self.insert, row)
+		if self.insert is not None:
+			self.music_list.insert (self.insert, row)
 		else:
-			self.masterer.source.append (row)
+			self.music_list.append (row)
 		
 	
 	def on_finished (self, evt):
@@ -337,12 +329,36 @@ class AudioMasteringMusicListener (MusicListListener):
 	def on_musics_removed (self, e, rows):
 		self.__master.update_disc_usage()
 
+class HintsFilter (object):
+	__priority = 0
+	
+	def priority (self, value):
+		assert isinstance (value, int)
+		self.__priority = value
+		
+	priority = property (lambda self: self.__priority, priority, doc="Represents " \
+	"the parser priority, a higher value will give it precedence over " \
+	"filters lower filters.")
+	
+	def filter_location (self, location):
+		"""Returns a list of dictionaries of hints of a given location.
+		The 'location' field is obligatory.
+		
+		For example if your filter parses a directory it should return a list
+		of hints of each encountered file.
+		"""
+		raise NotImplementedError
+	
+	def __cmp__ (self, value):
+		assert isinstance (value, HintsFilter)
+		return self.priority - value.priority
+
 class AudioMastering (gtk.VBox, operations.Listenable):
 	SIZE_74 = 0
 	SIZE_80 = 1
 	SIZE_90 = 2
 
-	disk_sizes = [74 * 60, 80 * 60, 90 * 60]
+	disc_sizes = [74 * 60, 80 * 60, 90 * 60]
 	
 	DND_TARGETS = [
 		('SERPENTINE_ROW', gtk.TARGET_SAME_WIDGET, 0),
@@ -350,20 +366,35 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		('text/plain', 0, 2),
 		('STRING', 0, 3),
 	]
-	def __init__ (self, preferences):
+	def __init__ (self):
 		gtk.VBox.__init__ (self)
 		operations.Listenable.__init__ (self)
-		self.__disk_size = 74 * 60
+		self.__disc_size = 74 * 60
 		self.update = True
 		self.source = GtkMusicList ()
 		self.source.listeners.append (AudioMasteringMusicListener(self))
 		gtk.VBox.__init__ (self)
-		g = gtk.glade.XML (os.path.join (preferences.data_dir, "serpentine.glade"),
+		g = gtk.glade.XML (os.path.join (constants.data_dir, "serpentine.glade"),
 		                   "audio_container")
 		self.add (g.get_widget ("audio_container"))
 		self.__setup_track_list (g)
 		self.__setup_container_misc (g)
+		# Filters
+		self.__filters = []
+	
+	def __set_disc_size (self, size):
+		assert size in AudioMastering.disc_sizes
+		self.__disc_size = size
+		self.__size_list.set_active (AudioMastering.disc_sizes.index(size))
+		self.update_disc_usage()
 
+	music_list = property (lambda self: self.source)
+	disc_size = property (
+			lambda self: self.__disc_size,
+			__set_disc_size,
+			doc = "Represents the disc size, in seconds.")
+	
+	disc_size_widget = property (lambda self: self.__size_list)
 	
 	def __setup_container_misc (self, g):
 		self.__size_list = g.get_widget ("size_list")
@@ -421,7 +452,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		renderer.set_property ('text', index + 1)
 	
 	def __on_size_changed (self, *args):
-		self.disk_size = AudioMastering.disk_sizes[self.__size_list.get_active()]
+		self.disc_size = AudioMastering.disc_sizes[self.__size_list.get_active()]
 	
 	def __on_title_edited (self, cell, path, new_text, user_data = None):
 		self.source[path]["title"] = new_text
@@ -479,20 +510,9 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			line = line.strip()
 			if len (line) < 1:
 				continue
-			try:
-				nfo = gnomevfs.get_file_info (line)
-				if nfo.type == gnomevfs.FILE_TYPE_DIRECTORY:
-					pass
-					# Handle directory importing
-				else:
-					hint = {'location': line}
-					hints_list.append (hint)
-					
-				del nfo
 				
-			except gnomevfs.NotFoundError, e:
-				print "file not found"
-				return
+			hint = {'location': line}
+			hints_list.append (hint)
 		self.add_files (hints_list, insert)
 	
 	def __on_dnd_send (self, widget, context, selection, target_type, timestamp):
@@ -515,18 +535,18 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def update_disc_usage (self):
 		if not self.update:
 			return
-		if self.source.total_duration > self.disk_size:
+		if self.source.total_duration > self.disc_size:
 			self.__usage_bar.set_fraction (1)
 			self.__capacity_exceeded.show ()
 		else:
-			self.__usage_bar.set_fraction (self.source.total_duration / float (self.disk_size))
+			self.__usage_bar.set_fraction (self.source.total_duration / float (self.disc_size))
 			self.__capacity_exceeded.hide ()
 		# Flush events so progressbar redrawing gets done
 		while gtk.events_pending():
 			gtk.main_iteration(True)
 		
 		if self.source.total_duration > 0:
-			dur = "%s remaining"  % self.__hig_duration (self.__disk_size - self.source.total_duration)
+			dur = "%s remaining"  % self.__hig_duration (self.__disc_size - self.source.total_duration)
 		else:
 			dur = "Empty"
 		
@@ -540,18 +560,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		e = operations.Event (self)
 		for l in self.listeners:
 			l.on_selection_changed (e)
-	
-	def __set_disk_size (self, size):
-		assert size in AudioMastering.disk_sizes
-		self.__disk_size = size
-		self.__size_list.set_active (AudioMastering.disk_sizes.index(size))
-		self.update_disc_usage()
-		
-	disk_size = property (
-			lambda self: self.__disk_size,
-			__set_disk_size,
-			doc = "Represents the disc size, in seconds.")
-	
+
 	def add_file (self, hints):
 		w = gtkutil.get_root_parent (self)
 		assert isinstance(w, gtk.Window)
@@ -561,60 +570,20 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			return
 			
 		trapper = ErrorTrapper (w)
-		a = AddFile (self, hints)
+		a = AddFile (self.source, hints)
 		queue = OperationsQueue()
 		queue.abort_on_failure = False
 		queue.append (a)
 		queue.append (trapper)
 		queue.start()
 	
-	def __add_totemplaylist (self, uri):
-		try:
-			mime = gnomevfs.get_mime_type (uri)
-		except RuntimeError:
-			return None
-		if mime == "audio/x-mpegurl" or mime == "audio/x-scpls":
-			hints_list = []
-			p = plparser.Parser()
-			p.connect("entry", self.__on_pl_entry, hints_list)
-			p.parse(uri, False)
-			return hints_list
+	def __filter_location (self, location):
+		for loc_filter in self.__filters:
+			hints = loc_filter.filter_location (location)
+			if hints is not None:
+				return hints
 		return None
 		
-	# Add a no op when we don't have a paylist parser
-	if plparser is None:
-		__add_totemplaylist = lambda self, uri: None
-		
-	def __add_playlist (self, uri):
-		try:
-			mime = gnomevfs.get_mime_type (uri)
-		except RuntimeError:
-			return None
-		if mime == "text/xml":
-			if not os.path.exists (uri):
-				s = urlparse (uri)
-				scheme = s[0]
-				# TODO: handle more urls
-				if scheme == 'file':
-					uri = urllib.unquote (s[2])
-				else:
-					return None
-			hints_list = []
-			p = xspf.Playlist()
-			p.parse (uri)
-			for t in p.tracks:
-				if t.location is None:
-					continue
-				r = {'location': t.location}
-				if t.title is not None:
-					r['title'] = t.title
-				if t.creator is not None:
-					r['artist'] = t.creator
-				hints_list.append (r)
-			return hints_list
-
-		return self.__add_totemplaylist (uri)
-			
 	def add_files (self, hints_list, insert = None):
 		assert insert is None or isinstance (insert, IntType)
 		# Lock graphical updating on each request and
@@ -627,9 +596,9 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 		queue.abort_on_failure = False
 		queue.append (SetGraphicalUpdate (self, False))
 		i = 0
-			
+
 		for h in hints_list:
-			pls = self.__add_playlist (h['location'])
+			pls = self.__filter_location (h['location'])
 			if pls is not None:
 				self.add_files(pls, insert)
 				continue
@@ -637,7 +606,7 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 			ins = insert
 			if insert != None:
 				ins += i
-			a = AddFile (self, h, ins)
+			a = AddFile (self.source, h, ins)
 			a.listeners.append (trapper)
 			queue.append (a)
 			i += 1
@@ -660,6 +629,13 @@ class AudioMastering (gtk.VBox, operations.Listenable):
 	def count_selected (self):
 		return self.__selection.count_selected_rows()
 	
+	def add_hints_filter (self, location_filter):
+		self.__filters.append (location_filter)
+		# Sort filters priority
+		self.__filters.sort ()
+	
+	def remove_hints_filter (self, location_filter):
+		self.__filters.remove (location_filter)
 	
 if __name__ == '__main__':
 	import sys, os

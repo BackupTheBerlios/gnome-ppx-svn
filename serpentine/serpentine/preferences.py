@@ -20,8 +20,10 @@ import gtk.glade, nautilusburn, gtk, gobject, os, os.path, gconf, gtk.gdk, urlli
 from xml.dom import minidom
 from urlparse import urlparse
 
+import gaw, xspf, constants
 from converting import GvfsMusicPool
-import gaw, xspf
+
+# For testing purposes we try to import it
 try:
 	import release
 except Exception:
@@ -30,10 +32,9 @@ except Exception:
 gconf.client_get_default ().add_dir ("/apps/serpentine", gconf.CLIENT_PRELOAD_NONE)
 
 class RecordingPreferences (object):
-	def __init__ (self, data_dir):
+	def __init__ (self):
 		# By default use burnproof
 		self.__write_flags = nautilusburn.RECORDER_WRITE_BURNPROOF
-		self.data_dir = data_dir
 		# Sets up data dir and version
 		if release:
 			self.version = release.version
@@ -41,7 +42,7 @@ class RecordingPreferences (object):
 			self.version = "testing"
 		
 		# setup ui
-		g = gtk.glade.XML (os.path.join(self.data_dir, 'serpentine.glade'),
+		g = gtk.glade.XML (os.path.join(constants.data_dir, 'serpentine.glade'),
 		                   'preferences_dialog')
 		self.__dialog = g.get_widget ("preferences_dialog")
 		self.dialog.connect ('destroy-event', self.__on_destroy)
@@ -50,8 +51,11 @@ class RecordingPreferences (object):
 		drv = g.get_widget ("drive")
 		cmb_drv = nautilusburn.DriveSelection ()
 		cmb_drv.show ()
+		cmb_drv.connect ("device-changed", self.__on_drive_changed)
+		
 		self.__drive_selection = cmb_drv
 		drv.pack_start (cmb_drv, False, False)
+		self.__drive_listeners = []
 		
 		# Speed selection
 		self.__speed = gaw.data_spin_button (g.get_widget ("speed"),
@@ -131,13 +135,21 @@ class RecordingPreferences (object):
 		
 	version = property (lambda self: self.__version, __set_version)
 	
-	def __set_data_dir (self, data_dir):
-		assert isinstance (data_dir, str)
-		self.__data_dir = data_dir
-		
-	data_dir = property (lambda self: self.__data_dir, __set_data_dir)
-	
 	drive = property (lambda self: self.__drive_selection.get_drive())
+	
+	drive_listeners = property (lambda self: self.__drive_listeners, 
+	doc = """"Drive listeners should register a callback function which is 
+	called when the drive is changed. This can be done in the following form:
+	
+	prefs = Preferences ()
+	
+	def on_changed (event, drive):
+		global prefs
+		print "Object holder:", event.source, \
+			"changed to the following drive:", drive
+		assert event.source = prefs
+	prefs.drive_listeners.append (on_changed)
+	""")
 	
 	def temporary_dir (self):
 		tmp = self.__tmp.data
@@ -172,6 +184,7 @@ class RecordingPreferences (object):
 		
 	write_flags = property (__get_write_flags)
 	
+	# Read only variable
 	def temporary_dir_is_ok (self):
 		tmp = self.temporary_dir
 		# Try to open the local file
@@ -181,6 +194,9 @@ class RecordingPreferences (object):
 			print err
 			is_ok = False
 		return is_ok
+	temporary_dir_is_ok = property (temporary_dir_is_ok,
+	                                doc="Tests if temporary directory exists " \
+	                                "and has write permissions.")
 	
 	def __on_tmp_choose (self, *args):
 		if self.__tmp_dlg.run () == gtk.RESPONSE_OK:
@@ -219,4 +235,8 @@ class RecordingPreferences (object):
 		p = xspf.Playlist (title="Serpentine's playlist", creator="Serpentine " + self.version)
 		p.parse (os.path.join (self.config_dir, "playlist.xml"))
 		source.from_playlist (p)
-		
+	
+	def __on_drive_changed (self, device):
+		event = operations.Event (self)
+		for listener in self.drive_listeners:
+			listener (event, self.drive)

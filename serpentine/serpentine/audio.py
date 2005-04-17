@@ -24,20 +24,22 @@ retrieve a their metadata.
 
 import gst, gobject
 import operations
-THREADS_BROKEN = True
+
 ################################################################################
 
 class GstOperation (operations.MeasurableOperation):
-	def __init__ (self, query_element = None):
+	def __init__ (self, query_element = None, pipeline = None):
 		operations.MeasurableOperation.__init__ (self)
 		self.__element = query_element
 		self.__can_start = True
 		self.__running = False
+		
 		# create a new bin to hold the elements
-		if THREADS_BROKEN:
-			self.__bin = gst.Pipeline()
+		if pipeline is None:
+			self.__bin = gst.Pipeline ()
 		else:
-			self.__bin = gst.Thread()
+			self.__bin = pipeline 
+			
 		self.__source = None
 		self.__bin.connect ('error', self.__on_error)
 		self.__bin.connect ('eos', self.__on_eos)
@@ -74,50 +76,40 @@ class GstOperation (operations.MeasurableOperation):
 		self.__bin.set_state (gst.STATE_PLAYING)
 		self.__can_start = False
 		self.__running = True
-		if THREADS_BROKEN:
-			self.__source = gobject.idle_add (self.bin.iterate)
-			
-		
+		self.__source = gobject.idle_add (self.bin.iterate)
 	
 	def __on_eos (self, element, user_data = None):
-		if THREADS_BROKEN:
-			self.__finalize ()
-			evt = operations.FinishedEvent (self, operations.SUCCESSFUL)
-			for l in self.listeners:
-				assert isinstance (l, operations.OperationListener), l
-				l.on_finished (evt)
-		else:
-			gobject.idle_add (self.__finalize, None)
+		self.__finalize ()
+		evt = operations.FinishedEvent (self, operations.SUCCESSFUL)
+		for l in self.listeners:
+			assert isinstance (l, operations.OperationListener), l
+			l.on_finished (evt)
 	
 	def __on_error (self, pipeline, element, error, user_data = None):
-		if THREADS_BROKEN:
-			# Do not continue processing it
-			if self.__source:
-				gobject.source_remove (self.__source)
-			self.__finalize ()
-			evt = operations.FinishedEvent (self, operations.ERROR)
-			evt.error = error
-			for l in self.listeners:
-				l.on_finished (evt)
-		else:
-			gobject.idle_add (self.__finalize)
-	
+		# Do not continue processing it
+		if self.__source:
+			gobject.source_remove (self.__source)
+		self.__finalize ()
+		evt = operations.FinishedEvent (self, operations.ERROR)
+		evt.error = error
+		for l in self.listeners:
+			l.on_finished (evt)
+
 	def __finalize (self):
 		self.__bin.set_state (gst.STATE_NULL)
 		self.__source = None
 		self.__running = False
 	
 	def stop (self):
-		if THREADS_BROKEN:
-			# After this it's dead
-			gobject.source_remove (self.__source)
-			# Finish the event
-			evt = operations.FinishedEvent(self, operations.ABORTED)
-			for l in self.listeners:
-				l.on_finished (evt)
-		else:
-			raise NotImplementedError, "TODO"
-			self.__on_eos (self, None)
+		if self.__source is None:
+			return
+		# After this it's dead
+		gobject.source_remove (self.__source)
+		self.__source = None
+		# Finish the event
+		evt = operations.FinishedEvent(self, operations.ABORTED)
+		for l in self.listeners:
+			l.on_finished (evt)
 
 ################################################################################
 
@@ -141,46 +133,35 @@ class AudioMetadataEvent (operations.Event):
 class AudioMetadata (operations.Operation, operations.OperationListener):
 	"""
 	Returns the metadata associated with the source element.
+	
+	To retrieve the metadata associated with a certain media file on gst-launch:
+	source ! decodebin ! fakesink
 	"""
 	
 	def __init__ (self, source):
 		operations.Operation.__init__ (self)
 		self.__can_start = True
-
-		self.__oper = GstOperation()
+		bin = gst.parse_launch ("decodebin ! fakesink")
+		                        
+		self.__oper = GstOperation(pipeline = bin)
 		self.__oper.listeners.append (self)
 		
-		# source ! typefind ! spider ! fakesink
 		self.__metadata = {}
 		self.__error = None
 		
-		bin = self.__oper.bin
 		bin.connect ("found-tag", self.__on_found_tag)
 		
-		# 1. source
+		# Last element of the bin is the sinks
+		sink = bin.get_list ()[-1]
+		sink.set_property ("signal-handoffs", True)
+		# handoffs are called when it processes one chunk of data
+		sink.connect ("handoff", self.__on_handoff)
+		self.__oper.element = sink
+		
+		# connect source to the first element on the pipeline
+		source.link (bin.get_list ()[0])
 		bin.add (source)
 		
-		
-		# typefind helps find more tags
-		typefind = gst.element_factory_make ("typefind")
-		bin.add (typefind)
-		source.link (typefind)
-		
-		# 2. decoder
-		decoder = gst.element_factory_make ("spider")
-		bin.add (decoder)
-		typefind.link (decoder)
-		
-		# 4. fakesink
-		sink = gst.element_factory_make ("fakesink")
-		self.__oper.element = sink
-		sink.set_property ('signal-handoffs', True)
-		# handoffs are called when it processes one chunk of data
-		sink.connect ('handoff', self.__on_handoff)
-		bin.add (sink)
-		filtercaps = gst.Caps("audio/x-raw-int")
-		decoder.link_filtered (sink, filtercaps)
-		del filtercaps
 	
 	can_start = property (lambda self: self.__can_start)
 	
@@ -196,7 +177,7 @@ class AudioMetadata (operations.Operation, operations.OperationListener):
 		success = event.id == operations.ABORTED
 		if success:
 			# We've completed the operation successfully
-			self.__metadata['duration'] = self.__oper.element.query(gst.QUERY_TOTAL, gst.FORMAT_TIME) / gst.SECOND
+			self.__metadata["duration"] = self.__oper.element.query(gst.QUERY_TOTAL, gst.FORMAT_TIME) / gst.SECOND
 			evt = operations.Event (self)
 			
 			for l in self.listeners:
@@ -253,22 +234,19 @@ except:
 def source_to_wav (source, sink):
 	"""
 	Converts a given source element to wav format and sends it to sink element.
+	
+	To convert a media file to a wav using gst-launch:
+	source ! decodebin ! audioconvert ! audioscale ! wavenc ! sink
 	"""
-	oper = GstOperation(sink)
+	bin = gst.parse_launch ("decodebin ! audioconvert ! audioscale ! wavenc")
+	oper = GstOperation(sink, bin)
 	
-	# typefind helps find more tags
-	typefind = gst.element_factory_make ("typefind")
-	decoder = gst.element_factory_make ("spider")
-	encoder = gst.element_factory_make ("wavenc")
+	elements = bin.get_list ()
+	decoder = elements[0]
+	encoder = elements[-1]
 	
-	oper.bin.add_many (source, typefind, decoder, encoder, sink)
-	# source ! typefind ! decoder
-	gst.element_link_many (source, typefind, decoder)
-	# Make sure we are having raw output from the encoder
-	filtercaps = gst.Caps ("audio/x-raw-int")
-	# decoder ! encoder
-	decoder.link_filtered (encoder, filtercaps)
-	# encoder ! sink
+	oper.bin.add_many (source, sink)
+	source.link (decoder)
 	encoder.link (sink)
 	
 	return oper
@@ -315,8 +293,8 @@ if __name__ == '__main__':
 			gst.main_quit()
 	
 	l = L()
-	#f = file_to_wav (sys.argv[1], sys.argv[2])
-	f = file_audio_metadata (sys.argv[1])
+	f = file_to_wav (sys.argv[1], sys.argv[2])
+	#f = file_audio_metadata (sys.argv[1])
 	f.listeners.append (l)
 	f.start()
 	l.finished = False
